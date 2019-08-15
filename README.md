@@ -1,7 +1,39 @@
-# **Trust Token API Explainer**
+# Trust Token API Explainer
 
 This document is an explainer for a potential future web platform API that allows propagating trust across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Motivation](#motivation)
+- [Overview](#overview)
+- [Potential API](#potential-api)
+  - [Trust Token Issuance](#trust-token-issuance)
+  - [Trust Token Redemption](#trust-token-redemption)
+  - [Forwarding Redemption Attestation](#forwarding-redemption-attestation)
+  - [Extension: Trust-Bound Keypair and Request Signing](#extension-trust-bound-keypair-and-request-signing)
+  - [Extension: Private Metadata](#extension-private-metadata)
+- [Privacy Considerations](#privacy-considerations)
+  - [Privacy Guarantee: Issuer Blinding](#privacy-guarantee-issuer-blinding)
+    - [Key Consistency](#key-consistency)
+    - [Potential Attack: Side Channel Fingerprinting](#potential-attack-side-channel-fingerprinting)
+  - [Cross site Information Transfer](#cross-site-information-transfer)
+    - [Mitigation: Dynamic Issuance / Redemption Limits](#mitigation-dynamic-issuance--redemption-limits)
+    - [Mitigation: Allowed/Blocked Issuer Lists](#mitigation-allowedblocked-issuer-lists)
+    - [Mitigation: Per-Site Issuer Limits](#mitigation-per-site-issuer-limits)
+  - [First Party Tracking Potential](#first-party-tracking-potential)
+- [Security Considerations](#security-considerations)
+  - [Trust Token Exhaustion](#trust-token-exhaustion)
+  - [Double-Spend Prevention](#double-spend-prevention)
+- [Future Extensions](#future-extensions)
+  - [Publicly Verifiable Tokens](#publicly-verifiable-tokens)
+  - [Request mechanism not based on `fetch()`](#request-mechanism-not-based-on-fetch)
+  - [Optimizing redemption RTT](#optimizing-redemption-rtt)
+- [Appendix](#appendix)
+  - [Sample API Usage](#sample-api-usage)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Motivation
 
@@ -156,12 +188,12 @@ This small change opens up a new application for Privacy Passes: embedding small
 The privacy of the protocol relies on the issuer being unable to correlate its issuances on one site with redemptions occurred on another site. That way, the issuer gives out N tokens each to M users, and later receives up to N*M requests for redemption on various sites. The issuer can't correlate those redemption requests to any user identity (unless M = 1); it learns only aggregate information about which sites users visit.
 
 
-#### **Key Consistency**
+#### Key Consistency
 
 If the server uses different values for their private keys for different clients, they can de-anonymize clients at redemption time and break the blinding guarantee. To mitigate this, the [Privacy Pass](https://privacypass.github.io) protocol should ensure that issuers publish a public key commitment list, verifies it is small (e.g. max 3 keys), and verifies consistency between issuance and redemption.
 
 
-#### **Potential Attack: Side Channel Fingerprinting**
+#### Potential Attack: Side Channel Fingerprinting
 
 If the issuer is able to use network-level fingerprinting or other side-channels to associate a browser at redemption time with the same browser at token issuance time, privacy is lost. Importantly, the API itself has not revealed any new information, since sites could use the same technique by issuing GET requests to the issuer in the two separate contexts anyway.
 
@@ -171,17 +203,17 @@ If the issuer is able to use network-level fingerprinting or other side-channels
 Trust tokens transfer information about one first-party cookie to another, and we have cryptographic guarantees that each token only contains a small amount of information. Still, if we allow many token redemptions on a single page, the first-party cookie for user U on domain A can be encoded in the trust token information channel and decoded on domain B, allowing domain B to learn the user's domain A cookie until either 1p cookie is cleared.
 
 
-#### **Mitigation: Dynamic Issuance / Redemption Limits**
+#### Mitigation: Dynamic Issuance / Redemption Limits
 
 To mitigate this attack, we place limits on both issuance and redemption. At issuance, we require [user activation](https://html.spec.whatwg.org/multipage/interaction.html#activation) with the issuing site. At redemption, we can slow down the rate of redemption by returning cached Signed Redemption Records when an issuer attempts too many refreshes (see also the [token exhaustion](#trust-token-exhaustion) problem). These mitigations should make the attack take a longer time and require many user visits to recover a full user ID.
 
 
-#### **Mitigation: Allowed/Blocked Issuer Lists**
+#### Mitigation: Allowed/Blocked Issuer Lists
 
 To prevent abuse of the API, browsers could maintain a list of allowed or disallowed issuers. Inclusion in the list should be easy, but should mean agreeing to certain policies about what an issuer is allowed to do. An analog to this is the [baseline requirements](https://cabforum.org/baseline-requirements/) in the CA ecosystem.
 
 
-#### **Mitigation: Per-Site Issuer Limits**
+#### Mitigation: Per-Site Issuer Limits
 
 The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per origin (e.g. 2), and those contacted should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits.
 
