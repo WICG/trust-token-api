@@ -87,7 +87,7 @@ getTrustAttestation([issuer], {refresh-policy: {use-cached, refresh}).then(...)
 ```
 
 
-If there are no tokens available for the given issuer, the returned promise rejects with with an error. Otherwise, it  invokes the Privacy Pass redemption protocol for an issuer, and send the token to the issuer. The result of this protocol is an object called a Signed Redemption Record (SRR):
+If there are no tokens available for the given issuer, the returned promise rejects with with an error. Otherwise, it  invokes the Privacy Pass redemption protocol for an issuer, and sends the token to the issuer. The result of this protocol is an object called a Signed Redemption Record (SRR):
 
 
 ```
