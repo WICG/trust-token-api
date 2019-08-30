@@ -15,7 +15,7 @@ This document is an explainer for a potential future web platform API that allow
   - [Extension: Trust-Bound Keypair and Request Signing](#extension-trust-bound-keypair-and-request-signing)
   - [Extension: Private Metadata](#extension-private-metadata)
 - [Privacy Considerations](#privacy-considerations)
-  - [Privacy Guarantee: Issuer Blinding](#privacy-guarantee-issuer-blinding)
+  - [Cryptographic Property: Unlinkability](#cryptographic-property-unlinkability)
     - [Key Consistency](#key-consistency)
     - [Potential Attack: Side Channel Fingerprinting](#potential-attack-side-channel-fingerprinting)
   - [Cross site Information Transfer](#cross-site-information-transfer)
@@ -183,14 +183,17 @@ This small change opens up a new application for Privacy Passes: embedding small
 ## Privacy Considerations
 
 
-### Privacy Guarantee: Issuer Blinding
+### Cryptographic Property: Unlinkability
 
-The privacy of the protocol relies on the issuer being unable to correlate its issuances on one site with redemptions occurred on another site. That way, the issuer gives out N tokens each to M users, and later receives up to N*M requests for redemption on various sites. The issuer can't correlate those redemption requests to any user identity (unless M = 1); it learns only aggregate information about which sites users visit.
+In Privacy Pass, tokens have an unlinkability property: token issuance cannot be linked to token redemption.
 
+The privacy of this API relies on that fact: the issuer is unable to correlate its issuances on one site with redemptions occurred on another site. If the issuer gives out N tokens each to M users, and later receives up to N*M requests for redemption on various sites, the issuer can't correlate those redemption requests to any user identity (unless M = 1). It learns only aggregate information about which sites users visit.
+
+However, there are a couple of finer points that need to be considered to ensure the underlying protocol remains private.
 
 #### Key Consistency
 
-If the server uses different values for their private keys for different clients, they can de-anonymize clients at redemption time and break the blinding guarantee. To mitigate this, the [Privacy Pass](https://privacypass.github.io) protocol should ensure that issuers publish a public key commitment list, verifies it is small (e.g. max 3 keys), and verifies consistency between issuance and redemption.
+If the server uses different values for their private keys for different clients, they can de-anonymize clients at redemption time and break the unlinkability property. To mitigate this, the [Privacy Pass](https://privacypass.github.io) protocol should ensure that issuers publish a public key commitment list, verifies it is small (e.g. max 3 keys), and verifies consistency between issuance and redemption.
 
 
 #### Potential Attack: Side Channel Fingerprinting
@@ -259,7 +262,7 @@ Issuers can verify that each token is seen only once, because every redemption i
 
 The tokens used in the above design require private key verification, necessitating a roundtrip to the issuer at redemption time for token verification and SRR generation. Here, the unlinkability of a client’s tokens relies on the assumption that the client and issuer can communicate anonymously (i.e. the issuer cannot link issuance and redemption requests from the same user via a side channel like network fingerprint).
 
-An alternative design that avoids this assumption is to instead use _publicly verifiable_ tokens (i.e. tokens that can be verified by any party). It is possible to instantiate these tokens using blind signatures as well, achieving the [same unlinkability properties](#privacy-guarantee-issuer-blinding) of the existing design. These tokens can be spent without a round trip to the issuer, but it requires either decentralized double spend protection, or round trips to a centralized double-spend aggregator.
+An alternative design that avoids this assumption is to instead use _publicly verifiable_ tokens (i.e. tokens that can be verified by any party). It is possible to instantiate these tokens using blind signatures as well, achieving the [same unlinkability properties](#cryptographic-property-unlinkability) of the existing design. These tokens can be spent without a round trip to the issuer, but it requires either decentralized double spend protection, or round trips to a centralized double-spend aggregator.
 
 
 ### Request mechanism not based on `fetch()`
