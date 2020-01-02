@@ -18,7 +18,7 @@ This document is an explainer for a potential future web platform API that allow
   - [Cryptographic Property: Unlinkability](#cryptographic-property-unlinkability)
     - [Key Consistency](#key-consistency)
     - [Potential Attack: Side Channel Fingerprinting](#potential-attack-side-channel-fingerprinting)
-  - [Cross site Information Transfer](#cross-site-information-transfer)
+  - [Cross-site Information Transfer](#cross-site-information-transfer)
     - [Mitigation: Dynamic Issuance / Redemption Limits](#mitigation-dynamic-issuance--redemption-limits)
     - [Mitigation: Allowed/Blocked Issuer Lists](#mitigation-allowedblocked-issuer-lists)
     - [Mitigation: Per-Site Issuer Limits](#mitigation-per-site-issuer-limits)
@@ -83,7 +83,7 @@ When the user is browsing another site (publisher.com), that site (or issuer.com
 
 
 ```
-getTrustAttestation([issuer], {refresh-policy: {use-cached, refresh}).then(...)
+getTrustAttestation(<issuer>, {refresh-policy: {use-cached, refresh}).then(...)
 ```
 
 
@@ -94,6 +94,7 @@ If there are no tokens available for the given issuer, the returned promise reje
 {
   Redemption timestamp,
   top level origin (publisher.com),
+  optional expiry timestamp,
   signature of the above verifiable by well-known public key of the issuer
 }
 ```
@@ -101,7 +102,7 @@ If there are no tokens available for the given issuer, the returned promise reje
 
 The SRR is HTTP-only and Javascript is only able to access/send the SRR via these APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party.
 
-To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached SRRs from that issuer. An iframe with the issuer origin can refresh the SRR by setting a `refresh-policy` to get a new record and refresh the trust attestation.
+To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached SRRs from that issuer. (When an SRR expires, it's as if it no longer exists; in particular, expired SRRs are not "cached" from the perspective of subsequent redemptions.) An iframe with the issuer origin can refresh the SRR by setting a `refresh-policy` to get a new record and refresh the trust attestation.
 
 
 ### Forwarding Redemption Attestation
@@ -112,7 +113,7 @@ Signed Redemption Records are only accessible via a new option to the Fetch API:
 ```
 fetch(<resource-url>, {
   ...
-  signedRedemptionRecord: [issuer],
+  signedRedemptionRecord: <issuer>,
   ...
 });
 ```
@@ -133,8 +134,8 @@ An additional parameter to the Fetch API then allows the browser to include a si
 ```
 fetch(<resource-url>, {
   ...
-  signedRedemptionRecord: [issuer],
-  signRequestData: <include, omit, headers-only>,
+  signedRedemptionRecord: <issuer>,
+  signRequestData: include |/ omit | headers-only,
   headers: new Headers('Signed-Headers', '"sec-signed-redemption-record", "referer"')
   ... 
 });
@@ -147,9 +148,10 @@ If `signRequestData` is `include`, then the browser will sign over the request d
 ```
 {
   'url': 'https://example.test/subresource',
-  'sec-signed-redemption-record':  <SRR>,
+  'sec-signed-redemption-record': <SRR>,
   'referer': 'https://example.test/',
-  'public-key': <pk>
+  'public-key': <pk>,
+  'timestamp': <high-resolution client timestamp>
 }
 ```
 
@@ -162,7 +164,7 @@ Sec-Signature:
   public-key=<pk>
   sig=<signature>
   sign-request-data=<include, headers-only>
-  timestamp=<high resolution client timestamp>
+  timestamp=<timestamp from `sig`'s signing data>
 ```
 
 
@@ -177,7 +179,7 @@ This can be managed by having a set of keys that sign the token at issuance, wit
 
 Then by packaging the private metadata in the SRR as a signature and another zero-knowledge proof of signing by one of a small set of keys, the client is able to verify exactly how many bits of private information are contained in the SRR.
 
-This small change opens up a new application for Privacy Passes: embedding small amounts (e.g. 1 bit) of information that is hidden from the client. This increases the rate of cross-site information transfer somewhat, but introduces new use-cases for passes like marking bad clients, so _distrust_ can propagate across sites as well as trust. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
+This small change opens up a new application for Privacy Passes: embedding small amounts (e.g. 1 bit) of information that is hidden from the client. This increases the rate of cross-site information transfer somewhat, but introduces new use-cases for passes like marking bad clients, so _distrust_ can propagate a/ sites as well as trust. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
 
 
 ## Privacy Considerations
@@ -187,7 +189,7 @@ This small change opens up a new application for Privacy Passes: embedding small
 
 In Privacy Pass, tokens have an unlinkability property: token issuance cannot be linked to token redemption.
 
-The privacy of this API relies on that fact: the issuer is unable to correlate its issuances on one site with redemptions occurred on another site. If the issuer gives out N tokens each to M users, and later receives up to N*M requests for redemption on various sites, the issuer can't correlate those redemption requests to any user identity (unless M = 1). It learns only aggregate information about which sites users visit.
+The privacy of this API relies on that fact: the issuer is unable to correlate its issuances on one site with redemptions on another site. If the issuer gives out N tokens each to M users, and later receives up to N*M requests for redemption on various sites, the issuer can't correlate those redemption requests to any user identity (unless M = 1). It learns only aggregate information about which sites users visit.
 
 However, there are a couple of finer points that need to be considered to ensure the underlying protocol remains private.
 
@@ -201,10 +203,9 @@ If the server uses different values for their private keys for different clients
 If the issuer is able to use network-level fingerprinting or other side-channels to associate a browser at redemption time with the same browser at token issuance time, privacy is lost. Importantly, the API itself has not revealed any new information, since sites could use the same technique by issuing GET requests to the issuer in the two separate contexts anyway.
 
 
-### Cross site Information Transfer
+### Cross-site Information Transfer
 
-Trust tokens transfer information about one first-party cookie to another, and we have cryptographic guarantees that each token only contains a small amount of information. Still, if we allow many token redemptions on a single page, the first-party cookie for user U on domain A can be encoded in the trust token information channel and decoded on domain B, allowing domain B to learn the user's domain A cookie until either 1p cookie is cleared.
-
+Trust tokens transfer information about one first-party cookie to another, and we have cryptographic guarantees that each token only contains a small amount of information. Still, if we allow many token redemptions on a single page, the first-party cookie for user U on domain A can be encoded in the trust token information channel and decoded on domain B, allowing domain B to learn the user's domain A cookie until either 1p cookie is cleared. Separate from the concern of channels allowing arbitrary communication between domains, some identification attacks---for instance, a malicious redeemer attempting to learn the exact set of issuers that have granted tokens to a particular user, which could be identifying---have similar mitigations.
 
 #### Mitigation: Dynamic Issuance / Redemption Limits
 
@@ -218,7 +219,7 @@ To prevent abuse of the API, browsers could maintain a list of allowed or disall
 
 #### Mitigation: Per-Site Issuer Limits
 
-The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per origin (e.g. 2), and those contacted should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits.
+The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per origin (e.g. 2); this limit should apply for both issuance and redemption; and the bound issuers should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits.
 
 
 ### First Party Tracking Potential
