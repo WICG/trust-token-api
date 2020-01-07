@@ -290,7 +290,6 @@ foo.com - Site requiring a Trust Token to prove the user is trusted.
 ```
 
 
-
 1.  User visits `areyouahuman.com`.
 1.  `areyouahuman.com` verifies the user is a human, and calls `fetchTrustTokens('/request-tokens')`.
     1.  The browser stores the trust tokens associated with `areyouahuman.com`.
