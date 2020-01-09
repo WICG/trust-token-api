@@ -135,7 +135,7 @@ An additional parameter to the Fetch API then allows the browser to include a si
 fetch(<resource-url>, {
   ...
   signedRedemptionRecord: <issuer>,
-  signRequestData: include |/ omit | headers-only,
+  signRequestData: include | omit | headers-only,
   headers: new Headers('Signed-Headers', '"sec-signed-redemption-record", "referer"')
   ... 
 });
@@ -179,7 +179,7 @@ This can be managed by having a set of keys that sign the token at issuance, wit
 
 Then by packaging the private metadata in the SRR as a signature and another zero-knowledge proof of signing by one of a small set of keys, the client is able to verify exactly how many bits of private information are contained in the SRR.
 
-This small change opens up a new application for Privacy Passes: embedding small amounts (e.g. 1 bit) of information that is hidden from the client. This increases the rate of cross-site information transfer somewhat, but introduces new use-cases for passes like marking bad clients, so _distrust_ can propagate a/ sites as well as trust. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
+This small change opens up a new application for Privacy Passes: embedding small amounts (e.g. 1 bit) of information that is hidden from the client. This increases the rate of cross-site information transfer somewhat, but introduces new use-cases for passes like marking bad clients, so _distrust_ can propagate across sites as well as trust. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
 
 
 ## Privacy Considerations
@@ -219,7 +219,7 @@ To prevent abuse of the API, browsers could maintain a list of allowed or disall
 
 #### Mitigation: Per-Site Issuer Limits
 
-The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per origin (e.g. 2); this limit should apply for both issuance and redemption; and the bound issuers should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits.
+The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per top-level origin (e.g. 2); this limit should apply for both issuance and redemption; and origins' bound issuers should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits.
 
 
 ### First Party Tracking Potential
