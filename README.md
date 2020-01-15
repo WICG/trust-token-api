@@ -160,15 +160,14 @@ fetch(<resource-url>, {
   ...
   trust-token: {
     type: 'send-srr',
-    issuer: <issuer>,
-    refresh: {none, refresh}
+    issuer: <issuer>
   }
   ...
 });
 ```
 
 
-The SRR will be added as a new request header `Sec-Signed-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no SRRs available and `refresh` is set, then a token redemption will be performed to the issuer (similar to `srr-token-redemption`) and the newly received SRR will be attached to this fetch.
+The SRR will be added as a new request header `Sec-Signed-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no SRRs available, the request header will be omitted.
 
 
 ### Extension: Trust-Bound Keypair and Request Signing
