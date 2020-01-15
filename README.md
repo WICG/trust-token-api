@@ -232,7 +232,7 @@ This small change opens up a new application for Privacy Passes: embedding small
 
 #### Extension: Public Metadata
 
-Some information about the token can be publicly visible by the client. Issuers could use this limited information to run A/B experiments or other comparisons against different trust metrics, so they can iterate on and improve their token issuing logic without needing to track what experiment group the user is in.
+Some information about the token can be publicly visible by the client. Issuers could use this limited information to run A/B experiments or other comparisons against different trust metrics, so they can iterate on and improve their token issuing logic.
 
 This can be managed by assigning different keys in the key commitment to have different labels, indicating a different value of the public metadata. The client and issuer would be able to determine what the value of the public metadata is based on which key is used to sign at issuance time. Downstream partners would be able to check the key ID contained in the SRR to read the value of the public metadata.
 
