@@ -83,7 +83,7 @@ When a response comes back with blind signatures, they will be unblinded, stored
 ### Trust Token Redemption
 
 
-When the user is browsing another site (publisher.com), that site (or issuer.com embedded on that site) can optionally redeem issuer.com tokens to learn something about the trust of a user. One way to do this would be via a new APIs:
+When the user is browsing another site (publisher.com), that site (or issuer.com embedded on that site) can optionally redeem issuer.com tokens to learn something about the trust of a user. One way to do this would be via new APIs:
 
 
 ```
@@ -117,7 +117,7 @@ fetch('<issuer>/.well-known/trust-token', {
   trust-token: {
     type: 'srr-token-redemption',
     issuer: <issuer>,
-    refresh: false | true
+    refresh-policy: {none, refresh}
   }
 }).then(...)
 ```
@@ -132,7 +132,7 @@ The structure of the Signed Redemption Record (SRR) is:
 {
   Redemption timestamp,
   ClientData: {
-    Publisher
+    Publisher Origin
   },
   Metadata: {
     Trust Token Key ID
@@ -161,21 +161,21 @@ fetch(<resource-url>, {
   trust-token: {
     type: 'send-srr',
     issuer: <issuer>,
-    refresh: false | true
+    refresh: {none, refresh}
   }
   ...
 });
 ```
 
 
-The SRR will be added as a new request header `Sec-Signed-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no SRRs available and `refresh` is set, then the `srr-token-redemption` fetch is performed to the issuer.
+The SRR will be added as a new request header `Sec-Signed-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no SRRs available and `refresh` is set, then a token redemption will be performed to the issuer (similar to `srr-token-redemption`) and the newly received SRR will be attached to this fetch.
 
 
 ### Extension: Trust-Bound Keypair and Request Signing
 
 An additional extension to the Trust Attestation allows us to ensure the integrity of the SRR, fetch data, and other headers by associating the SRR with a public/private keypair on the browser. This integrity allows the SRR and signed data to be passed around via third parties while preventing manipulation of the data. This is particularly useful in cases like ads and CDNs where the intermediary parties may not be fully trusted. This keypair is bound to the SRR (and the original token redemption) so that the browser can sign arbitrary request data with the private key and transfer trust to the request from the token.
 
-In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which is included in the `ClientData` portion of the SRR. The keypair is then stored in new first-party storage only accessible via these APIs.
+In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which is also included in the `ClientData` portion of the SRR. The keypair is then stored in new first-party storage only accessible via these APIs.
 
 An additional parameter to the Fetch API then allows the browser to include a signature over the SRR, request data, and additional request headers (specified using a new opt-in header), using the browser's private key associated with the SRR:
 
@@ -186,7 +186,7 @@ fetch(<resource-url>, {
   trust-token: {
     type: 'send-srr',
     issuer: <issuer>,
-    refresh: false | true,
+    refresh: {none, refresh}
     signRequestData: include | omit | headers-only,
     includeTimestampHeader: false | true,
     additionalSignedHeaders: <headers>
@@ -205,7 +205,7 @@ If `signRequestData` is `include`, then the browser will sign over the request d
   'url': 'https://example.test/subresource',
   'sec-signed-redemption-record': <SRR>,
   'referer': 'https://example.test/',
-  'timestamp': <high-resolution client timestamp>
+  'sec-time': <high-resolution client timestamp>
   'public-key': <pk>,
 }
 ```
@@ -229,11 +229,11 @@ The canonical CBOR data (verifiable by the signature) should be computable from 
 
 In addition to attesting trust in a user, an issuer may want to provide a limited amount of metadata in the token (and forward it as part of the SRR) to provide limited additional information about the token.
 
-This small change opens up a new application for Privacy Passes: embedding small amounts of information along with the token and SRR. This increases the rate of cross-site information transfer somewhat, but introduces new use-cases for passes like marking bad clients, so _distrust_ can propagate across sites as well as trust. 
+This small change opens up a new application for Privacy Passes: embedding small amounts of information along with the token and SRR. This increases the rate of cross-site information transfer somewhat, but introduces some new use-cases for trust tokens.
 
 #### Extension: Public Metadata
 
-Some information about the token can be publicly visible by the client.
+Some information about the token can be publicly visible by the client. Issuers could use this limited information to run A/B experiments or other comparisons against different trust metrics, so they can iterate on and improve their token issuing logic without needing to track what experiment group the user is in.
 
 This can be managed by assigning different keys in the key commitment to have different labels, indicating a different value of the public metadata. The client and issuer would be able to determine what the value of the public metadata is based on which key is used to sign at issuance time. Downstream partners would be able to check the key ID contained in the SRR to read the value of the public metadata.
 
@@ -247,7 +247,7 @@ Then by adding additional data in the SRR as part of the `Metadata` as a signatu
 
 ### Extension: iframe Activation
 
-Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trust-token` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an SRR to be sent with an iframe by setting an attribute of `trust-token="{type:'send-srr',issuer:<issuer>,refresh:true}"`.
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trust-token` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an SRR to be sent with an iframe by setting an attribute of `trust-token="{type:'send-srr',issuer:<issuer>,refresh:refresh}"`.
 
 ## Privacy Considerations
 
