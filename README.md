@@ -58,17 +58,20 @@ We further propose an extension mechanism for the browser to sign outgoing reque
 
 ### Trust Token Issuance
 
-When an issuer.com context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Javascript API that invokes Fetch:
+When an issuer.com context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the trust-token parameter:
 
 
 ```
-fetchTrustTokens('/request-tokens').then(...)
+fetch('<issuer>/.well-known/trust-token', {
+  trust-token: {
+    type: 'token-request',
+    issuer: <issuer>
+  }
+}).then(...)
 ```
 
 
 This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance protocol:
-
-
 
 *   Generate a set of nonces.
 *   Blind them and attach them to the HTTP request
@@ -79,30 +82,72 @@ When a response comes back with blind signatures, they will be unblinded, stored
 
 ### Trust Token Redemption
 
-When the user is browsing another site (publisher.com), that site (or issuer.com embedded on that site) can optionally redeem issuer.com tokens to learn something about the trust of a user. One way to do this would be via a new Javascript API:
+
+When the user is browsing another site (publisher.com), that site (or issuer.com embedded on that site) can optionally redeem issuer.com tokens to learn something about the trust of a user. One way to do this would be via new APIs:
 
 
 ```
-getTrustAttestation(<issuer>, {refresh-policy: {use-cached, refresh}).then(...)
+document.hasTrustToken(<issuer>)
 ```
 
 
-If there are no tokens available for the given issuer, the returned promise rejects with with an error. Otherwise, it  invokes the Privacy Pass redemption protocol for an issuer, and sends the token to the issuer. The result of this protocol is an object called a Signed Redemption Record (SRR):
+This returns whether there are any valid trust tokens for a particular issuer, so that the publisher can decide whether to attempt a token redemption.
+
+
+```
+fetch('<url>', {
+  ...
+  trust-token: {
+    type: 'raw-token-redemption',
+    issuer: <issuer>
+  }
+  ...
+}).then(...)
+```
+
+
+If there are no tokens available for the given issuer or the issuer doesn't support raw token redemptions, the returned promise rejects with an error. Otherwise, the token is attached in the Sec-Trust-Token request header.
+
+If that sites needs a redemption attestation to forward to other parties, it can redeem an issuer.com token and receive a Signed Redemption Record that can be used as a redemption attestation using the Fetch API:
+
+
+
+```
+fetch('<issuer>/.well-known/trust-token', {
+  trust-token: {
+    type: 'srr-token-redemption',
+    issuer: <issuer>,
+    refresh-policy: {none, refresh}
+  }
+}).then(...)
+```
+
+
+If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token attached in the Sec-Trust-Token request header and the resulting Signed Redemption Record (SRR) being expected in the Sec-Trust-Token response header.
+
+The structure of the Signed Redemption Record (SRR) is: 
 
 
 ```
 {
   Redemption timestamp,
-  top level origin (publisher.com),
-  optional expiry timestamp,
-  signature of the above verifiable by well-known public key of the issuer
+  ClientData: {
+    Publisher Origin
+  },
+  Metadata: {
+    Trust Token Key ID
+  }
+  Signature of the above verifiable by well-known public key of the issuer,
+  optional expiry timestamp
 }
 ```
 
 
-The SRR is HTTP-only and Javascript is only able to access/send the SRR via these APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party.
+The redemption timestamp is included to ensure the freshness of the SRR. The `ClientData` comes from the client as part of the redemption request and includes the publisher the redemption occurred on. The `Metadata` includes the key ID, so that consumers of the SRR can compare against the currently active key commitment.
 
-To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached SRRs from that issuer. (When an SRR expires, it's as if it no longer exists; in particular, expired SRRs are not "cached" from the perspective of subsequent redemptions.) An iframe with the issuer origin can refresh the SRR by setting a `refresh-policy` to get a new record and refresh the trust attestation.
+The SRR is HTTP-only and Javascript is only able to access/send the SRR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The expiry is a recommendation to the UA, telling it when to perform a refresh of the SRR. The UA is allowed to choose an expiry beyond that specified with the SRR.
+
+To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired SRRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
 
 
 ### Forwarding Redemption Attestation
@@ -113,20 +158,23 @@ Signed Redemption Records are only accessible via a new option to the Fetch API:
 ```
 fetch(<resource-url>, {
   ...
-  signedRedemptionRecord: <issuer>,
+  trust-token: {
+    type: 'send-srr',
+    issuer: <issuer>
+  }
   ...
 });
 ```
 
 
-The SRR will be added as a new request header `Sec-Signed-Redemption-Record`. This option to Fetch is only usable in the top-level document.
+The SRR will be added as a new request header `Sec-Signed-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no SRRs available, the request header will be omitted.
 
 
 ### Extension: Trust-Bound Keypair and Request Signing
 
 An additional extension to the Trust Attestation allows us to ensure the integrity of the SRR, fetch data, and other headers by associating the SRR with a public/private keypair on the browser. This integrity allows the SRR and signed data to be passed around via third parties while preventing manipulation of the data. This is particularly useful in cases like ads and CDNs where the intermediary parties may not be fully trusted. This keypair is bound to the SRR (and the original token redemption) so that the browser can sign arbitrary request data with the private key and transfer trust to the request from the token.
 
-In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which is also included in the returned SRR. The keypair is then stored in new first-party storage only accessible via these APIs.
+In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which is also included in the `ClientData` portion of the SRR. The keypair is then stored in new first-party storage only accessible via these APIs.
 
 An additional parameter to the Fetch API then allows the browser to include a signature over the SRR, request data, and additional request headers (specified using a new opt-in header), using the browser's private key associated with the SRR:
 
@@ -134,15 +182,21 @@ An additional parameter to the Fetch API then allows the browser to include a si
 ```
 fetch(<resource-url>, {
   ...
-  signedRedemptionRecord: <issuer>,
-  signRequestData: include | omit | headers-only,
+  trust-token: {
+    type: 'send-srr',
+    issuer: <issuer>,
+    refresh: {none, refresh}
+    signRequestData: include | omit | headers-only,
+    includeTimestampHeader: false | true,
+    additionalSignedHeaders: <headers>
+  }
   headers: new Headers('Signed-Headers', '"sec-signed-redemption-record", "referer"')
   ... 
 });
 ```
 
 
-If `signRequestData` is `include`, then the browser will sign over the request data with the private key associated with the Signed Redemption Record. It will sign over the entire URL, POST body, public key, and any headers included in the `Signed-Headers` request header. If `signRequestData` is `headers-only`, we will only sign over those in `Signed-Headers`. Additionally we will limit the size of POST bodies that can be sent via this API when signed, to prevent having to buffer the entire body in memory. To do this, we can (aligning as close as possible to the model in the [Signed Exchanges](https://wicg.github.io/webpackage/draft-yasskin-http-origin-signed-responses.html#rfc.section.3.2) spec) create a canonical [CBOR](https://cbor.io) representation of the resource URL, public key, and headers:
+If `signRequestData` is `include`, then the browser will sign over the request data with the private key associated with the Signed Redemption Record. It will sign over the entire URL, POST body, public key, and any headers included in the `Signed-Headers` request header. If `signRequestData` is `headers-only`, we will only sign over those in `Signed-Headers`. If `includeTimestampHeader` is set, we will add a new header to the request `Sec-Time` with the current client time (which can optionally be added to `Signed-Headers`). Any headers included in `additionalSignedHeaders` will also be appended to `Signed-Headers`. Additionally we will limit the size of POST bodies that can be sent via this API when signed, to prevent having to buffer the entire body in memory. To do this, we can (aligning as close as possible to the model in the [Signed Exchanges](https://wicg.github.io/webpackage/draft-yasskin-http-origin-signed-responses.html#rfc.section.3.2) spec) create a canonical [CBOR](https://cbor.io) representation of the resource URL, public key, and headers:
 
 
 ```
@@ -150,8 +204,8 @@ If `signRequestData` is `include`, then the browser will sign over the request d
   'url': 'https://example.test/subresource',
   'sec-signed-redemption-record': <SRR>,
   'referer': 'https://example.test/',
+  'sec-time': <high-resolution client timestamp>
   'public-key': <pk>,
-  'timestamp': <high-resolution client timestamp>
 }
 ```
 
@@ -164,23 +218,35 @@ Sec-Signature:
   public-key=<pk>
   sig=<signature>
   sign-request-data=<include, headers-only>
-  timestamp=<timestamp from `sig`'s signing data>
 ```
 
 
 The canonical CBOR data (verifiable by the signature) should be computable from a request, and so does not need to be sent over the wire from the browser. The `Signed-Headers` header, and the value of `sign-request-data` should be enough to re-construct it server side, robust to things like header re-ordering, etc.
 
 
+### Extension: Metadata
+
+In addition to attesting trust in a user, an issuer may want to provide a limited amount of metadata in the token (and forward it as part of the SRR) to provide limited additional information about the token.
+
+This small change opens up a new application for Privacy Passes: embedding small amounts of information along with the token and SRR. This increases the rate of cross-site information transfer somewhat, but introduces some new use-cases for trust tokens.
+
+#### Extension: Public Metadata
+
+Some information about the token can be publicly visible by the client. Issuers could use this limited information to run A/B experiments or other comparisons against different trust metrics, so they can iterate on and improve their token issuing logic.
+
+This can be managed by assigning different keys in the key commitment to have different labels, indicating a different value of the public metadata. The client and issuer would be able to determine what the value of the public metadata is based on which key is used to sign at issuance time. Downstream partners would be able to check the key ID contained in the SRR to read the value of the public metadata.
+
 ### Extension: Private Metadata
 
-In addition to attesting trust in a user, an issuer may want to provide a limited amount of private metadata in the token (and forward it as part of the SRR) to provide limited information about the token to themselves and partners without revealing metadata to the client. This could be used as a negative indicator of trust or other limited information that the client shouldn't know about.
+Other information about the token may need to be shared with themselves (on redemption) and other partners (via the SRR) without revealing the metadata to the client. This could be used as a negative indicator of trust or other limited information that the client shouldn't know about. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
 
-This can be managed by having a set of keys that sign the token at issuance, with one key being used to indicate the bit of metadata is true, while a different key is used to indicate the bit of metadata is false. The zero-knowledge proof returned during the token issuance then proves that one of two keys was used to sign the token, without revealing which key was actually used. At redemption time, the issuer can then check which of the two keys was used to retrieve the value of the private metadata.
+This can be managed by having pairs of keys that sign the token at issuance, with one key being used to indicate the bit of metadata is true, while a different key is used to indicate the bit of metadata is false. The zero-knowledge proof returned during the token issuance then proves that one of two keys was used to sign the token, without revealing which key was actually used. At redemption time, the issuer can then check which of the two keys was used to retrieve the value of the private metadata.
 
-Then by packaging the private metadata in the SRR as a signature and another zero-knowledge proof of signing by one of a small set of keys, the client is able to verify exactly how many bits of private information are contained in the SRR.
+Then by adding additional data in the SRR as part of the `Metadata` as a signature and another zero-knowledge proof of signing by one of a small set of keys, the client is able to verify exactly how many bits of private information are contained in the SRR without being able to read the value.
 
-This small change opens up a new application for Privacy Passes: embedding small amounts (e.g. 1 bit) of information that is hidden from the client. This increases the rate of cross-site information transfer somewhat, but introduces new use-cases for passes like marking bad clients, so _distrust_ can propagate across sites as well as trust. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
+### Extension: iframe Activation
 
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trust-token` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an SRR to be sent with an iframe by setting an attribute of `trust-token="{type:'send-srr',issuer:<issuer>,refresh:refresh}"`.
 
 ## Privacy Considerations
 
@@ -219,7 +285,7 @@ To prevent abuse of the API, browsers could maintain a list of allowed or disall
 
 #### Mitigation: Per-Site Issuer Limits
 
-The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per top-level origin (e.g. 2); this limit should apply for both issuance and redemption; and origins' bound issuers should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits.
+The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per top-level origin (e.g. 2); this limit should apply for both issuance and redemption; and the issuers used on an origin should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits. This should also apply for `document.hasTrustToken`, as the presence of tokens can be used as a tracking vector.
 
 
 ### First Party Tracking Potential
@@ -273,7 +339,7 @@ A possible enhancement would be to allow for sending Signed Redemption Records (
 
 ### Optimizing redemption RTT
 
-If the publisher can configure issuers in response headers (or otherwise early in the page load), then they could invoke a redemption in parallel with the page loading, before the relevant call to `getTrustAttestation`.
+If the publisher can configure issuers in response headers (or otherwise early in the page load), then they could invoke a redemption in parallel with the page loading, before the relevant `fetch()` calls.
 
 
 ## Appendix
@@ -291,13 +357,13 @@ foo.com - Site requiring a Trust Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.com`.
-1.  `areyouahuman.com` verifies the user is a human, and calls `fetchTrustTokens('/request-tokens')`.
+1.  `areyouahuman.com` verifies the user is a human, and calls `fetch(''areyouahuman.com'/.well-known/trust-token', {trust-token: {type: 'token-request', issuer: 'areyouahuman.com'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.com`.
 1.  Sometime later, the user visits `coolwebsite.com`.
-1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling` getTrustAttestation('areyouahuman.com')`.
+1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling `fetch(''areyouahuman.com'/.well-known/trust-token', {trust-token: {type: 'srr-token-redemption', issuer: 'areyouahuman.com'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an SRR (this indicates that `areyouahuman.com` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the SRR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.com` document can call `fetch("foo.com/get-content", {signedRedemptionRecord: 'areyouahuman.com'})`
+1.  Script running code in the top level `coolwebsite.com` document can call `fetch("foo.com/get-content", {trust-token: {type: 'send-srr', issuer: 'areyouahuman.com'}})`
     1.  The third-party receives the SRR, and now has some indication that `areyouahuman.com` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
