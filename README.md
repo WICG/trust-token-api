@@ -90,25 +90,11 @@ When the user is browsing another site (publisher.com), that site (or issuer.com
 document.hasTrustToken(<issuer>)
 ```
 
-
 This returns whether there are any valid trust tokens for a particular issuer, so that the publisher can decide whether to attempt a token redemption.
 
+#### Redeeming tokens from the issuer, obtaining a signed attestation
 
-```
-fetch('<url>', {
-  ...
-  trust-token: {
-    type: 'raw-token-redemption',
-    issuer: <issuer>
-  }
-  ...
-}).then(...)
-```
-
-
-If there are no tokens available for the given issuer or the issuer doesn't support raw token redemptions, the returned promise rejects with an error. Otherwise, the token is attached in the Sec-Trust-Token request header.
-
-If that sites needs a redemption attestation to forward to other parties, it can redeem an issuer.com token and receive a Signed Redemption Record that can be used as a redemption attestation using the Fetch API:
+If a site needs a redemption attestation to forward to other parties, it can redeem an issuer.com token and receive a Signed Redemption Record that can be used as a redemption attestation using the Fetch API:
 
 
 
@@ -123,7 +109,7 @@ fetch('<issuer>/.well-known/trust-token', {
 ```
 
 
-If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token attached in the Sec-Trust-Token request header and the resulting Signed Redemption Record (SRR) being expected in the Sec-Trust-Token response header.
+If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token and associated redemption metadata attached in the Sec-Trust-Token request header and the resulting Signed Redemption Record (SRR) being expected in the Sec-Trust-Token response header.
 
 The structure of the Signed Redemption Record (SRR) is: 
 
@@ -148,6 +134,23 @@ The redemption timestamp is included to ensure the freshness of the SRR. The `Cl
 The SRR is HTTP-only and Javascript is only able to access/send the SRR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The expiry is a recommendation to the UA, telling it when to perform a refresh of the SRR. The UA is allowed to choose an expiry beyond that specified with the SRR.
 
 To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired SRRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
+
+#### Extension: Sending tokens to arbitrary endpoints
+
+A more general API can allow "redeeming" raw tokens by sending them to arbitrary endpoints, rather than just the issuer:
+
+```
+fetch('<url>', {
+  ...
+  trust-token: {
+    type: 'raw-token-redemption',
+    issuer: <issuer>
+  }
+  ...
+}).then(...)
+```
+
+If there are no tokens available for the given issuer or the issuer doesn't support raw token redemptions, the returned promise rejects with an error. Otherwise, the token is attached in the Sec-Trust-Token request header.
 
 
 ### Forwarding Redemption Attestation
