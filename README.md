@@ -74,10 +74,10 @@ fetch('<issuer>/.well-known/trust-token', {
 This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance protocol:
 
 *   Generate a set of nonces.
-*   Blind them and attach them to the HTTP request
+*   Blind them and attach them (in a Sec-Trust-Tokens header) to the HTTP request
 *   Send a POST to the provided endpoint
 
-When a response comes back with blind signatures, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to Javascript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA.
+When a response comes back with blind signatures in a Sec-Trust-Tokens response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to Javascript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA.
 
 
 ### Trust Token Redemption
