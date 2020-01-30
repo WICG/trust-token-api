@@ -123,7 +123,7 @@ fetch('<issuer>/.well-known/trust-token', {
 ```
 
 
-If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token and associated redemption metadata attached in the Sec-Trust-Token request header and the resulting Signed Redemption Record (SRR) being expected in the Sec-Trust-Token response header.
+If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the Sec-Trust-Token request header and the resulting Signed Redemption Record (SRR) being expected in the Sec-Trust-Token response header.
 
 The structure of the Signed Redemption Record (SRR) is: 
 
