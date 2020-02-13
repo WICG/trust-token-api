@@ -185,7 +185,7 @@ fetch(<resource-url>, {
   trustToken: {
     type: 'send-srr',
     issuer: <issuer>,
-    refresh: {none, refresh}
+    refreshPolicy: {none, refresh}
     signRequestData: include | omit | headers-only,
     includeTimestampHeader: false | true,
     additionalSignedHeaders: <headers>
