@@ -58,12 +58,12 @@ We further propose an extension mechanism for the browser to sign outgoing reque
 
 ### Trust Token Issuance
 
-When an issuer.com context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the trust-token parameter:
+When an issuer.com context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the trustToken parameter:
 
 
 ```
 fetch('<issuer>/.well-known/trust-token', {
-  trust-token: {
+  trustToken: {
     type: 'token-request',
     issuer: <issuer>
   }
@@ -97,7 +97,7 @@ This returns whether there are any valid trust tokens for a particular issuer, s
 ```
 fetch('<url>', {
   ...
-  trust-token: {
+  trustToken: {
     type: 'raw-token-redemption',
     issuer: <issuer>
   }
@@ -114,10 +114,10 @@ If that sites needs a redemption attestation to forward to other parties, it can
 
 ```
 fetch('<issuer>/.well-known/trust-token', {
-  trust-token: {
+  trustToken: {
     type: 'srr-token-redemption',
     issuer: <issuer>,
-    refresh-policy: {none, refresh}
+    refreshPolicy: {none, refresh}
   }
 }).then(...)
 ```
@@ -158,7 +158,7 @@ Signed Redemption Records are only accessible via a new option to the Fetch API:
 ```
 fetch(<resource-url>, {
   ...
-  trust-token: {
+  trustToken: {
     type: 'send-srr',
     issuer: <issuer>
   }
@@ -182,10 +182,10 @@ An additional parameter to the Fetch API then allows the browser to include a si
 ```
 fetch(<resource-url>, {
   ...
-  trust-token: {
+  trustToken: {
     type: 'send-srr',
     issuer: <issuer>,
-    refresh: {none, refresh}
+    refreshPolicy: {none, refresh}
     signRequestData: include | omit | headers-only,
     includeTimestampHeader: false | true,
     additionalSignedHeaders: <headers>
@@ -196,7 +196,7 @@ fetch(<resource-url>, {
 ```
 
 
-If `signRequestData` is `include`, then the browser will sign over the request data with the private key associated with the Signed Redemption Record. It will sign over the entire URL, POST body, public key, and any headers included in the `Signed-Headers` request header. If `signRequestData` is `headers-only`, we will only sign over those in `Signed-Headers`. If `includeTimestampHeader` is set, we will add a new header to the request `Sec-Time` with the current client time (which can optionally be added to `Signed-Headers`). Any headers included in `additionalSignedHeaders` will also be appended to `Signed-Headers`. Additionally we will limit the size of POST bodies that can be sent via this API when signed, to prevent having to buffer the entire body in memory. To do this, we can (aligning as close as possible to the model in the [Signed Exchanges](https://wicg.github.io/webpackage/draft-yasskin-http-origin-signed-responses.html#rfc.section.3.2) spec) create a canonical [CBOR](https://cbor.io) representation of the resource URL, public key, and headers:
+If `signRequestData` is `include`, then the browser will sign over the request data with the private key associated with the Signed Redemption Record. It will sign over the entire URL, POST body, public key, and any headers included in the `Signed-Headers` request header. If `signRequestData` is `headers-only`, we will only sign over those in `Signed-Headers`. If `includeTimestampHeader` is set, we will add a new header to the request `Sec-Time` with the current client time (which can optionally be added to `Signed-Headers`). Any headers included in `additionalSignedHeaders` will also be appended to `Signed-Headers`. Additionally we will limit the size of POST bodies that can be sent via this API when signed, to prevent having to buffer the entire body in memory. To do this, we can (aligning as close as possible to the model in the [Signed Exchanges](https://wicg.github.io/webpackage/draft-yasskin-http-origin-signed-responses.html#rfc.section.3.2) spec) create a canonical [CBOR](https://cbor.io) representation of the resource URL, public key, and headers, of a form similar to:
 
 
 ```
@@ -246,7 +246,7 @@ Then by adding additional data in the SRR as part of the `Metadata` as a signatu
 
 ### Extension: iframe Activation
 
-Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trust-token` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an SRR to be sent with an iframe by setting an attribute of `trust-token="{type:'send-srr',issuer:<issuer>,refresh:refresh}"`.
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trustToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an SRR to be sent with an iframe by setting an attribute of `trustToken="{type:'send-srr',issuer:<issuer>,refreshPolicy:'refresh'}"`.
 
 ## Privacy Considerations
 
@@ -357,13 +357,13 @@ foo.com - Site requiring a Trust Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.com`.
-1.  `areyouahuman.com` verifies the user is a human, and calls `fetch(''areyouahuman.com'/.well-known/trust-token', {trust-token: {type: 'token-request', issuer: 'areyouahuman.com'}})`.
+1.  `areyouahuman.com` verifies the user is a human, and calls `fetch(''areyouahuman.com'/.well-known/trust-token', {trustToken: {type: 'token-request', issuer: 'areyouahuman.com'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.com`.
 1.  Sometime later, the user visits `coolwebsite.com`.
-1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling `fetch(''areyouahuman.com'/.well-known/trust-token', {trust-token: {type: 'srr-token-redemption', issuer: 'areyouahuman.com'}})`.
+1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling `fetch(''areyouahuman.com'/.well-known/trust-token', {trustToken: {type: 'srr-token-redemption', issuer: 'areyouahuman.com'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an SRR (this indicates that `areyouahuman.com` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the SRR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.com` document can call `fetch("foo.com/get-content", {trust-token: {type: 'send-srr', issuer: 'areyouahuman.com'}})`
+1.  Script running code in the top level `coolwebsite.com` document can call `fetch("foo.com/get-content", {trustToken: {type: 'send-srr', issuer: 'areyouahuman.com'}})`
     1.  The third-party receives the SRR, and now has some indication that `areyouahuman.com` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
