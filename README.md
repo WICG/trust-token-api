@@ -77,7 +77,7 @@ This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance 
 *   Blind them and attach them (in a Sec-Trust-Token header) to the HTTP request
 *   Send a POST to the provided endpoint
 
-When a response comes back with blind signatures in a Sec-Trust-Token response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to Javascript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA.
+When a response comes back with blind signatures in a Sec-Trust-Token response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA.
 
 
 ### Trust Token Redemption
@@ -145,7 +145,7 @@ The structure of the Signed Redemption Record (SRR) is:
 
 The redemption timestamp is included to ensure the freshness of the SRR. The `ClientData` comes from the client as part of the redemption request and includes the publisher the redemption occurred on. The `Metadata` includes the key ID, so that consumers of the SRR can compare against the currently active key commitment.
 
-The SRR is HTTP-only and Javascript is only able to access/send the SRR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The expiry is a recommendation to the UA, telling it when to perform a refresh of the SRR. The UA is allowed to choose an expiry beyond that specified with the SRR.
+The SRR is HTTP-only and JavaScript is only able to access/send the SRR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The expiry is a recommendation to the UA, telling it when to perform a refresh of the SRR. The UA is allowed to choose an expiry beyond that specified with the SRR.
 
 To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired SRRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
 
@@ -334,7 +334,7 @@ An alternative design that avoids this assumption is to instead use _publicly ve
 
 ### Request mechanism not based on `fetch()`
 
-A possible enhancement would be to allow for sending Signed Redemption Records (and signing requests using the trust keypair) for requests sent outside of `fetch()`, e.g. on top-level and iframe navigation requests. This would allow for the use of the API by entities that aren't running Javascript directly on the page, or that want some level of trust before returning a main response.
+A possible enhancement would be to allow for sending Signed Redemption Records (and signing requests using the trust keypair) for requests sent outside of `fetch()`, e.g. on top-level and iframe navigation requests. This would allow for the use of the API by entities that aren't running JavaScript directly on the page, or that want some level of trust before returning a main response.
 
 
 ### Optimizing redemption RTT
@@ -357,13 +357,13 @@ foo.com - Site requiring a Trust Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.com`.
-1.  `areyouahuman.com` verifies the user is a human, and calls `fetch(''areyouahuman.com'/.well-known/trust-token', {trustToken: {type: 'token-request', issuer: 'areyouahuman.com'}})`.
+1.  `areyouahuman.com` verifies the user is a human, and calls `fetch('areyouahuman.com/.well-known/trust-token', {trustToken: {type: 'token-request', issuer: 'areyouahuman.com'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.com`.
 1.  Sometime later, the user visits `coolwebsite.com`.
-1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling `fetch(''areyouahuman.com'/.well-known/trust-token', {trustToken: {type: 'srr-token-redemption', issuer: 'areyouahuman.com'}})`.
+1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling `fetch('areyouahuman.com/.well-known/trust-token', {trustToken: {type: 'srr-token-redemption', issuer: 'areyouahuman.com'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an SRR (this indicates that `areyouahuman.com` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the SRR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.com` document can call `fetch("foo.com/get-content", {trustToken: {type: 'send-srr', issuer: 'areyouahuman.com'}})`
+1.  Script running code in the top level `coolwebsite.com` document can call `fetch('foo.com/get-content', {trustToken: {type: 'send-srr', issuer: 'areyouahuman.com'}})`
     1.  The third-party receives the SRR, and now has some indication that `areyouahuman.com` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
