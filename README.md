@@ -58,7 +58,7 @@ We further propose an extension mechanism for the browser to sign outgoing reque
 
 ### Trust Token Issuance
 
-When an issuer.com context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the trustToken parameter:
+When an issuer.example context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the trustToken parameter:
 
 
 ```
@@ -83,7 +83,7 @@ When a response comes back with blind signatures in a Sec-Trust-Token response h
 ### Trust Token Redemption
 
 
-When the user is browsing another site (publisher.com), that site (or issuer.com embedded on that site) can optionally redeem issuer.com tokens to learn something about the trust of a user. One way to do this would be via new APIs:
+When the user is browsing another site (publisher.example), that site (or issuer.example embedded on that site) can optionally redeem issuer.example tokens to learn something about the trust of a user. One way to do this would be via new APIs:
 
 
 ```
@@ -108,7 +108,7 @@ fetch('<url>', {
 
 If there are no tokens available for the given issuer or the issuer doesn't support raw token redemptions, the returned promise rejects with an error. Otherwise, the token is attached in the Sec-Trust-Token request header.
 
-If that sites needs a redemption attestation to forward to other parties, it can redeem an issuer.com token and receive a Signed Redemption Record that can be used as a redemption attestation using the Fetch API:
+If that sites needs a redemption attestation to forward to other parties, it can redeem an issuer.example token and receive a Signed Redemption Record that can be used as a redemption attestation using the Fetch API:
 
 
 
@@ -125,7 +125,7 @@ fetch('<issuer>/.well-known/trust-token', {
 
 If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the Sec-Trust-Token request header and the resulting Signed Redemption Record (SRR) being expected in the Sec-Trust-Token response header.
 
-The structure of the Signed Redemption Record (SRR) is: 
+The structure of the Signed Redemption Record (SRR) is:
 
 
 ```
@@ -191,7 +191,7 @@ fetch(<resource-url>, {
     additionalSignedHeaders: <headers>
   }
   headers: new Headers('Signed-Headers', '"sec-signed-redemption-record", "referer"')
-  ... 
+  ...
 });
 ```
 
@@ -349,21 +349,21 @@ If the publisher can configure issuers in response headers (or otherwise early i
 
 
 ```
-areyouahuman.com - Trust Token Issuer
-coolwebsite.com - Publisher Top-Level Site
-foo.com - Site requiring a Trust Token to prove the user is trusted.
+areyouahuman.example - Trust Token Issuer
+coolwebsite.example - Publisher Top-Level Site
+foo.example - Site requiring a Trust Token to prove the user is trusted.
 
 ```
 
 
-1.  User visits `areyouahuman.com`.
-1.  `areyouahuman.com` verifies the user is a human, and calls `fetch('areyouahuman.com/.well-known/trust-token', {trustToken: {type: 'token-request', issuer: 'areyouahuman.com'}})`.
-    1.  The browser stores the trust tokens associated with `areyouahuman.com`.
-1.  Sometime later, the user visits `coolwebsite.com`.
-1.  `coolwebsite.com` wants to know if the user is a human, by asking `areyouahuman.com` that question, by calling `fetch('areyouahuman.com/.well-known/trust-token', {trustToken: {type: 'srr-token-redemption', issuer: 'areyouahuman.com'}})`.
+1.  User visits `areyouahuman.example`.
+1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/.well-known/trust-token', {trustToken: {type: 'token-request', issuer: 'areyouahuman.example'}})`.
+    1.  The browser stores the trust tokens associated with `areyouahuman.example`.
+1.  Sometime later, the user visits `coolwebsite.example`.
+1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/.well-known/trust-token', {trustToken: {type: 'srr-token-redemption', issuer: 'areyouahuman.example'}})`.
     1.  The browser requests a redemption.
-    1.  The issuer returns an SRR (this indicates that `areyouahuman.com` at some point issued a valid token to this browser).
+    1.  The issuer returns an SRR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the SRR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.com` document can call `fetch('foo.com/get-content', {trustToken: {type: 'send-srr', issuer: 'areyouahuman.com'}})`
-    1.  The third-party receives the SRR, and now has some indication that `areyouahuman.com` thought this user was a human.
+1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {trustToken: {type: 'send-srr', issuer: 'areyouahuman.example'}})`
+    1.  The third-party receives the SRR, and now has some indication that `areyouahuman.example` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
