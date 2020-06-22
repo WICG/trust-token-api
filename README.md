@@ -201,9 +201,8 @@ If `signRequestData` is `include`, then the browser will sign over the request d
 
 ```
 {
-  'url': 'https://example.test/subresource',
+  'destination': 'example.test',
   'sec-signed-redemption-record': <SRR>,
-  'referer': 'https://example.test/',
   'sec-time': <high-resolution client timestamp>
   'public-key': <pk>,
 }
