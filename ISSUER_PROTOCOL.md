@@ -47,7 +47,7 @@ To support the redemption of tokens by the client, server paths that support tok
 
 #### Redemption Metadata
 
-At redemption time, the metadata encoded in the Trust Token will be embedded in the Signed Redemption Record. The public metadata is embedded via the key ID of the corresponding key used to sign the Trust Token. The private metadata bit is embedded as a one-bit boolean that can be set per redeemer logic and which can be decoded by partners downstream. One potential means of encoding the private metadata is to hash a shared secret and the token hash and take the lowest bit XOR between that and the metadata value (H(shared\_secret||token-hash) ^ private metadata value), allowing only partners with the shared secret to get the true value of the private metadata bit. Other potential schemes involve an additional endpoint which can be used to read the private metadata value based on the SRR or token hash.
+At redemption time, the metadata encoded in the Trust Token will be embedded in the Signed Redemption Record. The public metadata is embedded via the key ID of the corresponding key used to sign the Trust Token. The private metadata bit is embedded as a one-bit boolean that can be set per redeemer logic and which can be decoded by partners downstream. One potential means of encoding the private metadata is to hash a shared secret and the token hash and take the lowest bit XOR between that and the metadata value (H(shared\_secret||token-hash) ^ private metadata value), allowing only partners with the shared secret to get the true value of the private metadata bit. Other potential schemes involve an additional endpoint which can be used to read the private metadata value based on the Signed Redemption Record (SRR) or token hash.
 
 
 ## Trust Token Crypto Protocol
@@ -263,15 +263,16 @@ The _Redeem_ function corresponds to the **AT.VerValid** and **AT.ReadBit** stag
 Inputs:
 
 *   token (The trust token to redeem)
-*   client\_data (the client data to include in the SRR)
-*   redemptionTime (the redemption time from the client)secretKey (the secret key that should be used to sign this request, determined by the public metadata)
+*   client\_data (the client data sent as part of the redemption request to include in the SRR)
+*   redemptionTime (the redemption time from the client)
+*   secretKey (the secret key that should be used to sign this request, determined by the public metadata)
 *   lifetime (lifetime for the SRR)
 *   keys (dictionary from known key IDs to secret/public keys)
 *   srrKey (SRRSigningKey)
 
 Outputs:
 
-*   srr (the Signed Redemption Record)
+*   srr (the Signed Redemption Record, a binding of the client data and metadata to this redemption)
 *   signature (the signature over the SRR)
 
 ```
@@ -329,5 +330,5 @@ Trust Token Redemption Response
 struct {
   opaque srr<1..2^16-1>;
   opaque signature<1..2^16-1>;
-} RedeemRequest;
+} RedeemResponse;
 ```
