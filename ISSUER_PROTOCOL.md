@@ -110,7 +110,7 @@ For the PMBTokens functions, the following serialization schemes and hashes are 
 
 ```
 struct {
-  opaque t<1..2^16-1>; // X9.62 Uncompressed point.
+  ECPoint t;
   opaque s[Nn];
 } T;
 ```
@@ -243,8 +243,8 @@ The Trust Token Issuance Response contains an `IssueResponse` structure defined 
 ```
 struct {
   opaque s<Nn>; // big-endian bytestring
-  opaque Wp<1..2^16-1>; // X9.62 Uncompressed Wp point.
-  opaque Wsp<1..2^16-1>; // X9.62 Uncompressed Wsp point.
+  ECPoint Wp;
+  ECPoint Wsp;
 } SignedNonce;
 
 struct {
@@ -292,13 +292,14 @@ Redeem:
   T = Ht(token.nonce)
   if token.Ws != secretKey.xs*T+secretKey.ys*token.S:
     return 0 // Invalid validity verification.
-  privateMetadata = 0
-  if token.W == secretKey.x0*T+secretKey.y0*token.S:
-    privateMetadata = 0
-  elseif token.W == secretKey.x1*T+secretKey.y1*token.S:
-    privateMetadata = 1
-  else:
+  W0 = secretKey.x0*T+secretKey.y0*token.S
+  W1 = secretKey.x1*T+secretKey.y1*token.S
+  // These equalities are timing-sensitive as they could be a timing side-channel.
+  isW0 = constantTimeEquality(tokenW, W0)
+  isW1 = constantTimeEquality(tokenW, W1)
+  if !(isW0 ^ isW1):
     return 0 // Internal Error
+  privateMetadata = isW1
   tokenHash = SHA256("TrustTokenV0 TokenHash"||token)
   // Issuer-specific logic for encoding the private metadata bit.
   encodedPrivate = EncodePrivateMetadata(privateMetadata)
@@ -326,7 +327,7 @@ struct {
 } Token;
 
 struct {
-  opaque token<1..2^16-1>;
+  opaque token<1..2^16-1>; // Bytestring containing a serialized Token struct.
   opaque client_data<1..2^16-1>;
   uint64 redemption_time;
 } RedeemRequest;
