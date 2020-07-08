@@ -2,13 +2,15 @@
 
 This document documents the cryptographic protocol for the "TrustTokenV1" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe.
 
+This document uses TLS presentation language (https://tools.ietf.org/html/rfc8446#section-3) for structures and serialization.
+
 ## Public Issuer Interfaces
 
 This section describes the public issuer interfaces that an issuer will need to support.
 
 ### Issuer Key Commitments
 
-A Trust Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Trust Token protocol. Request to this endpoint should result in a JSON response of the following format:
+A Trust Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Trust Token protocol. Requests to this endpoint should result in a JSON response of the following format:
 
 
 ```
@@ -52,7 +54,7 @@ At redemption time, the metadata encoded in the Trust Token will be embedded in 
 
 ## Trust Token Crypto Protocol
 
-The Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. The necessary keys and function mappings are described below. Serialization follows the TLS presentation language (https://tools.ietf.org/html/rfc8446).
+The Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. The necessary keys and function mappings are described below.
 
 
 ### Keys
@@ -75,12 +77,19 @@ Each keypair consist of the following:
 
 
 ```
-{
-  Scalar x0, y0; // Corresponding to the FALSE private metadata bit (x0, y0).
-  Scalar x1, y1; // Corresponding to the TRUE private metadata bit (x1, y1).
-  Scalar xs, ys; // Corresponding to the token validity (x˜, y˜).
+struct {
+  // Corresponding to the FALSE private metadata bit (x0, y0).
+  Scalar x0;
+  Scalar y0;
+  // Corresponding to the TRUE private metadata bit (x1, y1).
+  Scalar x1;
+  Scalar y1;
+  // Corresponding to the token validity (x˜, y˜).
+  Scalar xs;
+  Scalar ys;
 } TrustTokenSecretKey;
-{
+
+struct {
   ECPoint pub0; // Corresponding to the FALSE private metadata bit.
   ECPoint pub1; // Corresponding to the TRUE private metadata bit.
   ECPoint pubs; // Corresponding to the token validity check.
@@ -91,7 +100,7 @@ The TrustTokenPublicKey is encoded in the key commitment and should be serialize
 
 
 ```
-{
+struct {
   opaque pub0<1..2^16-1>; // X9.62 Uncompressed point.
   opaque pub1<1..2^16-1>; // X9.62 Uncompressed point.
   opaque pubs<1..2^16-1>; // X9.62 Uncompressed point.
@@ -106,18 +115,18 @@ For the PMBTokens functions, the following serialization schemes and hashes are 
 ```
 Ht(t) - P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of 't' and a dst of "PMBTokens Experiment V1 HashT".
 
-Hs(T, s) - p384_xmd_sha512_sswu with the following input and a dst of "PMBTokens Experiment V1 HashS".
+Hs(T, s) - P384_XMD:SHA-512_SSWU_RO_ with the following input and a dst of "PMBTokens Experiment V1 HashS".
 
-{
+struct {
   opaque t<1..2^16-1>; // X9.62 Uncompressed point.
   opaque s[Nn];
 };
 
-Hc(x) - p384_xmd_sha512 scalar derivation with the input x and a dst of "PMBTokens Experiment V1 HashC". Depending on the context, one of the following serializations is used for the input:
+Hc(x) - P384_XMD:SHA-512_SSWU_RO_ scalar derivation (using the hash-to-curve hash_to_field operation modulo the group order rather than the field element) with the input x and a dst of "PMBTokens Experiment V1 HashC". Depending on the context, one of the following serializations is used for the input:
 
 opaque ECPoint<1..2^16-1>; // X9.62 Uncompressed point.
 
-{
+struct {
   uint8 label[6] = "DLEQ2\0";
   ECPoint X;
   ECPoint T;
@@ -128,7 +137,7 @@ opaque ECPoint<1..2^16-1>; // X9.62 Uncompressed point.
 
 } DLEQInput; // Used for DLEQ proof.
 
-{
+struct {
   uint8 label[8] = "DLEQOR2\0";
   ECPoint X0;
   ECPoint X1;
@@ -141,7 +150,7 @@ opaque ECPoint<1..2^16-1>; // X9.62 Uncompressed point.
   ECPoint K11;
 } DLEQORInput; // Used for DLEQOR proof.
 
-{
+struct {
   uint8 label[11] = "DLEQ Batch\0";
   ECPoint pubs;
   ECPoint pub0;
@@ -182,32 +191,32 @@ Outputs:
 
 ```
 Issue:
-issued = min(count, toIssue)
-xb,yb = secretKey.x1, secretKey.y1
-if privateMetadata == 0:
-  xb,yb = secretKey.x0, secretKey.y0
-signed = []
-T,S,W,Ws = [], [], [], []
-for i in 0..issued:
-  T' = nonces[i]
-  s ←$ {0, 1}λ
-  S' = Hs(T', s)
-  Wp = xb*T' + yb*S'
-  Wsp = secretKey.xs*T' + secretKey.ys*S'
-  T,S,W,Ws += T', S', Wp, Wsp
-  signed += SignedNonce{s, Wp, Wsp}
-proof = DLEQbatched.P((publicKey,T,S,W,Ws),(secretKey.xs, secretKey.ys, xb, yb))
-return (issued, keyID, signed, proof)
+  issued = min(count, toIssue)
+  xb,yb = secretKey.x1, secretKey.y1
+  if privateMetadata == 0:
+    xb,yb = secretKey.x0, secretKey.y0
+  signed = []
+  T,S,W,Ws = [], [], [], []
+  for i in 0..issued:
+    T' = nonces[i]
+    s ←$ {0, 1}λ
+    S' = Hs(T', s)
+    Wp = xb*T' + yb*S'
+    Wsp = secretKey.xs*T' + secretKey.ys*S'
+    T,S,W,Ws += T', S', Wp, Wsp
+    signed += SignedNonce{s, Wp, Wsp}
+  proof = DLEQbatched.P((publicKey,T,S,W,Ws),(secretKey.xs, secretKey.ys, xb, yb))
+  return (issued, keyID, signed, proof)
 
 DLEQbatched.P((X,T,S,W,Ws),(xs, ys, xb, yb)):
-e0,...,em = Hc(X,T,S,W,Ws)
-Tt = Sum(ej*Tj) // over j from 0 to m
-St = Sum(ej*Sj) // over j from 0 to m
-Wt = Sum(ej*Wj) // over j from 0 to m
-Wst = Sum(ej*Wsj) // over j from 0 to m
-dleqProof = DLEQ2.P((X,T,S,Ws), (xs,ys)) // cs,us,vs
-dleqorProof = DLEQOR2.P((X,T,S,W), (xb,yb)) // c0,c1,u0,u1,v0,v1
-return dleqProof + dleqorProof
+  e0,...,em = Hc(X,T,S,W,Ws)
+  Tt = Sum(ej*Tj) // over j from 0 to m
+  St = Sum(ej*Sj) // over j from 0 to m
+  Wt = Sum(ej*Wj) // over j from 0 to m
+  Wst = Sum(ej*Wsj) // over j from 0 to m
+  dleqProof = DLEQ2.P((X,T,S,Ws), (xs,ys)) // cs,us,vs
+  dleqorProof = DLEQOR2.P((X,T,S,W), (xb,yb)) // c0,c1,u0,u1,v0,v1
+  return dleqProof + dleqorProof
 ```
 
 Input Serialization:
@@ -277,27 +286,27 @@ Outputs:
 
 ```
 Redeem:
-secretKey, publicKey = keys[token.key_id]
-T = Ht(token.nonce)
-if token.Ws != secretKey.xs*T+secretKey.ys*token.S:
-  return 0 // Invalid validity verification.
-privateMetadata = 0
-if token.W == secretKey.x0*T+secretKey.y0*token.S:
+  secretKey, publicKey = keys[token.key_id]
+  T = Ht(token.nonce)
+  if token.Ws != secretKey.xs*T+secretKey.ys*token.S:
+    return 0 // Invalid validity verification.
   privateMetadata = 0
-elseif token.W == secretKey.x1*T+secretKey.y1*token.S:
-  privateMetadata = 1
-else:
-  return 0 // Internal Error
-tokenHash = SHA256("TrustTokenV0 TokenHash"||token)
-encodedPrivate = EncodePrivateMetadata(privateMetadata) // Issuer-specific logic for encoding the private metadata bit.
-srr = ConstructCBOR({
-  "metadata": { "public": token.key_id, "private": encodedPrivate},
-  "token-hash": tokenHash,
-  "client-data": client_data,
-  "expiry-timestamp": redemptionTime + lifetime
-}) // Function to correctly encode a CBOR structure into a bytestring.
-signature = Ed25519Sign(srrKey, srr)
-return (srr, signature)
+  if token.W == secretKey.x0*T+secretKey.y0*token.S:
+    privateMetadata = 0
+  elseif token.W == secretKey.x1*T+secretKey.y1*token.S:
+    privateMetadata = 1
+  else:
+    return 0 // Internal Error
+  tokenHash = SHA256("TrustTokenV0 TokenHash"||token)
+  encodedPrivate = EncodePrivateMetadata(privateMetadata) // Issuer-specific logic for encoding the private metadata bit.
+  srr = ConstructCBOR({
+    "metadata": { "public": token.key_id, "private": encodedPrivate},
+    "token-hash": tokenHash,
+    "client-data": client_data,
+    "expiry-timestamp": redemptionTime + lifetime
+  }) // Function to correctly encode a CBOR structure into a bytestring.
+  signature = Ed25519Sign(srrKey, srr)
+  return (srr, signature)
 ```
 
 Input Serialization:
