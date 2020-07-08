@@ -77,6 +77,9 @@ Each keypair consist of the following:
 
 
 ```
+opaque ECPoint<1..2^16-1>; // X9.62 Uncompressed point.
+opaque Scalar<Ns>; // big-endian bytestring
+
 struct {
   // Corresponding to the FALSE private metadata bit (x0, y0).
   Scalar x0;
@@ -96,36 +99,32 @@ struct {
 } TrustTokenPublicKey;
 ```
 
-The TrustTokenPublicKey is encoded in the key commitment and should be serialized as follows:
-
-
-```
-struct {
-  opaque pub0<1..2^16-1>; // X9.62 Uncompressed point.
-  opaque pub1<1..2^16-1>; // X9.62 Uncompressed point.
-  opaque pubs<1..2^16-1>; // X9.62 Uncompressed point.
-} TrustTokenPublicKey;
-```
-
 ### Serialization/Hashing
 
 For the PMBTokens functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
 
 
+`Ht(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PMBTokens Experiment V1 HashT".
+
+`Hs(T, s)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a bytestring input of `T` with the following content and a dst of "PMBTokens Experiment V1 HashS".
+
 ```
-Ht(t) - P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of 't' and a dst of "PMBTokens Experiment V1 HashT".
-
-Hs(T, s) - P384_XMD:SHA-512_SSWU_RO_ with the following input and a dst of "PMBTokens Experiment V1 HashS".
-
 struct {
   opaque t<1..2^16-1>; // X9.62 Uncompressed point.
   opaque s[Nn];
-};
+} T;
+```
 
-Hc(x) - P384_XMD:SHA-512_SSWU_RO_ scalar derivation (using the hash-to-curve hash_to_field operation modulo the group order rather than the field element) with the input x and a dst of "PMBTokens Experiment V1 HashC". Depending on the context, one of the following serializations is used for the input:
+The hash-to-curve document does not define hash to scalars, so `Hc(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
 
-opaque ECPoint<1..2^16-1>; // X9.62 Uncompressed point.
+* `DST` is "PMBTokens Experiment V1 HashC"
+* `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO_.
+* `L` is 72, derived based on P384_XMD:SHA-512_SSWU_RO_'s security parameter `k` (192), and `p` defined above.
+* `expand_message` uses the corresponding function from P384_XMD:SHA-512_SSWU_RO_.
 
+When used in the DLEQ proof, `Hc` takes the following input.
+
+```
 struct {
   uint8 label[6] = "DLEQ2\0";
   ECPoint X;
@@ -134,9 +133,12 @@ struct {
   ECPoint W;
   ECPoint K0;
   ECPoint K1;
-
 } DLEQInput; // Used for DLEQ proof.
+```
 
+When used in the DLEQOR proof, `Hc` takes the following input.
+
+```
 struct {
   uint8 label[8] = "DLEQOR2\0";
   ECPoint X0;
@@ -149,7 +151,11 @@ struct {
   ECPoint K10;
   ECPoint K11;
 } DLEQORInput; // Used for DLEQOR proof.
+```
 
+When used in the DLEQ batching step, `Hc` is called once for each `e_i` output, with the following input. The `index` field contains `i`.
+
+```
 struct {
   uint8 label[11] = "DLEQ Batch\0";
   ECPoint pubs;
@@ -221,29 +227,25 @@ DLEQbatched.P((X,T,S,W,Ws),(xs, ys, xb, yb)):
 
 Input Serialization:
 
-```
-Trust Token Issuance Request
-struct {
-  opaque point<1..2^16-1>; // X9.62 Uncompressed point.
-} BlindedNonce;
+The Trust Token Issuance Request contains an `IssueRequest` structure defined below.
 
+```
 struct {
   uint16 count;
-  BlindedNonce nonces[count];
+  ECPoint nonces[count];
 } IssueRequest;
 ```
 
 Output Serialization:
 
+The Trust Token Issuance Response contains an `IssueResponse` structure defined below.
 
 ```
-Trust Token Issuance Response
 struct {
   opaque s<Nn>; // big-endian bytestring
   opaque Wp<1..2^16-1>; // X9.62 Uncompressed Wp point.
   opaque Wsp<1..2^16-1>; // X9.62 Uncompressed Wsp point.
 } SignedNonce;
-opaque Scalar<Ns>; // big-endian bytestring
 
 struct {
   Scalar cs;
@@ -298,7 +300,8 @@ Redeem:
   else:
     return 0 // Internal Error
   tokenHash = SHA256("TrustTokenV0 TokenHash"||token)
-  encodedPrivate = EncodePrivateMetadata(privateMetadata) // Issuer-specific logic for encoding the private metadata bit.
+  // Issuer-specific logic for encoding the private metadata bit.
+  encodedPrivate = EncodePrivateMetadata(privateMetadata)
   srr = ConstructCBOR({
     "metadata": { "public": token.key_id, "private": encodedPrivate},
     "token-hash": tokenHash,
@@ -311,16 +314,15 @@ Redeem:
 
 Input Serialization:
 
+The Trust Token Redemption Request contains a `RedemptionRequest` structure as defined below.
 
 ```
-Trust Token Redemption Request
 struct {
   uint32 key_id;
   opaque nonce<nonce_size>;
-  opaque S<1..2^16-1>; // X9.62 Uncompressed point.
-  opaque W<1..2^16-1>; // X9.62 Uncompressed point.
-  opaque Ws<1..2^16-1>; // X9.62 Uncompressed point.
-
+  ECPoint S;
+  ECPoint W;
+  ECPoint Ws;
 } Token;
 
 struct {
@@ -333,9 +335,9 @@ struct {
 
 Output Serialization:
 
+The Trust Token Redemption Response contains a `RedemptionResponse` structure as defined below.
 
 ```
-Trust Token Redemption Response
 struct {
   opaque srr<1..2^16-1>;
   opaque signature<1..2^16-1>;
