@@ -17,7 +17,7 @@ A Trust Token issuer should have an endpoint at a publicly accessible secure URL
 Key commitment result
 {
   "protocol_version": <protocol version, TrustTokenV1 for this>,
-  "id": <key commitment identifier, as a string>
+  "id": <key commitment identifier, as a monotonically increasing integer>
   "batchsize": <batch size>,
   "srrkey": <base-64 encoded SRRVerificationKey, in 32-byte RFC8032 encoding>,
   <keyID>: { "Y": <base64-encoded TrustTokenPublicKey>,
