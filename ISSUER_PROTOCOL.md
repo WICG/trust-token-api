@@ -31,6 +31,7 @@ Key commitment result
 }
 ```
 
+The `id` field is used as a unique identifier to identify this key commitment and to allow comparing the freshness of key commitments (larger values indicate a newer key commitment).
 
 ### Issuing Tokens
 
