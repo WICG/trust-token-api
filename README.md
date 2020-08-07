@@ -342,7 +342,7 @@ If the publisher can configure issuers in response headers (or otherwise early i
 
 ### Non-web sources of tokens
 
-Trust token issuance could be expanded to other entities (the operating system, or native applications) capable of making an informed decision about whether to grant tokens. Naturally, this would need to take into consideration different systems' security models in order for these tokens to maintain their meaning. (For instance, on some platforms, malicious applications might routinely have similar privileges to the operating system itself, which would at best reduce the signal-to-noise ratio of tokens created by the operating system.)
+Trust token issuance could be expanded to other entities (the operating system, or native applications) capable of making an informed decision about whether to grant tokens. Naturally, this would need to take into consideration different systems' security models in order for these tokens to maintain their meaning. (For instance, on some platforms, malicious applications might routinely have similar privileges to the operating system itself, which would at best reduce the signal-to-noise ratio of tokens created on those operating systems.)
 
 ## Appendix
 
