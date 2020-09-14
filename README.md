@@ -190,7 +190,7 @@ fetch(<resource-url>, {
     includeTimestampHeader: false | true,
     additionalSignedHeaders: <headers>
   }
-  headers: new Headers('Signed-Headers', '"sec-signed-redemption-record", "referer"')
+  headers: new Headers({'Signed-Headers': 'sec-signed-redemption-record, sec-time'})
   ...
 });
 ```
@@ -209,7 +209,7 @@ If `signRequestData` is `include`, then the browser will sign over the request d
 ```
 
 
-The browser will add a new request header with the resulting signature over a context string and CBOR data (`"Trust-Token-v1"||CBOR data)`, along with the public key. Something like:
+The browser will add a new request header with the resulting signature over a context string and CBOR data (`"Trust Token v0"||CBOR data)`, along with the public key. Something like:
 
 
 ```
