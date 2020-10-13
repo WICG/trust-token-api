@@ -159,7 +159,7 @@ In order to allow multiple versions of Trust Token to be supported in the ecosys
 
 An additional extension to the Trust Attestation allows us to ensure the integrity of the RR, fetch data, and other headers by associating the RR with a public/private keypair on the browser. This integrity allows the RR and signed data to be passed around via third parties while preventing manipulation of the data. This is particularly useful in cases like ads and CDNs where the intermediary parties may not be fully trusted. This keypair is bound to the RR (and the original token redemption) so that the browser can sign arbitrary request data with the private key and transfer trust to the request from the token.
 
-In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which can be included in the `ClientData` portion of the RR. The keypair is then stored in new first-party storage only accessible via these APIs.
+In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which can be included in the RR. The keypair is then stored in new first-party storage only accessible via these APIs.
 
 An additional parameter to the Fetch API then allows the browser to include a signature over the RR, request data, and additional request headers (specified using a new opt-in header), using the browser's private key associated with the RR:
 
