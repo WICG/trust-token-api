@@ -214,6 +214,7 @@ The browser will add a new request header with the resulting signature over a co
 
 ```
 Sec-Signature:
+  alg=<alg>
   public-key=<pk>
   sig=<signature>
   sign-request-data=<include, headers-only>
