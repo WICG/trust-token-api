@@ -107,7 +107,7 @@ fetch('<issuer>/.well-known/trust-token', {
 
 If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the Sec-Trust-Token request header. The issuer can either consume the token and act based on the result, optionally including a Redemption Record (RR) in the Sec-Trust-Token response header to provide a redemption attestation to forward to other parties.
 
-The RR is HTTP-only and JavaScript is only able to access/send the RR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party.
+The RR is HTTP-only and JavaScript is only able to access/send the RR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The RR is treated as an arbitrary blob of bytes from the issuer, that may have semantic meaning to downstream consumers.
 
 To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired RRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
 
@@ -129,7 +129,7 @@ fetch(<resource-url>, {
 ```
 
 
-The RR will be added as a new request header `Sec-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no RRs available, the request header will be omitted.
+The RR will be added as a new request header `Sec-Redemption-Record`. This option to Fetch is only usable in the top-level document. If there are no RRs available, the request header will be empty.
 
 
 ### Extension: Trust Token Versioning
