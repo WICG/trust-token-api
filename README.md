@@ -352,8 +352,8 @@ Different issuers/ecosystems should specify their own Redemption Record format s
   Metadata: {
     Trust Token Key ID
   },
-  SigAlg: <Well known algorithm identifier used to sign this RR>,
   Signature of the above verifiable by well-known public key of the issuer,
+  SigAlg: <Well known algorithm identifier used to sign this RR>,
   optional expiry timestamp
 }
 ```
