@@ -1,6 +1,6 @@
-# TrustTokenV2 Issuer Protocol
+# TrustTokenV3 Issuer Protocol
 
-This document documents the cryptographic protocol for the "TrustTokenV2PMB" and "TrustTokenV2VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe.
+This document documents the cryptographic protocol for the "TrustTokenV3PMB" and "TrustTokenV3VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe.
 
 This document uses TLS presentation language (https://tools.ietf.org/html/rfc8446#section-3) for structures and serialization.
 
@@ -16,7 +16,7 @@ A Trust Token issuer should have an endpoint at a publicly accessible secure URL
 ```
 Key commitment result
 {
-  "protocol_version": <protocol version, TrustTokenV2PMB or TrustTokenV2VOPRF for this>,
+  "protocol_version": <protocol version, TrustTokenV3PMB or TrustTokenV3VOPRF for this>,
   "id": <key commitment identifier, as a monotonically increasing integer>
   "batchsize": <batch size>,
   "srrkey": <base-64 encoded SRRVerificationKey, in 32-byte RFC8032 encoding>,
@@ -40,7 +40,7 @@ To support the issuance of tokens made via Trust Token calls by the client, serv
 
 #### Issuance Metadata
 
-As part of an issuance, two forms of metadata can be embedded into the token. Public metadata is embedded via the choice of key which is used as part of the issuance process and is passed into the _Issue_ method as the keypair selection. Private metadata is embedded via a cryptographically hidden bit in the signed token itself and is passed into the _Issue_ method as the private metadata boolean. TrustTokenV2VOPRF supports up to 6 buckets (keypairs) of public metadata and no private metadata, while TrustTokenV2PMB supports up to 3 buckets (keypairs) of public metadata and one bit of private metadata.
+As part of an issuance, two forms of metadata can be embedded into the token. Public metadata is embedded via the choice of key which is used as part of the issuance process and is passed into the _Issue_ method as the keypair selection. Private metadata is embedded via a cryptographically hidden bit in the signed token itself and is passed into the _Issue_ method as the private metadata boolean. TrustTokenV3VOPRF supports up to 6 buckets (keypairs) of public metadata and no private metadata, while TrustTokenV3PMB supports up to 3 buckets (keypairs) of public metadata and one bit of private metadata.
 
 
 ### Redeeming Tokens
@@ -52,10 +52,14 @@ To support the redemption of tokens by the client, server paths that support tok
 
 At redemption time, the token is decoded and provided via the redemption API. The issuer can then choose to encode this in the Redemption Record in whatever way it prefers.
 
+#### Request Signing
+
+In Version 3, the algorithm used for [request signing](https://github.com/WICG/trust-token-api#extension-trust-bound-keypair-and-request-signing) is `ecdsa_secp256r1_sha256`.
+
 
 ## TrustTokenV2PMB Crypto Protocol
 
-This Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. The necessary keys and function mappings are described below.
+This Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. This crypto protocol is used in both the V2 and V3 Trust Token protocol versions.  The necessary keys and function mappings are described below.
 
 ### Keys
 
@@ -99,9 +103,9 @@ struct {
 For the PMBTokens functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
 
 
-`Ht(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PMBTokens Experiment V2 HashT".
+`Ht(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PMBTokens Experiment V3 HashT".
 
-`Hs(T, s)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a bytestring input of `T` with the following content and a dst of "PMBTokens Experiment V2 HashS".
+`Hs(T, s)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a bytestring input of `T` with the following content and a dst of "PMBTokens Experiment V3 HashS".
 
 ```
 struct {
@@ -112,7 +116,7 @@ struct {
 
 The hash-to-curve document does not define hash to scalars, so `Hc(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
 
-* `DST` is "PMBTokens Experiment V2 HashC"
+* `DST` is "PMBTokens Experiment V3 HashC"
 * `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO_.
 * `L` is 72, derived based on P384_XMD:SHA-512_SSWU_RO_'s security parameter `k` (192), and `p` defined above.
 * `expand_message` uses the corresponding function from P384_XMD:SHA-512_SSWU_RO_.
@@ -328,7 +332,7 @@ struct {
 
 ## TrustTokenV2VOPRF Crypto Protocol
 
-This Trust Token crypto protocol is based on the VOPRF design in https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/.
+This Trust Token crypto protocol is based on the VOPRF design in https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/. This crypto protocol is used in both the V2 and V3 Trust Token protocol versions.
 
 ### Keys
 
@@ -362,11 +366,11 @@ struct {
 For the VOPRF functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
 
 
-`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "TrustToken VOPRF Experiment V2 HashToGroup".
+`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "TrustToken VOPRF Experiment V3 HashToGroup".
 
 The hash-to-curve document does not define hash to scalars, so `H2S(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
 
-* `DST` is "TrustToken VOPRF Experiment V2 HashToScalar"
+* `DST` is "TrustToken VOPRF Experiment V3 HashToScalar"
 * `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO_.
 * `L` is 72, derived based on P384_XMD:SHA-512_SSWU_RO_'s security parameter `k` (192), and `p` defined above.
 * `expand_message` uses the corresponding function from P384_XMD:SHA-512_SSWU_RO_.
@@ -470,3 +474,9 @@ struct {
   opaque rr<1..2^16-1>;
 } RedeemResponse;
 ```
+
+## Version History
+
+V3 uses `ecdsa_secp256r1_sha256` as the signing algorithm for request signing.
+
+V2 introduces two protocol versions, each supporting a different arrangement of public and private metadata. It also enables the issuer to structure the Redemption Record as they choose, and removes the signing requirement.
