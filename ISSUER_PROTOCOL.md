@@ -1,6 +1,6 @@
 # TrustTokenV3 Issuer Protocol
 
-This document documents the cryptographic protocol for the "TrustTokenV3PMB" and "TrustTokenV3VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe.
+This document documents the cryptographic protocol for the "TrustTokenV3PMB" and "TrustTokenV3VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe. Note that there is a distinct different between the issuer protocol version and the cryptographic protocol version, with the latter describing the underlying cryptographic primitives used in the issuer protocol.
 
 This document uses TLS presentation language (https://tools.ietf.org/html/rfc8446#section-3) for structures and serialization.
 
@@ -54,7 +54,7 @@ At redemption time, the token is decoded and provided via the redemption API. Th
 
 #### Request Signing
 
-In Version 3, the algorithm used for [request signing](https://github.com/WICG/trust-token-api#extension-trust-bound-keypair-and-request-signing) is `ecdsa_secp256r1_sha256`.
+In Version 3, the algorithm used for [request signing](https://github.com/WICG/trust-token-api#extension-trust-bound-keypair-and-request-signing) is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3).
 
 
 ## TrustTokenV2PMB Crypto Protocol
@@ -103,9 +103,9 @@ struct {
 For the PMBTokens functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
 
 
-`Ht(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PMBTokens Experiment V3 HashT".
+`Ht(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PMBTokens Experiment V2 HashT".
 
-`Hs(T, s)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a bytestring input of `T` with the following content and a dst of "PMBTokens Experiment V3 HashS".
+`Hs(T, s)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a bytestring input of `T` with the following content and a dst of "PMBTokens Experiment V2 HashS".
 
 ```
 struct {
@@ -116,7 +116,7 @@ struct {
 
 The hash-to-curve document does not define hash to scalars, so `Hc(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
 
-* `DST` is "PMBTokens Experiment V3 HashC"
+* `DST` is "PMBTokens Experiment V2 HashC"
 * `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO_.
 * `L` is 72, derived based on P384_XMD:SHA-512_SSWU_RO_'s security parameter `k` (192), and `p` defined above.
 * `expand_message` uses the corresponding function from P384_XMD:SHA-512_SSWU_RO_.
@@ -366,7 +366,7 @@ struct {
 For the VOPRF functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
 
 
-`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "TrustToken VOPRF Experiment V3 HashToGroup".
+`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "TrustToken VOPRF Experiment V2 HashToGroup".
 
 The hash-to-curve document does not define hash to scalars, so `H2S(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
 
@@ -477,6 +477,6 @@ struct {
 
 ## Version History
 
-V3 uses `ecdsa_secp256r1_sha256` as the signing algorithm for request signing.
+V3 uses [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3) as the signing algorithm for request signing.
 
 V2 introduces two protocol versions, each supporting a different arrangement of public and private metadata. It also enables the issuer to structure the Redemption Record as they choose, and removes the signing requirement.
