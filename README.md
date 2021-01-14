@@ -175,9 +175,7 @@ If `signRequestData` is `include`, then the browser will sign over the request d
 }
 ```
 
-
-The browser will add a new request header with the resulting signature over a context string and CBOR data (`"TrustTokenV2"||CBOR data)`, along with the public key. Something like:
-
+The browser will add a new request header with the resulting signature over a context string and CBOR data (`"TrustTokenV3"||CBOR data)`, along with the public key. Something like:
 
 ```
 Sec-Signature:
@@ -188,7 +186,7 @@ Sec-Signature:
 ```
 
 
-The canonical CBOR data (verifiable by the signature) should be computable from a request, and so does not need to be sent over the wire from the browser. The `Signed-Headers` header, and the value of `sign-request-data` should be enough to re-construct it server side, robust to things like header re-ordering, etc.
+The canonical CBOR data (verifiable by the signature) should be computable from a request, and so does not need to be sent over the wire from the browser. The `Signed-Headers` header, and the value of `sign-request-data` should be enough to re-construct it server side, robust to things like header re-ordering, etc. In Version 3 of the protocol, the algorithm used for signing is `ecdsa_secp256r1_sha256`.
 
 
 ### Extension: Metadata
