@@ -1,5 +1,7 @@
 # TrustTokenV3 Issuer Protocol
 
+*Version 3 is a working version and is subject to change.*
+
 This document documents the cryptographic protocol for the "TrustTokenV3PMB" and "TrustTokenV3VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe. Note that there is a distinct different between the issuer protocol version and the cryptographic protocol version, with the latter describing the underlying cryptographic primitives used in the issuer protocol.
 
 This document uses TLS presentation language (https://tools.ietf.org/html/rfc8446#section-3) for structures and serialization.
