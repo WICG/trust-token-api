@@ -175,9 +175,7 @@ If `signRequestData` is `include`, then the browser will sign over the request d
 }
 ```
 
-
 The browser will add a new request header with the resulting signature over a context string and CBOR data (`"TrustTokenV3"||CBOR data)`, along with the public key. Something like:
-
 
 ```
 Sec-Signature:
