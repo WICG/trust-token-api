@@ -38,7 +38,8 @@ Key commitment result
 }
 ```
 
-The commitment is a dictionary keyed by protocol version where each value is a self-contained key commitment for that version. To support compatibility with prior
+The commitment is a dictionary keyed by protocol version where each value is a self-contained key commitment for that version (for
+current protocol versions, the protocol_version field is also included as a field of the individual commitment itself). To support compatibility with prior
 key commitment formats, unknown fields in the top level dictionary should be ignored. The `id` field is used as a unique identifier to identify this key commitment
 and to allow comparing the freshness of key commitments (larger values indicate a newer key commitment).
 
@@ -486,6 +487,6 @@ struct {
 
 ## Version History
 
-V3 uses [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3) as the signing algorithm for request signing and updates the key commitment format.
+V3 uses [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3) as the signing algorithm for request signing and updates the key commitment format to nest it in a version-keyed dictionary (and to move the set of keys to their own dictionary within the commitment).
 
 V2 introduces two protocol versions, each supporting a different arrangement of public and private metadata. It also enables the issuer to structure the Redemption Record as they choose, and removes the signing requirement.
