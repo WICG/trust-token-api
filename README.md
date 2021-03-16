@@ -207,7 +207,7 @@ This can be managed by assigning different keys in the key commitment to have di
 
 Other information about the token may need to be shared with themselves (on redemption) and other partners (via the RR) without revealing the metadata to the client. This could be used as a negative indicator of trust or other limited information that the client shouldn't know about. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
 
-This can be managed by having pairs of keys that sign the token at issuance, with one key being used to indicate the bit of metadata is true, while a different key is used to indicate the bit of metadata is false. The zero-knowledge proof returned during the token issuance then proves that one of two keys was used to sign the token, without revealing which key was actually used. At redemption time, the issuer can then check which of the two keys was used to retrieve the value of the private metadata.
+This can be managed using the [PMBTokens construction](https://eprint.iacr.org/2020/072.pdf) that combines two different entwined secret keys being used to indicate the value of the metadata. At redemption time, the issuer can then check which of the two keys was used to retrieve the value of the private metadata.
 
 
 ### Extension: iframe Activation
