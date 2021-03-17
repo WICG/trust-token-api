@@ -39,7 +39,7 @@ Key commitment result
 
 The commitment is a dictionary keyed by protocol version where each value is a self-contained key commitment for that version (for
 current protocol versions, the protocol_version field is also included as a field of the individual commitment itself). To support compatibility with prior
-key commitment formats, unknown fields in the top level dictionary should be ignored. The `id` field is used as a unique identifier to identify this key commitment
+key commitment formats, unknown fields in the top level dictionary should be ignored. The `id` field is used as a unique identifier to identify each key commitment
 and to allow comparing the freshness of key commitments (larger values indicate a newer key commitment).
 
 ### Issuing Tokens
