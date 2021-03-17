@@ -19,7 +19,7 @@ A Trust Token issuer should have an endpoint at a publicly accessible secure URL
 Key commitment result
 {
   <protocol_version>: {
-    "protocol_version": <protocol version, TrustTokenV3PMB or TrustTokenV3VOPRF for this>,
+    "protocol_version": <protocol version as a string, "TrustTokenV3PMB" or "TrustTokenV3VOPRF" for this>,
     "id": <key commitment identifier, as a monotonically increasing integer>
     "batchsize": <batch size>,
     "keys": {
