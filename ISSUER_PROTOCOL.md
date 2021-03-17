@@ -22,7 +22,6 @@ Key commitment result
     "protocol_version": <protocol version, TrustTokenV3PMB or TrustTokenV3VOPRF for this>,
     "id": <key commitment identifier, as a monotonically increasing integer>
     "batchsize": <batch size>,
-    "srrkey": <base-64 encoded SRRVerificationKey, in 32-byte RFC8032 encoding>,
     "keys": {
       <keyID>: { "Y": <base64-encoded TrustTokenPublicKey>,
                          "expiry": <key expiry, encoded as a string representation of
