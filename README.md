@@ -128,7 +128,7 @@ fetch(<resource-url>, {
 ```
 
 
-The RRs will be added as a new request header `Sec-Redemption-Record`. The header contains a Structured Headers list of issuer and redemption record pairs corresponding to each requested redemption record. This option to Fetch is only usable in the top-level document. If there are no RRs available, the request header will be empty.
+The RRs will be added as a new request header `Sec-Redemption-Record`. The header contains a list of issuer and redemption record pairs corresponding to each requested redemption record. This option to Fetch is only usable in the top-level document. If there are no RRs available, the request header will be empty.
 
 
 ### Extension: Trust Token Versioning
@@ -183,7 +183,7 @@ Sec-Signature:
 ```
 
 
-The canonical CBOR data (verifiable by the signature) should be computable from a request, and so does not need to be sent over the wire from the browser. The `Signed-Headers` header, and the value of `sign-request-data` should be enough to re-construct it server side, robust to things like header re-ordering, etc. A key for each requested issuer is included in the signatures field as a Structured Headers list of pairs of issuers and their respective signature material (algorithm, key, signature). In Version 3 of the protocol, the algorithm used for signing is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3).
+The canonical CBOR data (verifiable by the signature) should be computable from a request, and so does not need to be sent over the wire from the browser. The `Signed-Headers` header, and the value of `sign-request-data` should be enough to re-construct it server side, robust to things like header re-ordering, etc. A key for each requested issuer is included in the signatures field as a list of pairs of issuers and their respective signature material (algorithm, key, signature). In Version 3 of the protocol, the algorithm used for signing is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3). Consumers of this header should ignore unknown signatures.
 
 
 ### Extension: Metadata

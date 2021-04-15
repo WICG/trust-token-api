@@ -486,6 +486,6 @@ struct {
 
 ## Version History
 
-V3 uses [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3) as the signing algorithm for request signing and updates the key commitment format to nest it in a version-keyed dictionary (and to move the set of keys to their own dictionary within the commitment).
+V3 uses [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3) as the signing algorithm for request signing and updates the key commitment format to nest it in a version-keyed dictionary (and to move the set of keys to their own dictionary within the commitment). The send redemption API is also updated to support multiple records with differing signing algorithms for future compatibility.
 
 V2 introduces two protocol versions, each supporting a different arrangement of public and private metadata. It also enables the issuer to structure the Redemption Record as they choose, and removes the signing requirement.
