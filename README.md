@@ -135,6 +135,8 @@ The RRs will be added as a new request header `Sec-Redemption-Record`. The heade
 
 In order to allow multiple versions of Trust Token to be supported in the ecosystem, issuers include the version of the protocol (i.e. "TrustTokenV1") in their key commitments via the "protocol_version" field, and that is included in Trust Token requests via the Sec-Trust-Token-Version header. Trust Token operations should not be performed with issuers configured with an unknown protocol version.
 
+In addition to the core cryptographic layer, signed requests' formats (see the next section) might change from version to version. In order to make adapting to these changes easier, we could employ a mechanism like the Sec-Trust-Token-Version header, or an addition to the requests' payloads, to tell consumers the version of the client that generated the request.
+
 
 ### Extension: Trust-Bound Keypair and Request Signing
 
