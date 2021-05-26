@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 # TrustTokenV3 Issuer Protocol
 
 *Version 3 is a working version and is subject to change.*
 
 This document documents the cryptographic protocol for the "TrustTokenV3PMB" and "TrustTokenV3VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe. Note that there is a distinct different between the issuer protocol version and the cryptographic protocol version, with the latter describing the underlying cryptographic primitives used in the issuer protocol.
+=======
+# TrustTokenV2 Issuer Protocol
+
+This document documents the cryptographic protocol for the "TrustTokenV2PMB" and "TrustTokenV2VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe.
+>>>>>>> origin/v2changes
 
 This document uses TLS presentation language (https://tools.ietf.org/html/rfc8446#section-3) for structures and serialization.
 
@@ -18,6 +24,7 @@ A Trust Token issuer should have an endpoint at a publicly accessible secure URL
 ```
 Key commitment result
 {
+<<<<<<< HEAD
   <protocol_version>: {
     "protocol_version": <protocol version as a string, "TrustTokenV3PMB" or "TrustTokenV3VOPRF" for this>,
     "id": <key commitment identifier, as a monotonically increasing integer>
@@ -34,6 +41,20 @@ Key commitment result
     }
   },
   ...
+=======
+  "protocol_version": <protocol version, TrustTokenV2PMB or TrustTokenV2VOPRF for this>,
+  "id": <key commitment identifier, as a monotonically increasing integer>
+  "batchsize": <batch size>,
+  "srrkey": <base-64 encoded SRRVerificationKey, in 32-byte RFC8032 encoding>,
+  <keyID>: { "Y": <base64-encoded TrustTokenPublicKey>,
+                     "expiry": <key expiry, encoded as a string representation of
+                                an integer timestamp in microseconds since the Unix
+                                epoch> },
+  <keyID>: { "Y": <base64-encoded public key>,
+                     "expiry": <key expiry, encoded as a string representation of
+                                an integer timestamp in microseconds since the Unix
+                                epoch> }, ...
+>>>>>>> origin/v2changes
 }
 ```
 
@@ -49,7 +70,11 @@ To support the issuance of tokens made via Trust Token calls by the client, serv
 
 #### Issuance Metadata
 
+<<<<<<< HEAD
 As part of an issuance, two forms of metadata can be embedded into the token. Public metadata is embedded via the choice of key which is used as part of the issuance process and is passed into the _Issue_ method as the keypair selection. Private metadata is embedded via a cryptographically hidden bit in the signed token itself and is passed into the _Issue_ method as the private metadata boolean. TrustTokenV3VOPRF supports up to 6 buckets (keypairs) of public metadata and no private metadata, while TrustTokenV3PMB supports up to 3 buckets (keypairs) of public metadata and one bit of private metadata.
+=======
+As part of an issuance, two forms of metadata can be embedded into the token. Public metadata is embedded via the choice of key which is used as part of the issuance process and is passed into the _Issue_ method as the keypair selection. Private metadata is embedded via a cryptographically hidden bit in the signed token itself and is passed into the _Issue_ method as the private metadata boolean. TrustTokenV2VOPRF supports up to 6 buckets (keypairs) of public metadata and no private metadata, while TrustTokenV2PMB supports up to 3 buckets (keypairs) of public metadata and one bit of private metadata.
+>>>>>>> origin/v2changes
 
 
 ### Redeeming Tokens
@@ -60,15 +85,24 @@ To support the redemption of tokens by the client, server paths that support tok
 #### Redemption Metadata
 
 At redemption time, the token is decoded and provided via the redemption API. The issuer can then choose to encode this in the Redemption Record in whatever way it prefers.
+<<<<<<< HEAD
 
 #### Request Signing
+=======
+>>>>>>> origin/v2changes
 
 In Version 3, the algorithm used for [request signing](https://github.com/WICG/trust-token-api#extension-trust-bound-keypair-and-request-signing) is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3).
 
+<<<<<<< HEAD
 
 ## TrustTokenV2PMB Crypto Protocol
 
 This Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. This crypto protocol is used in both the V2 and V3 Trust Token protocol versions.  The necessary keys and function mappings are described below.
+=======
+## TrustTokenV2PMB Crypto Protocol
+
+This Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. The necessary keys and function mappings are described below.
+>>>>>>> origin/v2changes
 
 ### Keys
 
@@ -336,6 +370,7 @@ The Trust Token Redemption Response contains a `RedemptionResponse` structure as
 ```
 struct {
   opaque rr<1..2^16-1>;
+<<<<<<< HEAD
 } RedeemResponse;
 ```
 
@@ -489,3 +524,152 @@ struct {
 V3 uses [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3) as the signing algorithm for request signing and updates the key commitment format to nest it in a version-keyed dictionary (and to move the set of keys to their own dictionary within the commitment). The `send-redemption-record` API is also updated to support sending multiple redemption records from different issuers with differing signing algorithms for future compatibility.
 
 V2 introduces two protocol versions, each supporting a different arrangement of public and private metadata. It also enables the issuer to structure the Redemption Record as they choose, and removes the signing requirement.
+=======
+} RedeemResponse;
+```
+
+## TrustTokenV2VOPRF Crypto Protocol
+
+This Trust Token crypto protocol is based on the VOPRF design in https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/.
+
+### Keys
+
+The Trust Token protocol primarily requires keypairs consisting of each public metadata bucket:
+
+*   TrustTokenSecretKey/TrustTokenPublicKey - A Trust Token keypair used to sign and verify Trust Tokens.
+
+
+#### TrustTokenSecretKey/TrustTokenPublicKey
+
+These are keys used in Trust Token consisting of elliptic curve scalars and points. All scalars and points are sized based on the curve choice (P-384). Up to 6 keys may be configured in parallel in the key commitment.
+
+Each keypair consist of the following:
+
+
+```
+opaque ECPoint<1..2^16-1>; // X9.62 Uncompressed point.
+opaque Scalar<Ns>; // big-endian bytestring
+
+struct {
+  Scalar x;
+} TrustTokenSecretKey;
+
+struct {
+  ECPoint pub;
+} TrustTokenPublicKey;
+```
+
+### Serialization/Hashing
+
+For the VOPRF functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
+
+
+`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "TrustToken VOPRF Experiment V2 HashToGroup".
+
+The hash-to-curve document does not define hash to scalars, so `H2S(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
+
+* `DST` is "TrustToken VOPRF Experiment V2 HashToScalar"
+* `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO_.
+* `L` is 72, derived based on P384_XMD:SHA-512_SSWU_RO_'s security parameter `k` (192), and `p` defined above.
+* `expand_message` uses the corresponding function from P384_XMD:SHA-512_SSWU_RO_.
+
+When used in the DLEQ proof, `H2S` takes the following input.
+
+```
+struct {
+  uint8 label[6] = "DLEQ2\0";
+  ECPoint X;
+  ECPoint T;
+  ECPoint W;
+  ECPoint K0;
+  ECPoint K1;
+} DLEQInput; // Used for DLEQ proof.
+```
+
+When used in the DLEQ batching step, `H2C` is called once for each `e_i` output, with the following input. The `index` field contains `i`.
+
+```
+struct {
+  uint8 label[11] = "DLEQ BATCH\0";
+  ECPoint pub;
+  ECPoint BT0;
+  ECPoint Z0;
+  ...
+  ECPoint Tn;
+  ECPoint Zn;
+  uint16 index;
+} DLEQBatchInput; // Used for Batch proof.
+```
+
+### Issue Function
+
+The _Issue_ **Blind**/**Evaluate**/**Unblind** stages of the VOPRF protocol.
+
+Input Serialization:
+
+The Trust Token Issuance Request contains an `IssueRequest` structure defined below.
+
+```
+struct {
+  uint16 count;
+  ECPoint nonces[count];
+} IssueRequest;
+```
+
+Output Serialization:
+
+The Trust Token Issuance Response contains an `IssueResponse` structure defined below.
+
+```
+struct {
+  opaque s<Nn>; // big-endian bytestring
+  ECPoint W;
+} SignedNonce;
+
+struct {
+  Scalar c;
+  Scalar u;
+  Scalar v;
+} DLEQProof;
+
+struct {
+  uint16 issued;
+  uint32 key_id = keyID;
+  SignedNonce signed[issued];
+  opaque proof<1..2^16-1>; // Length-prefixed form of DLEQProof.
+} IssueResponse;
+```
+
+### Redeem Function
+
+The _Redeem_ function corresponds to the **VerifyFinalize** stage of the VOPRF protocol.
+
+Input Serialization:
+
+The Trust Token Redemption Request contains a `RedemptionRequest` structure as defined below.
+
+```
+struct {
+  uint32 key_id;
+  opaque nonce<nonce_size>;
+  ECPoint W;
+} Token;
+
+struct {
+  opaque token<1..2^16-1>; // Bytestring containing a serialized Token struct.
+  opaque client_data<1..2^16-1>;
+  uint64 redemption_time;
+} RedeemRequest;
+```
+
+
+Output Serialization:
+
+The Trust Token Redemption Response contains a `RedemptionResponse` structure as defined below.
+
+```
+struct {
+  opaque rr<1..2^16-1>;
+} RedeemResponse;
+```
+>>>>>>> origin/v2changes
