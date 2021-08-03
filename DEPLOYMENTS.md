@@ -3,7 +3,7 @@
 ## First-Party vs Third-Party Issuance
 Issuers need to make a decision about what sort of information they will use as part of issuing tokens, and where issuances can happen, generally this decision is made based on where they can get good issuance signals, and we see issuers falling into two major categories.
 
-![Issuance Types](https://github.com/wicg/trust-token-api/blob/master/assets/deployment_issuance.png?raw=true)
+![Issuance Types](https://raw.githubusercontent.com/wicg/trust-token-api/main/assets/deployment_issuance.png)
 
 ### First Party Issuance
 First-Party issuers are instances where the issuer is the first-party site the user is interacting with, that then decides to perform a Trust Token issuance based on the first-hand information it has about the user based on the first-party interactions it sees. Some examples of this are things like an e-commerce or social media site measuring user interactions and the user having an account to derive the trust signal.
@@ -14,7 +14,7 @@ Third-Party issuers are instances where the actual issuer is not the same entity
 ## Public vs Private Redemption
 On the redemption side, we expect issuers to fall into two categories.
 
-![Redemption Types](https://github.com/wicg/trust-token-api/blob/master/assets/deployment_redemption.png?raw=true)
+![Redemption Types](https://raw.githubusercontent.com/wicg/trust-token-api/main/assets/deployment_redemption.png)
 
 ### Public Redemption
 Some issuers may be willing to allow any entity to redeem their tokens, providing a general trust signal that sites can consume to improve the web ecosystem. Particularly things like device attestations (described in https://github.com/WICG/trust-token-api#non-web-sources-of-tokens), about the integrity of the device, are likely to fall into this category, where the value is in attesting to real devices and sites being able to rely on that signal. 
