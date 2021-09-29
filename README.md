@@ -77,8 +77,7 @@ This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance 
 *   Blind them and attach them (in a Sec-Trust-Token header) to the HTTP request
 *   Send a POST to the provided endpoint
 
-When a response comes back with blind signatures in a Sec-Trust-Token response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA.
-
+When a response comes back with blind signatures in a Sec-Trust-Token response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA. Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data` header in the response to indicate to the UA that it should discard all previously stored tokens. If the value of the header is `all`, then all previously stored tokens should be discarded before the newly issued tokens are stored. Other values in the header should be ignored.
 
 ### Trust Token Redemption
 
