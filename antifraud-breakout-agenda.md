@@ -1,6 +1,8 @@
-# ??? October 2021
+# October 18, 2021
 
 ## Logistics
+
+9-10AM PDT / 4-5PM GMT
 
 ## Agenda
 
