@@ -11,7 +11,12 @@
 * Presentations on anti-fraud/IVT problem space (15 minutes)
   * Website Fraud (CAPTCHAs/Bot Detection) 
   * Network Fraud (DoS)
-  * ...
+  * Accounts Fraud
 * Brief overview on existing work (5 minutes)
 * Open discussion (30 minutes)
 * Any other business
+
+
+### Existing Work
+* [Trust Token API](https://github.com/WICG/trust-token-api)
+* [Privacy Proxy, Private Access Tokens](https://github.com/tfpauly/privacy-proxy)
