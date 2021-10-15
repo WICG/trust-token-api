@@ -4,7 +4,7 @@
 
 9-10AM PDT / 4-5PM GMT
 
-## Agenda
+t## Agenda
 
 * Introductions (5 minutes)
 * Overview from facilitators (5 minutes)
@@ -18,5 +18,6 @@
 
 
 ### Existing Work
+* [Privacy Pass](https://github.com/ietf-wg-privacypass/base-drafts/)
 * [Trust Token API](https://github.com/WICG/trust-token-api)
 * [Privacy Proxy, Private Access Tokens](https://github.com/tfpauly/privacy-proxy)
