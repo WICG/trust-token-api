@@ -10,7 +10,7 @@ t## Agenda
 * Overview from facilitators (5 minutes)
 * Presentations on anti-fraud/IVT problem space (15 minutes)
   * CAPTCHAs/Bot Detection/Website Fraud (Kevin Gibbons & Michael Ficarra, Shape Security ([slides](https://docs.google.com/presentation/d/1Yfmx6u7pa4b8X_iQHE2WNuqEZySLZKKSsrI2rzUp6Go/edit)))
-  * Network Fraud (???)
+  * Network Fraud (Sofia Celi)
   * Accounts Safety (Daniel Margolis, Google)
 * Brief overview on existing work (5 minutes)
 * Open discussion (30 minutes)
