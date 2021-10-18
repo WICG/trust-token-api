@@ -9,7 +9,7 @@
 * Overview from facilitators (5 minutes)
 * Introductions (5 minutes)
 * Presentations on anti-fraud/IVT problem space (15 minutes)
-  * CAPTCHAs/Bot Detection/Website Fraud (Kevin Gibbons & Michael Ficarra, Shape Security ([slides](https://docs.google.com/presentation/d/1Yfmx6u7pa4b8X_iQHE2WNuqEZySLZKKSsrI2rzUp6Go/edit)))
+  * CAPTCHAs/Bot Detection/Website Fraud (Kevin Gibbons & Michael Ficarra, Shape Security
   * Accounts Safety (Daniel Margolis, Google)
   * Hoarding Attacks in Privacy Pass (Sofia Celi, Cloudflare)
 * Brief overview on existing work (5 minutes)
@@ -22,6 +22,10 @@
 * [Trust Token API](https://github.com/WICG/trust-token-api)
 * [Privacy Proxy, Private Access Tokens](https://github.com/tfpauly/privacy-proxy)
 
+
+## Slides
+* [Facilitator Slides](https://docs.google.com/presentation/d/1TBT2QWL28UAI2J_o5UoE_RlcHP9sVITpGDG6HMPdDBI/edit?usp=sharing)
+* [CAPTCHAs/Bot Detection/Website Fraud](https://docs.google.com/presentation/d/1Yfmx6u7pa4b8X_iQHE2WNuqEZySLZKKSsrI2rzUp6Go/edit)
 
 ## Minutes/Notes
 ### Introductions
