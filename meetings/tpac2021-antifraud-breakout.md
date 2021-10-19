@@ -128,6 +128,6 @@ Q1: What are your preferences for next steps?
 
 
 ### Future Areas of Interest
-* Low-friction risk assessment techniques during payment flows; see for example draft EMV 3-D Secure requirements for risk assessment
+* Low-friction risk assessment techniques during payment flows; see for example draft [EMV 3-D Secure requirements for risk assessment](https://github.com/w3c/wpsig/blob/gh-pages/3ds-reqs.md)
 * Using WebAuthn as CAPTCHA replacement - in some use cases (e.g. user sign-up or sign-in, payments)
-* Cross-site understanding of Trust Token spend patterns to mitigate fraudulent usage of tokens.
+* Cross-site understanding of Trust Token spend patterns to mitigate fraudulent usage of tokens: [MSEdgeExplainers/IssuerRedemptionStatistics.md](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/TrustTokenExtensions/IssuerRedemptionStatistics.md)
