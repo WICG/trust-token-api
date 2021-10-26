@@ -24,6 +24,7 @@
 
 
 ## Slides
+* [Recording](https://watch.videodelivery.net/2e114b2bdeeca4958e0966e182051a21)
 * [Facilitator Slides](https://docs.google.com/presentation/d/1TBT2QWL28UAI2J_o5UoE_RlcHP9sVITpGDG6HMPdDBI/edit?usp=sharing)
 * [CAPTCHAs/Bot Detection/Website Fraud](https://docs.google.com/presentation/d/1Yfmx6u7pa4b8X_iQHE2WNuqEZySLZKKSsrI2rzUp6Go/edit)
 
