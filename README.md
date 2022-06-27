@@ -107,6 +107,15 @@ fetch('<issuer>/.well-known/trust-token', {
 If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the `Sec-Trust-Token` request header. The issuer can either consume the token and act based on the result, optionally including a Redemption Record (RR) in the `Sec-Trust-Token` response header to provide a redemption attestation to forward to other parties. Additionally, the issuer may include the `Sec-Trust-Token-Lifetime` header in the response to indicate to the UA how long (in seconds) the RR should be cached for. When `Sec-Trust-Token-Lifetime` header value is invalid (too large, a negative number or non-numeric), UA should ignore the `Sec-Trust-Token-Lifetime` header. When `Sec-Trust-Token-Lifetime` header value is zero UA should treat the record as expired. In case of multiple `Sec-Trust-Token-Lifetime` headers, UA uses the last one. If `Sec-Trust-Token-Lifetime` header is omitted, the lifetime of the RR will be tied to the lifetime of the Trust Token verification key that confirmed the redeemed token's issuance.
 The RR is HTTP-only and JavaScript is only able to access/send the RR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The RR is treated as an arbitrary blob of bytes from the issuer, that may have semantic meaning to downstream consumers.
 
+UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using following API.
+
+```
+document.hasRedemptionRecord(<issuer>)
+```
+
+This returns whether there are any valid RRs from the given issuer.
+
+
 To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired RRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
 
 
