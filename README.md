@@ -12,7 +12,6 @@ This document is an explainer for a potential future web platform API that allow
   - [Trust Token Issuance](#trust-token-issuance)
   - [Trust Token Redemption](#trust-token-redemption)
   - [Forwarding Redemption Attestation](#forwarding-redemption-attestation)
-  - [Extension: Trust-Bound Keypair and Request Signing](#extension-trust-bound-keypair-and-request-signing)
   - [Extension: Private Metadata](#extension-private-metadata)
 - [Privacy Considerations](#privacy-considerations)
   - [Cryptographic Property: Unlinkability](#cryptographic-property-unlinkability)
@@ -49,8 +48,6 @@ Segmenting users into very coarse sets satisfies other use-cases as well. For in
 This API proposes a new per-origin storage area for “Privacy Pass” style cryptographic tokens, which are accessible in third party contexts. These tokens are non-personalized and cannot be used to track users, but are cryptographically signed so they cannot be forged.
 
 When an origin is in a context where they trust the user, they can issue the browser a batch of tokens, which can be “spent” at a later time in a context where the user would otherwise be unknown or less trusted. Crucially, the tokens are indistinguishable from one another, preventing websites from tracking users through them.
-
-We further propose an extension mechanism for the browser to sign outgoing requests with keys bound to a particular token redemption.
 
 
 ## Potential API
@@ -144,56 +141,6 @@ The RRs will be added as a new request header `Sec-Redemption-Record`. The heade
 In order to allow multiple versions of Trust Token to be supported in the ecosystem, issuers include the version of the protocol (i.e. "TrustTokenV1") in their key commitments via the "protocol_version" field, and that is included in Trust Token requests via the Sec-Trust-Token-Version header. Trust Token operations should not be performed with issuers configured with an unknown protocol version.
 
 In addition to the core cryptographic layer, signed requests' formats (see the next section) might change from version to version. In order to make adapting to these changes easier, we could employ a mechanism like the Sec-Trust-Token-Version header, or an addition to the requests' payloads, to tell consumers the version of the client that generated the request.
-
-
-### Extension: Trust-Bound Keypair and Request Signing
-
-An additional extension to the Trust Attestation allows us to ensure the integrity of the RR, fetch data, and other headers by associating the RR with a public/private keypair on the browser. This integrity allows the RR and signed data to be passed around via third parties while preventing manipulation of the data. This is particularly useful in cases like ads and CDNs where the intermediary parties may not be fully trusted. This keypair is bound to the RR (and the original token redemption) so that the browser can sign arbitrary request data with the private key and transfer trust to the request from the token.
-
-In order to achieve this, the browser generates the public/private keypair at redemption time, and includes the hash of the public key in the redemption request to the token issuer, which can be included in the RR. The keypair is then stored in new first-party storage only accessible via these APIs.
-
-An additional parameter to the Fetch API then allows the browser to include a signature over the RR, request data, and additional request headers (specified using a new opt-in header), using the browser's private key associated with the RR:
-
-
-```
-fetch(<resource-url>, {
-  ...
-  trustToken: {
-    type: 'send-redemption-record',
-    issuers: [<issuer>,...],
-    refreshPolicy: {none, refresh}
-    signRequestData: include | omit | headers-only,
-    includeTimestampHeader: false | true,
-    additionalSignedHeaders: <headers>
-  }
-  headers: new Headers({'Signed-Headers': 'sec-redemption-record, sec-time'})
-  ...
-});
-```
-
-
-If `signRequestData` is `include`, then the browser will sign over the request data with the private key associated with the Redemption Record. It will sign over the entire URL, POST body, public key, and any headers included in the `Signed-Headers` request header. If `signRequestData` is `headers-only`, we will only sign over those in `Signed-Headers`. If `includeTimestampHeader` is set, we will add a new header to the request `Sec-Time` with the current client time (which can optionally be added to `Signed-Headers`). Any headers included in `additionalSignedHeaders` will also be appended to `Signed-Headers`. Additionally we will limit the size of POST bodies that can be sent via this API when signed, to prevent having to buffer the entire body in memory. To do this, we can (aligning as close as possible to the model in the [Signed Exchanges](https://wicg.github.io/webpackage/draft-yasskin-http-origin-signed-responses.html#rfc.section.3.2) spec) create a canonical [CBOR](https://cbor.io) representation of the resource URL, public key, and headers, of a form similar to:
-
-
-```
-{
-  'destination': 'example.test',
-  'sec-redemption-record': <RR>,
-  'sec-time': <high-resolution client timestamp>
-  'public-key': <pk>,
-}
-```
-
-The browser will add a new request header with the resulting signature over a context string and CBOR data (`"TrustTokenV3"||CBOR data)`, along with the public key. Something like:
-
-```
-Sec-Signature:
-  signatures=[(<issuer>, {"alg": "ecdsa_secp256r1_sha256", "public-key": <pk>, "sig": <signature>}), ...]
-  sign-request-data=<include, headers-only>
-```
-
-
-The canonical CBOR data (verifiable by the signature) should be computable from a request, and so does not need to be sent over the wire from the browser. The `Signed-Headers` header, and the value of `sign-request-data` should be enough to re-construct it server side, robust to things like header re-ordering, etc. A key for each requested issuer is included in the signatures field as a list of pairs of issuers and their respective signature material (algorithm, key, signature). In Version 3 of the protocol, the algorithm used for signing is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3). Consumers of this header should ignore unknown signatures.
 
 
 ### Extension: Metadata
