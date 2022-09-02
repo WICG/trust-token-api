@@ -1,0 +1,207 @@
+<pre class='metadata'>
+Title: Trust Token API
+Shortname: trust-token-api
+Level: 1
+Status: CG-DRAFT
+Group: WICG
+Repository: WICG/trust-token-api
+URL: https://wicg.github.io/trust-token-api/
+Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
+Abstract: Trust Token is a web platform API that allows propagating trust across sites, using the Privacy Pass protocol as an underlying primitive.
+!Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
+!Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
+</pre>
+
+<pre class='biblio'>
+{
+    "PRIVACY-PASS-ARCHITECTURE": {
+        "authors": ["A. Davidson", "J. Iyengar", "C. A. Wood"],
+        "href": "https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html",
+        "publisher": "IETF",
+        "title": "Privacy Pass Architectural Framework"
+    },
+    "PRIVACY-PASS-AUTH-SCHEME": {
+        "authors": ["T. Pauly", "S. Valdez", "C. A. Wood"],
+        "href" : "https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html",
+        "publisher": "IETF",
+        "title": "The Privacy Pass HTTP Authentication Scheme"
+    },
+    "PRIVACY-PASS-ISSUANCE-PROTOCOL": {
+        "authors": ["S. Celi", "A. Davidson", "A. Faz-Hernandez", "S. Valdez", "C. A. Wood"],
+        "href": "https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html",
+        "publisher": "IETF",
+        "title": "Privacy Pass Issuance Protocol"
+    },
+    "PRIVACY-PASS-WG": {
+        "href": "https://datatracker.ietf.org/wg/privacypass/about/"
+    }
+}
+</pre>
+
+?? Ideally this spec should have the details on every observable behavior related to TT.
+And things happening behind the scenees that make it work.
+
+?? This doc should include all relevant HTTP headers
+
+Goals {#goals}
+==============
+
+Goal of Trust Token API is to transfer trust across sites through time in a
+privacy preserving manner. It achieves this using protocols specified in
+working documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]].
+
+Backgroud {#backgroud}
+======================
+
+Trust Token API provides a mechanism for anonymous authentication. Trust Token
+mechanism provided by browser does not authenticate clients, instead it
+facilitates transfer of authentication information. Trust Token API performs
+cross site anonymous authentication without using linkable state carrying
+cookies [[RFC6265]]. Cookies do provide cross site authentication, however,
+fail to provide anonymity.
+
+The clients are authenticated by the issuers. Authentication of the clients and
+token signing are both carried by the same entity referred as the
+issuer. This is the joint attester and issuer architecture described in
+[[PRIVACY-PASS-ARCHITECTURE]].
+
+[?? Add reference on blind signatures to https://datatracker.ietf.org/doc/draft-irtf-cfrg-rsa-blind-signatures/]
+
+
+[[PRIVACY-PASS-ARCHITECTURE]]
+[[PRIVACY-PASS-AUTH-SCHEME]]
+
+
+Issuers issue/provide tokens. Browsers store tokens for the user. Origins might
+ask to fetch tokens or include thirdparty code that get/spend tokens. Spending
+tokens are called redeeming.
+
+Origins may ask browser to fetch tokens from the issuers of their choice. These
+tokens can be consumed (redeemed) from other origins as well.
+
+Trust Token operations rely on [[FETCH]]. A request [??] corresponding to a
+specific Trust Token operation can be created and used as a parameter to the
+fetch [??]  function.
+
+Getting Tokens {#getting-tokens}
+================================
+
+Browser obtains tokens by fetching a request corresponding to a Trust Token
+issue operation. A Trust Token issue request can be created as follows.
+
+```
+issueRequest = new Request(https://example.issuer:1234/issuer_path, {
+  trustToken: {
+    type: 'token-request',
+    issuer: https://example.issuer
+  }
+});
+```
+
+Fetching this request obtains tokens specified by the request.
+
+```
+fetch(issueRequest)
+```
+
+This API will invoke the Privacy Pass Issuance protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]].
+
+- Browser generates a set of nonces.
+- Browser blinds them and attach them to ```Sec-Trust-Token header``` HTTP request header.
+- Browser sends an HTTP POST request to the issuer URL.
+
+When a response [??] comes back with blind signatures in a ```Sec-Trust-Token```
+response header, they will be unblinded, stored, and associated with the
+unblinded nonces internally in the browser. The pairs of nonces and signatures
+are Trust Tokens that can be redeemed later. Raw tokens are never accessible to
+JavaScript. The issuer can store a limited amount of metadata in the signature
+of a nonce by choosing one of a set of keys to use to sign the nonce and
+providing a zero-knowledge proof that it signed the nonce using a particular
+key or set of keys. The browser will verify the proof and may choose to keep or
+drop the token based on other metadata constraints and limits from the
+UA. Additionally, the issuer may include an optional ```Sec-Trust-Token-Clear-Data```
+header in the response to indicate to the UA that it should discard all
+previously stored tokens. If the value of the header is ```all```, then all
+previously stored tokens should be discarded before the newly issued tokens are
+stored. Other values in the header should be ignored.
+
+
+Redeeming Tokens {#redeeming-tokens}
+====================================
+
+Browser spends tokens by fetching a redeem request corresponding to a Trust Token
+redeem operation. A Trust Token redeem request can be created as follows.
+
+```
+redemptionRequest = new Request(https://example.issuer:1234/redemption_path, {
+  trustToken: {
+    type: 'token-redemption',
+    issuer: https://example.issuer,
+    refreshPolicy: {'none', 'refresh'}
+  }
+});
+```
+
+If there are no tokens available for the given issuer, the returned promise
+rejects with an error. Otherwise, it invokes the redemption protocol
+[[PRIVACY-PASS-AUTH-SCHEME]] against the issuer, with the token (potentially,
+if specified by an extension, along with associated redemption metadata)
+attached in the ```Sec-Trust-Token`` request header. The issuer can either
+consume the token and act based on the result, optionally including a
+Redemption Record (RR) in the ```Sec-Trust-Token``` response header to provide
+a redemption attestation to forward to other parties. Additionally, the issuer
+may include the ```Sec-Trust-Token-Lifetime``` header in the response to
+indicate to the UA how long (in seconds) the RR should be cached for. When
+```Sec-Trust-Token-Lifetime``` response header value is invalid (too large, a
+negative number or non-numeric), UA should ignore the
+```Sec-Trust-Token-Lifetime``` header. When ```Sec-Trust-Token-Lifetime```
+header value is zero, UA should treat the record as expired. In case of
+multiple ```Sec-Trust-Token-Lifetime``` headers, UA uses the last one. If
+```Sec-Trust-Token-Lifetime``` header is omitted, the lifetime of the RR will
+be tied to the lifetime of the Trust Token verification key that confirmed the
+redeemed token's issuance. The RR is HTTP-only and JavaScript is only able to
+access/send the RR via Trust Token Fetch APIs. It is also cached in new
+first-party storage accessible only by these APIs for subsequent visits to that
+first-party. The RR is treated as an arbitrary blob of bytes from the issuer,
+that may have semantic meaning to downstream consumers.
+
+
+Redemption Records {#redemption-records}
+----------------------------------------
+
+Prevent communicating issuers by caching redemption records. Provide these
+records to origins that can verify its validity. These are stored in persistent
+browser storage. Redemption records are provided in the ```Sec-Trust-Token```
+response header after a redemption fetch call. Optionally, issuer might provide
+an expiration time for the redemption record provided. This expiration is
+specified as number of seconds in the ```Sec-Trust-Token-Lifetime``` HTTP
+response header value.
+
+Query APIs {#query-apis}
+=======================
+
+An origin might query whether browser has any tokens from a specific issuer using the following API.
+
+```
+document.hasTrustToken(<issuer>)
+```
+
+Similarly an origin can check whether browser has already a valid redemption
+record for a specific issuer using following API.
+
+```
+document.hasRedemptionRecord(<issuer>)
+```
+
+Unlike checking for tokens, checking redemption records do not associate
+origins with issuers and saturate issuer limits for the origin.
+
+
+Token Exhaustion {#token-exhaustion}
+====================================
+
+Malicious origins might attempt to exhaust all user tokens by redeeming them
+all. To prevent this, browser limits redemption allowed. In an origin first two
+redemptions are allowed, however, the third redemption is not allowed in a 48
+hour window. The third redemption is allowed once more than 48 hours have
+elapsed since the first redemption.
