@@ -43,6 +43,9 @@ Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
 </pre>
 
 
+**This is a working version and is subject to change.**
+
+
 Goals {#goals}
 ==============
 
@@ -85,7 +88,7 @@ Getting Tokens {#getting-tokens}
 Browser obtains tokens by fetching a request corresponding to a Trust Token
 issue operation. A Trust Token issue request can be created as follows.
 
-```
+```javascript
 issueRequest = new Request(https://example.issuer:1234/issuer_path, {
   trustToken: {
     type: 'token-request',
