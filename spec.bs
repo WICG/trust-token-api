@@ -38,6 +38,18 @@ Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
     },
     "PRIVACY-PASS-WG": {
         "href": "https://datatracker.ietf.org/wg/privacypass/about/"
+    },
+    "PMB": {
+        "authors": ["Ben Kreuter", "Tancrede Lepoint", "Michele Orru", "Mariana Raykova"],
+        "href": "https://eprint.iacr.org/2020/072",
+        "publisher": "Cryptology ePrint Archive",
+        "title": "Anonymous Tokens with Private Metadata Bit"
+    },
+    "VOPRF": {
+        "authors": ["A. Davidson", "A. Faz-Hernandez",  "N. Sullivan", "C. A. Wood"],
+        "href": "https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-13.html",
+        "publisher": "IETF",
+        "title": "Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups"
     }
 }
 </pre>
@@ -54,6 +66,18 @@ through time in a privacy preserving manner. It achieves this using protocols
 specified in working documents of privacy pass working group of IETF
 [[PRIVACY-PASS-WG]]. Trust Tokens can be considered as a web platform
 implementation of Privacy Pass.
+
+<!--
+
+In a real-world
+system relying on anonymous tokens without private metadata bit, if the issuer stops providing
+malicious users with tokens, the attacker will know that they have been detected as malicious.
+In fact, this information could serve as an incentive to corrupt more users, or to train machine
+learning models that detect which malicious behavior goes un-noticed.
+
+https://eprint.iacr.org/2020/072.pdf
+
+-->
 
 
 Backgroud {#backgroud}
@@ -82,60 +106,204 @@ specific Trust Token operation can be created and used as a parameter to the
 fetch function.
 
 
-Getting Tokens {#getting-tokens}
-================================
+Issuer Public Keys {#issuer-public-keys}
+========================================
 
-Browser obtains tokens by fetching a request corresponding to a Trust Token
-issue operation. A Trust Token issue request can be created as follows.
+This section describes the public interfaces that an issuer is required to
+support to provide public keys to be used by Trust Token protocols.
+
+An issuer needs to maintain a set of keys and implement the Issue and Redeem
+cryptographic functions to sign and validate tokens. Issuers are required to
+serve a key commitment endpoint. Key commitments are collections of
+cryptographic keys and associated metadata necessary for executing the issuance
+and redemption operations. Issuers make these available through secure HTTP
+endpoints [[RFC8446]]. Browsers should fetch the key commitments periodically.
+
+Requests to key commitment endpoints should result in a JSON response
+[[RFC8259]] of the following format.
 
 ```javascript
-issueRequest = new Request(https://example.issuer:1234/issuer_path, {
+{
+  <protocol_version>: {
+    "protocol_version": <protocol version as a string>,
+    "id": <key commitment identifier as a string>
+    "batchsize": <batch size as string>,
+    "keys": {
+      <keyID>: { "Y": <base64-encoded TrustTokenPublicKey>,
+                 "expiry": <key expiry, encoded as a string representation of
+                           an integer timestamp in microseconds since the Unix
+                                    epoch> },
+      <keyID>: { "Y": <base64-encoded public key>,
+                 "expiry": <key expiry, encoded as a string representation of
+                           an integer timestamp in microseconds since the Unix
+                           epoch> }, ...
+    }
+  },
+  ...
+}
+```
+
+* `<protocol_version>` is a string identifier for the Trust Token protocol
+    version used. The same string is used as a value of the inner
+    `protocol_version` field. Protocol version string identifier is either
+    `"TrustTokenV3PMB"` or `"TrustTokenV3VOPRF"`. Both protocols are similar
+    in terms of privacy implications.
+
+    * Protocol version `“TrustTokenV3PMB”` implements [[PMB]]. Each issued
+               token contains a private metadata bit.
+
+    * Protocol version `“TrustTokenV2VOPRF”` implements [[VOPRF]]. Tokens do
+               not contain private metadata bits. However, issuers can use twice
+               as many concurrently valid token signing keys (six compared to three of
+               protocol `“TrustTokenV3PMB”`.
+
+* `id` field provides the ID of the key commitment. Key commitment ID is a
+       string representation of a non-negative integer that is within the range
+       of an unsigned 32 bit integer type. ID values should be montonically
+       increasing.
+
+* `batchsize` specifies the maximum number of blinded tokens that the issuer
+       supports being sent during each token issuance operation. `batchsize`
+       value is a string representation of a positive integer. Maximum value
+       allowed is 500. If value is larger, 500 will be used. Browser might send
+       fewer tokens in a single operation, but will generally default to
+       sending `batchsize` many tokens per operation.
+
+* `keys` field lists set of public keys dictionaries by their ID.
+
+         * `<keyID>` is a string representation of a non-negative integer that
+               is within the range of an unsigned 32 bit integer type.
+
+         * Each key has a `Y` field which is a string representation of a
+               big-endian base64 encoding of the byte string of the key.
+
+         * `expiry` field specifies how long the underlying key is valid. It is
+                    an integer timestamp encoded as a string. Underlying key
+                    expires if this amount many or more microseconds are
+                    elapsed since the POSIX epoch [[RFC8536]].
+
+All field names and their values are strings. When new key commitments are
+fetched for an issuer, previous commitments are discarded.
+
+Issuing Protocol {#issuing-protocol}
+====================================
+
+This section explains the issuing protocol. It has two sections that explains
+the issuing protocol steps happenning in browsers and issuers.
+
+Browser Steps For Creating Issue Request {#browser-issue-steps}
+---------------------------------------------------------------
+
+We assume the public key commitments for the underlying issuer is fetched as
+explained in [[#issuer-public-keys]]. An issue request is created and fetched
+as follows.
+
+```javascript
+issueRequest = new Request(https://example.issuer:1234/issuer_path?public=0&private=0, {
   trustToken: {
     type: 'token-request',
     issuer: https://example.issuer
   }
 });
+fetch(issueRequest);
 ```
 
-Fetching this request obtains tokens specified by the request.
+An issuance request is parameterized by issuer and top level origins. Following
+steps are carried out when an issue request is fetched.
+
+ 1. Reject if the document is not in a secure context [[secure-contexts]]
+ 2. Reject if associating the issuer with the top level origin would exceed the
+    top level’s number-of-issuers limit of 2.
+ 3. Associate the issuer with the top level origin.
+ 4. Reject if the number of tokens from the issuer is already at capacity
+           which is 500.
+ 5. Reject if there are no key commitments stored for the issuer.
+ 6. Pass issuer public keys to cryptographic procedures. Reject if keys are
+         malformed.
+ 7. Discard tokens from issuer that are signed with keys other than those from
+            the issuer's most recent commitments.
+ 8. Compare issuer's max batch size to global limit of 100 on batch size. Use
+            the smaller value.
+ 9. Look up the key commitments from storage. Error out if key commitments are
+         unavailable.
+ 10. Generate the right number of blinded tokens identified in step 6.
+ 11. Configure the HTTP request. Set a load flag to bypass the HTTP cache. Add
+               a `Sec-Trust-Token` request header containing a base64-encoded
+              version of the bytestring as value. Add `Sec-Trust-Token-Version`
+              that specifies the version of the cryptographic protocol used.
+
+Information to be encoded in the tokens are passed in the URL parameters with
+`public` and `private` keys. VOPRF can encode only `public` values. PMB can encode
+3 buckets for public an a single bit for `private` key. In VOPRF `public` value
+can be 0 to 5. In PMB `public` value can be 0 to 2 and `private` value is
+either 0 or 1.
+
+Trust token HTTP request headers created for a typical fetch isas follows.
 
 ```
-fetch(issueRequest)
+Sec-Trust-Token: <blinded tokens encoded as base64 string>
+Sec-Trust-Token-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 
-This API will invoke the Privacy Pass Issuance protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]].
+Issuer Signing Tokens {#issuer-signing-tokens}
+----------------------------------------------
 
-- Browser generates a set of nonces.
-- Browser blinds them and attach them to `Sec-Trust-Token` header HTTP request header.
-- Browser sends an HTTP POST request to the issuer URL.
+Using its private keys, issuer signs the blinded tokens obtained in the
+`Sec-Trust-Token` request header value. Issuer uses the cryptographic protocol
+specified in the request `Sec-Trust-Token-Version` header. Encoding the values
+passes in URL parameter keys `private` and `public` happens at this
+step. Issuer returns the signed tokens in the `Sec-Trust-Token` response header
+value encoded as base64 byte string. Issuer returns the number of tokens issued
+in `Sec-TT-Count` header. Value of this header is the string message of
+`Issuing <number of tokens> tokens.` with the right nonnegative integer value
+that specifies the tokens issued.
 
-When an HTTP response comes back with blind signatures in a `Sec-Trust-Token`
-response header, they will be unblinded, stored, and associated with the
-unblinded nonces internally in the browser. The pairs of nonces and signatures
-are Trust Tokens that can be redeemed later. Raw tokens are never accessible to
-JavaScript. The issuer can store a limited amount of metadata in the signature
-of a nonce by choosing one of a set of keys to use to sign the nonce and
-providing a zero-knowledge proof that it signed the nonce using a particular
-key or set of keys. The browser will verify the proof and may choose to keep or
-drop the token based on other metadata constraints and limits from the
-UA. Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data`
-header in the response to indicate to the UA that it should discard all
-previously stored tokens. If the value of the header is `all`, then all
-previously stored tokens should be discarded before the newly issued tokens are
-stored. Other values in the header should be ignored.
+A response displaying Trust Token related headers.
+
+```
+Sec-Trust-Token: <token encoded as base64 string>
+Sec-TT-Count: Issuing 3 tokens.
+```
+
+Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data`
+header in the response. If the value of the header is `"all"`, then browser
+should discard all previously stored tokens before the newly issued tokens are
+stored. `Sec-Trust-Token-Clear-Data` header should be ignored for all other
+values.
+
+
+Browser Steps For Issue Response {#browser-issue-response}
+----------------------------------------------------------
+
+To process a response to an issue request, browser follows the following steps.
+
+ 1. If the response has no `Sec-Trust-Token` header, return an error.
+ 2. If the response has an empty `Sec-Trust-Token` header, return; this is a
+       `Success` response bearing 0 tokens.
+ 3. If the response has `Sec-Trust-Token-Clear-Data` header,
+    a. If its value is `"all"` discard all previously stored tokens from the issuer.
+    b. Else, ignore the header.
+ 3. Strip the `Sec-Trust-Token` header from the response and carry out the
+    cryptographic procedures to obtain a list of unblinded tokens.
+    a. If cryptographic procedure succeeds, associate the tokens with the
+          issuing key’s label and store the tokens.
+    b. Else, return an error
 
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
 
-Browser spends tokens by fetching a redeem request corresponding to a Trust Token
-redeem operation. A Trust Token redeem request can be created as follows.
+When browser navigates to an origin, top level origin or a third party site
+embedded on the top level origin may redeem tokens stored in browser from a
+specific issuer to learn `public` and/or `private` data encoded in the
+tokens. Redemption is carried through fetch as demonstrated in the following
+snippet.
 
-```
-redemptionRequest = new Request(https://example.issuer:1234/redemption_path, {
+```javascript
+redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
   trustToken: {
     type: 'token-redemption',
-    issuer: https://example.issuer,
+    issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
   }
 });
@@ -196,8 +364,12 @@ Unlike checking for tokens, checking redemption records do not associate
 origins with issuers and saturate issuer limits for the origin.
 
 
-Token Exhaustion {#token-exhaustion}
-====================================
+Privacy and Security Considerations {#p-c}
+==========================================
+
+
+Preventing Token Exhaustion {#token-exhaustion}
+===============================================
 
 Malicious origins might attempt to exhaust all user tokens by redeeming them
 all. To prevent this, browser limits redemption allowed. In an origin first two
