@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 44af0bf3e, updated Fri Jul 29 17:05:16 2022 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="2912f3689a71968a79775d3306b36048fe6d2a94" name="document-revision">
+  <meta content="626309b3cc0334946d5d288264c5e1a2de80dcce" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -526,7 +526,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Trust Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-09-26">26 September 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-09-27">27 September 2022</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -601,9 +601,10 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <p><strong>This is a working version and is subject to change.</strong></p>
    <h2 class="heading settled" data-level="1" id="goals"><span class="secno">1. </span><span class="content">Goals</span><a class="self-link" href="#goals"></a></h2>
    <p>Goal of Trust Token API is to transfer limited amount of signals across sites
-through time in a privacy preserving manner. It achieves this using protocols
-specified in working documents of privacy pass working group of IETF <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Trust Tokens can be considered as a web platform
-implementation of Privacy Pass.</p>
+through time in a privacy preserving manner. It achieves this using privacy
+pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in working documents
+of privacy pass working group of IETF <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Trust Tokens can be
+considered as a web platform implementation of Privacy Pass.</p>
    <h2 class="heading settled" data-level="2" id="backgroud"><span class="secno">2. </span><span class="content">Backgroud</span><a class="self-link" href="#backgroud"></a></h2>
    <p>Trust Token API provides a mechanism for anonymous authentication. Trust Token
 mechanism provided by browser does not authenticate clients, instead it
@@ -625,27 +626,23 @@ fetch function.</p>
    <h2 class="heading settled" data-level="3" id="issuer-public-keys"><span class="secno">3. </span><span class="content">Issuer Public Keys</span><a class="self-link" href="#issuer-public-keys"></a></h2>
    <p>This section describes the public interfaces that an issuer is required to
 support to provide public keys to be used by Trust Token protocols.</p>
-   <p>An issuer needs to maintain a set of keys and implement the Issue and Redeem
-cryptographic functions to sign and validate tokens. Issuers are required to
-serve a key commitment endpoint. Key commitments are collections of
-cryptographic keys and associated metadata necessary for executing the issuance
-and redemption operations. Issuers make these available through secure HTTP
-endpoints <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a>. Browsers should fetch the key commitments periodically.</p>
+   <p>An issuer needs to maintain a set of keys and implement the <strong>Issue</strong> and <strong>Redeem</strong> cryptographic functions to sign and validate tokens. Issuers are
+required to serve a <strong>key commitment</strong> endpoint. Key commitments are
+collections of cryptographic keys and associated metadata necessary for
+executing the issuance and redemption operations. Issuers make these available
+through secure HTTP <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a> endpoints. Browsers should fetch the key
+commitments periodically.</p>
    <p>Requests to key commitment endpoints should result in a JSON response <a data-link-type="biblio" href="#biblio-rfc8259">[RFC8259]</a> of the following format.</p>
 <pre class="language-javascript highlight"><c- p>{</c->
-  <c- o>&lt;</c->protocol_version<c- o>>:</c-> <c- p>{</c->
-    <c- u>"protocol_version"</c-><c- o>:</c-> <c- o>&lt;</c->protocol version <c- kr>as</c-> a string<c- o>></c-><c- p>,</c->
-    <c- u>"id"</c-><c- o>:</c-> <c- o>&lt;</c->key commitment identifier <c- kr>as</c-> a string<c- o>></c->
-    <c- u>"batchsize"</c-><c- o>:</c-> <c- o>&lt;</c->batch size <c- kr>as</c-> string<c- o>></c-><c- p>,</c->
+  <c- o>&lt;</c->cryptographic protocol_version<c- o>>:</c-> <c- p>{</c->
+    <c- u>"protocol_version"</c-><c- o>:</c-> <c- o>&lt;</c->cryptographic protocol version<c- o>></c-><c- p>,</c->
+    <c- u>"id"</c-><c- o>:</c-> <c- o>&lt;</c->key commitment identifier<c- o>></c->
+    <c- u>"batchsize"</c-><c- o>:</c-> <c- o>&lt;</c->batch size<c- o>></c-><c- p>,</c->
     <c- u>"keys"</c-><c- o>:</c-> <c- p>{</c->
-      <c- o>&lt;</c->keyID<c- o>>:</c-> <c- p>{</c-> <c- u>"Y"</c-><c- o>:</c-> <c- o>&lt;</c->base64<c- o>-</c->encoded TrustTokenPublicKey<c- o>></c-><c- p>,</c->
-                 <c- u>"expiry"</c-><c- o>:</c-> <c- o>&lt;</c->key expiry<c- p>,</c-> encoded <c- kr>as</c-> a string representation <c- k>of</c->
-                           an integer timestamp <c- ow>in</c-> microseconds since the Unix
-                                    epoch<c- o>></c-> <c- p>},</c->
       <c- o>&lt;</c->keyID<c- o>>:</c-> <c- p>{</c-> <c- u>"Y"</c-><c- o>:</c-> <c- o>&lt;</c->base64<c- o>-</c->encoded <c- kr>public</c-> key<c- o>></c-><c- p>,</c->
-                 <c- u>"expiry"</c-><c- o>:</c-> <c- o>&lt;</c->key expiry<c- p>,</c-> encoded <c- kr>as</c-> a string representation <c- k>of</c->
-                           an integer timestamp <c- ow>in</c-> microseconds since the Unix
-                           epoch<c- o>></c-> <c- p>},</c-> <c- p>...</c->
+                 <c- u>"expiry"</c-><c- o>:</c-> <c- o>&lt;</c->key expirion data<c- o>></c-><c- p>},</c->
+      <c- o>&lt;</c->keyID<c- o>>:</c-> <c- p>{</c-> <c- u>"Y"</c-><c- o>:</c-> <c- o>&lt;</c->base64<c- o>-</c->encoded <c- kr>public</c-> key<c- o>></c-><c- p>,</c->
+                 <c- u>"expiry"</c-><c- o>:</c-> <c- o>&lt;</c->key expirion data<c- p>},</c-> <c- p>...</c->
     <c- p>}</c->
   <c- p>},</c->
   <c- p>...</c->
@@ -653,44 +650,50 @@ endpoints <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a>. Brows
 </pre>
    <ul>
     <li data-md>
-     <p><code>&lt;protocol_version></code> is a string identifier for the Trust Token protocol
-version used. The same string is used as a value of the inner <code>protocol_version</code> field. Protocol version string identifier is either <code>"TrustTokenV3PMB"</code> or <code>"TrustTokenV3VOPRF"</code>. Both protocols are similar
-in terms of privacy implications.</p>
+     <p><code>&lt;cryptographic protocol version></code> is a string identifier for the Trust Token
+protocol version used. The same string is used as a value of the inner <code>"protocol_version"</code> field. Protocol version string identifier is either <code>"TrustTokenV3PMB"</code> or <code>"TrustTokenV3VOPRF"</code>. Both protocols have similar
+properties in terms of privacy implications.</p>
      <ul>
       <li data-md>
-       <p>Protocol version <code>“TrustTokenV3PMB”</code> implements <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a>. Each issued
-       token contains a private metadata bit.</p>
+       <p>Protocol version <code>“TrustTokenV3PMB”</code> implements <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> cryptographic
+       protocol. In this protocol, each token contains a private
+       metadata bit.</p>
       <li data-md>
-       <p>Protocol version <code>“TrustTokenV2VOPRF”</code> implements <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a>. Tokens do
-       not contain private metadata bits. However, issuers can use twice
-       as many concurrently valid token signing keys (six compared to three of
-       protocol <code>“TrustTokenV3PMB”</code>.</p>
+       <p>Protocol version <code>“TrustTokenV2VOPRF”</code> implements <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> cryptographic
+       protocol. Contrary to PMB, tokens do not contain private
+       metadata bits. However, issuers can use twice as many
+       concurrently valid token signing keys (six compared to three of
+       PMB).</p>
      </ul>
     <li data-md>
-     <p><code>id</code> field provides the ID of the key commitment. Key commitment ID is a
-   string representation of a non-negative integer that is within the range
-   of an unsigned 32 bit integer type. ID values should be montonically
-   increasing.</p>
+     <p><code>"id"</code> field provides the identifier of the key commitment. It is a string
+     representation of a non-negative integer that is within the range of
+     an unsigned 32 bit integer type. Values should be montonically
+     increasing.</p>
     <li data-md>
-     <p><code>batchsize</code> specifies the maximum number of blinded tokens that the issuer
-   supports being sent during each token issuance operation. <code>batchsize</code> value is a string representation of a positive integer. Maximum value
-   allowed is 500. If value is larger, 500 will be used. Browser might send
-   fewer tokens in a single operation, but will generally default to
-   sending <code>batchsize</code> many tokens per operation.</p>
+     <p><code>"batchsize"</code> specifies the maximum number of blinded tokens that the issuer
+            supports for each token issuance operation. Its value is a
+            string representation of a positive integer. Maximum value
+            allowed is 100. If a larger value is specified, 100 will be
+            used. Browser might send fewer tokens in a single operation,
+            but will generally default to sending <code>batchsize</code> many tokens
+            per operation.</p>
     <li data-md>
-     <p><code>keys</code> field lists set of public keys dictionaries by their ID.</p>
+     <p><code>"keys"</code> field is a dictionary of public keys listed by their identifiers.</p>
      <ul>
       <li data-md>
        <p><code>&lt;keyID></code> is a string representation of a non-negative integer that
    is within the range of an unsigned 32 bit integer type.</p>
       <li data-md>
-       <p>Each key has a <code>Y</code> field which is a string representation of a
-   big-endian base64 encoding of the byte string of the key.</p>
+       <p>Each key has a <code>"Y"</code> field which is a string representation of a
+    big-endian base64 encoding <a data-link-type="biblio" href="#biblio-rfc4648">[RFC4648]</a> of the byte string of
+    the key.</p>
       <li data-md>
-       <p><code>expiry</code> field specifies how long the underlying key is valid. It is
-        an integer timestamp encoded as a string. Underlying key
-        expires if this amount many or more microseconds are
-        elapsed since the POSIX epoch <a data-link-type="biblio" href="#biblio-rfc8536">[RFC8536]</a>.</p>
+       <p><code>"expiry"</code> field specifies how long the underlying key is valid. It
+          is a string representation of a nonnegative integer that
+          is within the range of an unsigned 64 bit integer type.
+          Underlying key expires if this amount many or more
+          microseconds are elapsed since the POSIX epoch <a data-link-type="biblio" href="#biblio-rfc8536">[RFC8536]</a>.</p>
      </ul>
    </ul>
    <p>All field names and their values are strings. When new key commitments are
@@ -699,13 +702,11 @@ fetched for an issuer, previous commitments are discarded.</p>
    <p>This section explains the issuing protocol. It has two sections that explains
 the issuing protocol steps happenning in browsers and issuers.</p>
    <h3 class="heading settled" data-level="4.1" id="browser-issue-steps"><span class="secno">4.1. </span><span class="content">Browser Steps For Creating Issue Request</span><a class="self-link" href="#browser-issue-steps"></a></h3>
-   <p>We assume the public key commitments for the underlying issuer is fetched as
-explained in <a href="#issuer-public-keys">§ 3 Issuer Public Keys</a>. An issue request is created and fetched
-as follows.</p>
-<pre class="language-javascript highlight">issueRequest <c- o>=</c-> <c- ow>new</c-> Request<c- p>(</c->https<c- o>:</c-><c- c1>//example.issuer:1234/issuer_path?public=0&amp;private=0, {</c->
+   <p>An issue request is created and fetched as demostrated in the following snippet.</p>
+<pre class="language-javascript highlight">issueRequest <c- o>=</c-> <c- ow>new</c-> Request<c- p>(</c-><c- u>"https://example.issuer:1234/issuer_path?public=0&amp;private=0"</c-><c- p>,</c-> <c- p>{</c->
   trustToken<c- o>:</c-> <c- p>{</c->
-    type<c- o>:</c-> <c- t>'token-request'</c-><c- p>,</c->
-    issuer<c- o>:</c-> https<c- o>:</c-><c- c1>//example.issuer</c->
+    type<c- o>:</c-> <c- u>"token-request"</c-><c- p>,</c->
+    issuer<c- o>:</c-> <c- u>"https://example.issuer"</c->
   <c- p>}</c->
 <c- p>});</c->
 fetch<c- p>(</c->issueRequest<c- p>);</c->
@@ -714,10 +715,10 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
 steps are carried out when an issue request is fetched.</p>
    <ol>
     <li data-md>
-     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a></p>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
     <li data-md>
      <p>Reject if associating the issuer with the top level origin would exceed the
-top level’s number-of-issuers limit of 2.</p>
+       top level’s number-of-issuers limit of 2.</p>
     <li data-md>
      <p>Associate the issuer with the top level origin.</p>
     <li data-md>
@@ -800,30 +801,65 @@ snippet.</p>
   <c- p>}</c->
 <c- p>});</c->
 </pre>
-   <p>If there are no tokens available for the given issuer, the returned promise
-rejects with an error. Otherwise, it invokes the redemption protocol <a data-link-type="biblio" href="#biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]</a> against the issuer, with the token (potentially,
-if specified by an extension, along with associated redemption metadata)
-attached in the <code>Sec-Trust-Token</code> request header. The issuer can either
-consume the token and act based on the result, optionally including a
-Redemption Record (RR) in the <code>Sec-Trust-Token</code> response header to provide
-a redemption attestation to forward to other parties. Additionally, the issuer
-may include the <code>Sec-Trust-Token-Lifetime</code> header in the response to
-indicate to the UA how long (in seconds) the RR should be cached for. When <code>Sec-Trust-Token-Lifetime</code> response header value is invalid (too large, a
-negative number or non-numeric), UA should ignore the <code>Sec-Trust-Token-Lifetime</code> header. When <code>Sec-Trust-Token-Lifetime</code> header value is zero, UA should treat the record as expired. In case of
-multiple <code>Sec-Trust-Token-Lifetime</code> headers, UA uses the last one. If <code>Sec-Trust-Token-Lifetime</code> header is omitted, the lifetime of the RR will
-be tied to the lifetime of the Trust Token verification key that confirmed the
+   <p>Default value for refreshPolicy is <code>'none'</code>.</p>
+   <p>Browser carries the following steps when a redemption request is fetched.</p>
+   <ol>
+    <li data-md>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+    <li data-md>
+     <p>Reject if associating the issuer with the top level origin would exceed the
+       top level’s number-of-issuers limit of 2.</p>
+    <li data-md>
+     <p>Associate the issuer with the top level origin.</p>
+    <li data-md>
+     <p>If <code>refreshPolicy</code> is <code>'none'</code>,
+    a. If an unexpired redemption record exists in permenant storage,
+          return early, add this redemption record to corresponding
+          header value. Go to step 11.
+    b. Else continue redemption.</p>
+    <li data-md>
+     <p>If this is the third token exhausting redemption request within the
+   last 48 hours, return error.</p>
+    <li data-md>
+     <p>Look up the key commitments from storage. Error out if key commitments are
+     unavailable.</p>
+    <li data-md>
+     <p>Discard tokens from issuer that are signed with keys other than those from
+        the issuer’s most recent commitments.</p>
+    <li data-md>
+     <p>Return error if there are no tokens stored to redeem.</p>
+    <li data-md>
+     <p>Retrieve a single token from persistent storage.</p>
+    <li data-md>
+     <p>Pass token to cryptographic redemption procedure, if procedure fails
+     return error.</p>
+    <li data-md>
+     <p>Set redemption procedure result in <code>Sec-Trust-Token</code> request header.</p>
+    <li data-md>
+     <p>Set <code>Sec-Trust-Token-Version</code> header value to the cryptographic protocol
+      used.</p>
+    <li data-md>
+     <p>Optionally, set <code>Sec-Trust-Token-Lifetime</code> header.</p>
+    <li data-md>
+     <p>Configure the HTTP request. Set a load flag to bypass the HTTP cache.</p>
+   </ol>
+   <p><code>Sec-Trust-Token-Lifetime</code> response header indicates how long (in seconds) the
+RR should be cached for. When <code>Sec-Trust-Token-Lifetime</code> response header value
+is invalid (too large, a negative number or non-numeric), UA should ignore the <code>Sec-Trust-Token-Lifetime</code> header. When <code>Sec-Trust-Token-Lifetime</code> header value
+is zero, UA should treat the record as expired. In case of multiple <code>Sec-Trust-Token-Lifetime</code> headers, UA uses the last one. If <code>Sec-Trust-Token-Lifetime</code> header is omitted, the lifetime of the RR will be
+tied to the lifetime of the Trust Token verification key that confirmed the
 redeemed token’s issuance. The RR is HTTP-only and JavaScript is only able to
-access/send the RR via Trust Token Fetch APIs. It is also cached in new
-first-party storage accessible only by these APIs for subsequent visits to that
-first-party. The RR is treated as an arbitrary blob of bytes from the issuer,
-that may have semantic meaning to downstream consumers.</p>
+access/send the RR via Trust Token Fetch APIs. The RR is treated as an
+arbitrary blob of bytes from the issuer, that may have semantic meaning to
+downstream consumers.</p>
    <h3 class="heading settled" data-level="5.1" id="redemption-records"><span class="secno">5.1. </span><span class="content">Redemption Records</span><a class="self-link" href="#redemption-records"></a></h3>
-   <p>Prevent communicating issuers by caching redemption records. Provide these
-records to origins that can verify its validity. These are stored in persistent
-browser storage. Redemption records are provided in the <code>Sec-Trust-Token</code> response header after a redemption fetch call. Optionally, issuer might provide
-an expiration time for the redemption record provided. This expiration is
-specified as number of seconds in the <code>Sec-Trust-Token-Lifetime</code> HTTP
-response header value.</p>
+   <p>To reduce communication overhead, browser might cache blobs returned in <code>Sec-Trust-Token</code> header value in redemption responses. These blobs are
+referred as <em>Redemption Records</em>. Browsers might choose to store these records
+to include them in subsequent requests to the origins that can verify its
+validity. Issuer might choose to include optional <code>Sec-Trust-Token-Lifetime</code> header in the redemption response. The value of this header indicates the
+expiration time for the redemption record provided. This expiration is
+specified as number of seconds in the <code>Sec-Trust-Token-Lifetime</code> HTTP response
+header value.</p>
    <h2 class="heading settled" data-level="6" id="query-apis"><span class="secno">6. </span><span class="content">Query APIs</span><a class="self-link" href="#query-apis"></a></h2>
    <p>An origin might query whether browser has any tokens from a specific issuer using the following API.</p>
 <pre>document.hasTrustToken(&lt;issuer>)
@@ -898,10 +934,12 @@ elapsed since the first redemption.</p>
    <dd>Ben Kreuter; et al. <a href="https://eprint.iacr.org/2020/072"><cite>Anonymous Tokens with Private Metadata Bit</cite></a>. URL: <a href="https://eprint.iacr.org/2020/072">https://eprint.iacr.org/2020/072</a>
    <dt id="biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]
    <dd>A. Davidson; J. Iyengar; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html"><cite>Privacy Pass Architectural Framework</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html</a>
-   <dt id="biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]
-   <dd>T. Pauly; S. Valdez; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html"><cite>The Privacy Pass HTTP Authentication Scheme</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html</a>
+   <dt id="biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]
+   <dd>S. Celi; et al. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html"><cite>Privacy Pass Issuance Protocol</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html</a>
    <dt id="biblio-privacy-pass-wg">[PRIVACY-PASS-WG]
    <dd><a href="https://datatracker.ietf.org/wg/privacypass/about/"><cite></cite></a>. URL: <a href="https://datatracker.ietf.org/wg/privacypass/about/">https://datatracker.ietf.org/wg/privacypass/about/</a>
+   <dt id="biblio-rfc4648">[RFC4648]
+   <dd>S. Josefsson. <a href="https://www.rfc-editor.org/rfc/rfc4648"><cite>The Base16, Base32, and Base64 Data Encodings</cite></a>. October 2006. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc4648">https://www.rfc-editor.org/rfc/rfc4648</a>
    <dt id="biblio-rfc6265">[RFC6265]
    <dd>A. Barth. <a href="https://httpwg.org/specs/rfc6265.html"><cite>HTTP State Management Mechanism</cite></a>. April 2011. Proposed Standard. URL: <a href="https://httpwg.org/specs/rfc6265.html">https://httpwg.org/specs/rfc6265.html</a>
    <dt id="biblio-rfc8259">[RFC8259]
