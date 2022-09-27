@@ -62,10 +62,10 @@ Goals {#goals}
 ==============
 
 Goal of Trust Token API is to transfer limited amount of signals across sites
-through time in a privacy preserving manner. It achieves this using protocols
-specified in working documents of privacy pass working group of IETF
-[[PRIVACY-PASS-WG]]. Trust Tokens can be considered as a web platform
-implementation of Privacy Pass.
+through time in a privacy preserving manner. It achieves this using privacy
+pass protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working documents
+of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Trust Tokens can be
+considered as a web platform implementation of Privacy Pass.
 
 <!--
 
@@ -112,75 +112,78 @@ Issuer Public Keys {#issuer-public-keys}
 This section describes the public interfaces that an issuer is required to
 support to provide public keys to be used by Trust Token protocols.
 
-An issuer needs to maintain a set of keys and implement the Issue and Redeem
-cryptographic functions to sign and validate tokens. Issuers are required to
-serve a key commitment endpoint. Key commitments are collections of
-cryptographic keys and associated metadata necessary for executing the issuance
-and redemption operations. Issuers make these available through secure HTTP
-endpoints [[RFC8446]]. Browsers should fetch the key commitments periodically.
+An issuer needs to maintain a set of keys and implement the **Issue** and
+**Redeem** cryptographic functions to sign and validate tokens. Issuers are
+required to serve a **key commitment** endpoint. Key commitments are
+collections of cryptographic keys and associated metadata necessary for
+executing the issuance and redemption operations. Issuers make these available
+through secure HTTP [[RFC8446]] endpoints. Browsers should fetch the key
+commitments periodically.
 
 Requests to key commitment endpoints should result in a JSON response
 [[RFC8259]] of the following format.
 
 ```javascript
 {
-  <protocol_version>: {
-    "protocol_version": <protocol version as a string>,
-    "id": <key commitment identifier as a string>
-    "batchsize": <batch size as string>,
+  <cryptographic protocol_version>: {
+    "protocol_version": <cryptographic protocol version>,
+    "id": <key commitment identifier>
+    "batchsize": <batch size>,
     "keys": {
-      <keyID>: { "Y": <base64-encoded TrustTokenPublicKey>,
-                 "expiry": <key expiry, encoded as a string representation of
-                           an integer timestamp in microseconds since the Unix
-                                    epoch> },
       <keyID>: { "Y": <base64-encoded public key>,
-                 "expiry": <key expiry, encoded as a string representation of
-                           an integer timestamp in microseconds since the Unix
-                           epoch> }, ...
+                 "expiry": <key expirion data>},
+      <keyID>: { "Y": <base64-encoded public key>,
+                 "expiry": <key expirion data}, ...
     }
   },
   ...
 }
 ```
 
-* `<protocol_version>` is a string identifier for the Trust Token protocol
-    version used. The same string is used as a value of the inner
-    `protocol_version` field. Protocol version string identifier is either
-    `"TrustTokenV3PMB"` or `"TrustTokenV3VOPRF"`. Both protocols are similar
-    in terms of privacy implications.
+* `<cryptographic protocol version>` is a string identifier for the Trust Token
+    protocol version used. The same string is used as a value of the inner
+    `"protocol_version"` field. Protocol version string identifier is either
+    `"TrustTokenV3PMB"` or `"TrustTokenV3VOPRF"`. Both protocols have similar
+    properties in terms of privacy implications.
 
-    * Protocol version `“TrustTokenV3PMB”` implements [[PMB]]. Each issued
-               token contains a private metadata bit.
+    * Protocol version `“TrustTokenV3PMB”` implements [[PMB]] cryptographic
+               protocol. In this protocol, each token contains a private
+               metadata bit.
 
-    * Protocol version `“TrustTokenV2VOPRF”` implements [[VOPRF]]. Tokens do
-               not contain private metadata bits. However, issuers can use twice
-               as many concurrently valid token signing keys (six compared to three of
-               protocol `“TrustTokenV3PMB”`.
+    * Protocol version `“TrustTokenV2VOPRF”` implements [[VOPRF]] cryptographic
+               protocol. Contrary to PMB, tokens do not contain private
+               metadata bits. However, issuers can use twice as many
+               concurrently valid token signing keys (six compared to three of
+               PMB).
 
-* `id` field provides the ID of the key commitment. Key commitment ID is a
-       string representation of a non-negative integer that is within the range
-       of an unsigned 32 bit integer type. ID values should be montonically
-       increasing.
+* `"id"` field provides the identifier of the key commitment. It is a string
+         representation of a non-negative integer that is within the range of
+         an unsigned 32 bit integer type. Values should be montonically
+         increasing.
 
-* `batchsize` specifies the maximum number of blinded tokens that the issuer
-       supports being sent during each token issuance operation. `batchsize`
-       value is a string representation of a positive integer. Maximum value
-       allowed is 500. If value is larger, 500 will be used. Browser might send
-       fewer tokens in a single operation, but will generally default to
-       sending `batchsize` many tokens per operation.
+* `"batchsize"` specifies the maximum number of blinded tokens that the issuer
+                supports for each token issuance operation. Its value is a
+                string representation of a positive integer. Maximum value
+                allowed is 100. If a larger value is specified, 100 will be
+                used. Browser might send fewer tokens in a single operation,
+                but will generally default to sending `batchsize` many tokens
+                per operation.
 
-* `keys` field lists set of public keys dictionaries by their ID.
+* `"keys"` field is a dictionary of public keys listed by their identifiers.
 
          * `<keyID>` is a string representation of a non-negative integer that
                is within the range of an unsigned 32 bit integer type.
 
-         * Each key has a `Y` field which is a string representation of a
-               big-endian base64 encoding of the byte string of the key.
+         * Each key has a `"Y"` field which is a string representation of a
+                big-endian base64 encoding [[RFC4648]] of the byte string of
+                the key.
 
-         * `expiry` field specifies how long the underlying key is valid. It is
-                    an integer timestamp encoded as a string. Underlying key
-                    expires if this amount many or more microseconds are
-                    elapsed since the POSIX epoch [[RFC8536]].
+         * `"expiry"` field specifies how long the underlying key is valid. It
+                      is a string representation of a nonnegative integer that
+                      is within the range of an unsigned 64 bit integer type.
+                      Underlying key expires if this amount many or more
+                      microseconds are elapsed since the POSIX epoch
+                      [[RFC8536]].
 
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
@@ -194,15 +197,13 @@ the issuing protocol steps happenning in browsers and issuers.
 Browser Steps For Creating Issue Request {#browser-issue-steps}
 ---------------------------------------------------------------
 
-We assume the public key commitments for the underlying issuer is fetched as
-explained in [[#issuer-public-keys]]. An issue request is created and fetched
-as follows.
+An issue request is created and fetched as demostrated in the following snippet.
 
 ```javascript
-issueRequest = new Request(https://example.issuer:1234/issuer_path?public=0&private=0, {
+issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
   trustToken: {
-    type: 'token-request',
-    issuer: https://example.issuer
+    type: "token-request",
+    issuer: "https://example.issuer"
   }
 });
 fetch(issueRequest);
@@ -211,9 +212,9 @@ fetch(issueRequest);
 An issuance request is parameterized by issuer and top level origins. Following
 steps are carried out when an issue request is fetched.
 
- 1. Reject if the document is not in a secure context [[secure-contexts]]
+ 1. Reject if the document is not in a secure context [[secure-contexts]].
  2. Reject if associating the issuer with the top level origin would exceed the
-    top level’s number-of-issuers limit of 2.
+           top level’s number-of-issuers limit of 2.
  3. Associate the issuer with the top level origin.
  4. Reject if the number of tokens from the issuer is already at capacity
            which is 500.
@@ -309,40 +310,71 @@ redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
 });
 ```
 
-If there are no tokens available for the given issuer, the returned promise
-rejects with an error. Otherwise, it invokes the redemption protocol
-[[PRIVACY-PASS-AUTH-SCHEME]] against the issuer, with the token (potentially,
-if specified by an extension, along with associated redemption metadata)
-attached in the `Sec-Trust-Token` request header. The issuer can either
-consume the token and act based on the result, optionally including a
-Redemption Record (RR) in the `Sec-Trust-Token` response header to provide
-a redemption attestation to forward to other parties. Additionally, the issuer
-may include the `Sec-Trust-Token-Lifetime` header in the response to
-indicate to the UA how long (in seconds) the RR should be cached for. When
-`Sec-Trust-Token-Lifetime` response header value is invalid (too large, a
-negative number or non-numeric), UA should ignore the
-`Sec-Trust-Token-Lifetime` header. When `Sec-Trust-Token-Lifetime`
-header value is zero, UA should treat the record as expired. In case of
-multiple `Sec-Trust-Token-Lifetime` headers, UA uses the last one. If
-`Sec-Trust-Token-Lifetime` header is omitted, the lifetime of the RR will
-be tied to the lifetime of the Trust Token verification key that confirmed the
+Default value for refreshPolicy is `'none'`.
+
+<!--
+checking fetch syntax, malformed input etc?
+
+When `refreshPolicy` is `'none'`,
+browser uses the previously cached redemption record instead of redeeming a new
+token.
+-->
+
+Browser carries the following steps when a redemption request is fetched.
+
+ 1. Reject if the document is not in a secure context [[secure-contexts]].
+ 2. Reject if associating the issuer with the top level origin would exceed the
+           top level’s number-of-issuers limit of 2.
+ 3. Associate the issuer with the top level origin.
+ 4. If `refreshPolicy` is `'none'`,
+        a. If an unexpired redemption record exists in permenant storage,
+              return early, add this redemption record to corresponding
+              header value. Go to step 11.
+        b. Else continue redemption.
+ 5. If this is the third token exhausting redemption request within the
+       last 48 hours, return error.
+ 6. Look up the key commitments from storage. Error out if key commitments are
+         unavailable.
+ 7. Discard tokens from issuer that are signed with keys other than those from
+            the issuer's most recent commitments.
+ 8. Return error if there are no tokens stored to redeem.
+ 9. Retrieve a single token from persistent storage.
+ 10. Pass token to cryptographic redemption procedure, if procedure fails
+         return error.
+ 11. Set redemption procedure result in `Sec-Trust-Token` request header.
+ 12. Set `Sec-Trust-Token-Version` header value to the cryptographic protocol
+          used.
+ 13. Optionally, set `Sec-Trust-Token-Lifetime` header.
+ 14. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
+
+`Sec-Trust-Token-Lifetime` response header indicates how long (in seconds) the
+RR should be cached for. When `Sec-Trust-Token-Lifetime` response header value
+is invalid (too large, a negative number or non-numeric), UA should ignore the
+`Sec-Trust-Token-Lifetime` header. When `Sec-Trust-Token-Lifetime` header value
+is zero, UA should treat the record as expired. In case of multiple
+`Sec-Trust-Token-Lifetime` headers, UA uses the last one. If
+`Sec-Trust-Token-Lifetime` header is omitted, the lifetime of the RR will be
+tied to the lifetime of the Trust Token verification key that confirmed the
 redeemed token's issuance. The RR is HTTP-only and JavaScript is only able to
-access/send the RR via Trust Token Fetch APIs. It is also cached in new
-first-party storage accessible only by these APIs for subsequent visits to that
-first-party. The RR is treated as an arbitrary blob of bytes from the issuer,
-that may have semantic meaning to downstream consumers.
+access/send the RR via Trust Token Fetch APIs. The RR is treated as an
+arbitrary blob of bytes from the issuer, that may have semantic meaning to
+downstream consumers.
 
 
 Redemption Records {#redemption-records}
 ----------------------------------------
 
-Prevent communicating issuers by caching redemption records. Provide these
-records to origins that can verify its validity. These are stored in persistent
-browser storage. Redemption records are provided in the `Sec-Trust-Token`
-response header after a redemption fetch call. Optionally, issuer might provide
-an expiration time for the redemption record provided. This expiration is
-specified as number of seconds in the `Sec-Trust-Token-Lifetime` HTTP
-response header value.
+To reduce communication overhead, browser might cache blobs returned in
+`Sec-Trust-Token` header value in redemption responses. These blobs are
+referred as *Redemption Records*. Browsers might choose to store these records
+to include them in subsequent requests to the origins that can verify its
+validity. Issuer might choose to include optional `Sec-Trust-Token-Lifetime`
+header in the redemption response. The value of this header indicates the
+expiration time for the redemption record provided. This expiration is
+specified as number of seconds in the `Sec-Trust-Token-Lifetime` HTTP response
+header value.
+
+
 
 Query APIs {#query-apis}
 =======================
