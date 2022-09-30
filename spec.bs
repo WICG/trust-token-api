@@ -92,7 +92,8 @@ fail to provide anonymity.
 
 Authentication of the clients and token signing are both carried by the same
 entity referred as the **issuer**. This is the joint attester and issuer
-architecture described in [[PRIVACY-PASS-ARCHITECTURE]].
+architecture described in [[PRIVACY-PASS-ARCHITECTURE]],
+[[PRIVACY-PASS-AUTH-SCHEME]].
 
 Browser store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
@@ -227,39 +228,46 @@ steps are carried out when an issue request is fetched.
             the smaller value.
  9. Look up the key commitments from storage. Error out if key commitments are
          unavailable.
- 10. Generate the right number of blinded tokens identified in step 6.
- 11. Configure the HTTP request. Set a load flag to bypass the HTTP cache. Add
-               a `Sec-Trust-Token` request header containing a base64-encoded
-              version of the bytestring as value. Add `Sec-Trust-Token-Version`
-              that specifies the version of the cryptographic protocol used.
+ 10. Identify right number of tokens considering issuer batch size and current
+     number of tokens from the issuer.
+ 11. Generate the right number of blinded tokens identified in Step 10.
+ 12. Configure the HTTP request.
+               a. Set a load flag to bypass the HTTP cache.
+               b. Add `Sec-Trust-Token` request header containing a
+                      base64-encoded version of the bytestring of tokens
+                      generated in Step 11.
+               c. Add `Sec-Trust-Token-Version` request header that specifies
+                      the version of the cryptographic protocol used.
 
-Information to be encoded in the tokens are passed in the URL parameters with
-`public` and `private` keys. VOPRF can encode only `public` values. PMB can encode
-3 buckets for public an a single bit for `private` key. In VOPRF `public` value
-can be 0 to 5. In PMB `public` value can be 0 to 2 and `private` value is
-either 0 or 1.
-
-Trust token HTTP request headers created for a typical fetch isas follows.
+Trust token HTTP request headers created for a typical fetch is as follows.
 
 ```
 Sec-Trust-Token: <blinded tokens encoded as base64 string>
 Sec-Trust-Token-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 
+
 Issuer Signing Tokens {#issuer-signing-tokens}
 ----------------------------------------------
+
+This section explains the signing of tokens that happens in the issuer
+servers. Information to be encoded in the tokens are passed in the URL `public`
+and `private` parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
+passed in the URL `public` parameter. PMB can encode a value from set {0,1,2}
+in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the blinded tokens obtained in the
 `Sec-Trust-Token` request header value. Issuer uses the cryptographic protocol
 specified in the request `Sec-Trust-Token-Version` header. Encoding the values
-passes in URL parameter keys `private` and `public` happens at this
+passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the `Sec-Trust-Token` response header
-value encoded as base64 byte string. Issuer returns the number of tokens issued
+value encoded as a base64 byte string. The number of tokens issued is returned
 in `Sec-TT-Count` header. Value of this header is the string message of
 `Issuing <number of tokens> tokens.` with the right nonnegative integer value
 that specifies the tokens issued.
 
-A response displaying Trust Token related headers.
+Following snippet displays a typical response demonstrating the Trust Token
+related headers.
 
 ```
 Sec-Trust-Token: <token encoded as base64 string>
@@ -267,9 +275,9 @@ Sec-TT-Count: Issuing 3 tokens.
 ```
 
 Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data`
-header in the response. If the value of the header is `"all"`, then browser
+header in the response. If the value of the header is `all`, then browser
 should discard all previously stored tokens before the newly issued tokens are
-stored. `Sec-Trust-Token-Clear-Data` header should be ignored for all other
+stored. `Sec-Trust-Token-Clear-Data` header should be ignored for any other
 values.
 
 
@@ -286,9 +294,9 @@ To process a response to an issue request, browser follows the following steps.
     b. Else, ignore the header.
  3. Strip the `Sec-Trust-Token` header from the response and carry out the
     cryptographic procedures to obtain a list of unblinded tokens.
-    a. If cryptographic procedure succeeds, associate the tokens with the
+    a. If the cryptographic procedure succeeds, associate the tokens with the
           issuing key’s label and store the tokens.
-    b. Else, return an error
+    b. Else, return an error.
 
 
 Redeeming Tokens {#redeeming-tokens}
@@ -375,36 +383,143 @@ specified as number of seconds in the `Sec-Trust-Token-Lifetime` HTTP response
 header value.
 
 
-
 Query APIs {#query-apis}
-=======================
+========================
 
-An origin might query whether browser has any tokens from a specific issuer using the following API.
+Token Query {#token-query}
+--------------------------
 
-```
+An origin might query whether browser has any tokens from a specific issuer
+using the following API.
+
+```javascript
 document.hasTrustToken(<issuer>)
 ```
 
-Similarly an origin can check whether browser has already a valid redemption
-record for a specific issuer using following API.
+Browser carries the following steps on this query.
 
-```
+ 1. Reject if the document is not in a secure context [[secure-contexts]].
+ 2. Reject if associating the issuer with the top level origin would exceed the
+           top level’s number-of-issuers limit of 2.
+ 3. Associate the issuer with the top level origin.
+ 4. Look up the key commitments from storage. If there are key commitments,
+         discard tokens from issuer that are signed with keys other than those
+         from the issuer's most recent commitments.
+ 5. Return true if there are tokens stored for the given issuer, false
+           otherwise.
+
+Note that this query modifies the browser state. It associates the issuer
+argument with the current origin. Browser allows at most 2 issuers associated
+with an origin. This is to prevent leaking information through the issers a
+user has tokens from. Note that token query triggers removal of stale tokens
+at Step 4.
+
+Redemption Record Query {#redemption-record-query}
+--------------------------------------------------
+
+Similar to token query, an origin can check whether browser has a valid
+redemption record for a specific issuer using following API.
+
+```javascript
 document.hasRedemptionRecord(<issuer>)
 ```
 
-Unlike checking for tokens, checking redemption records do not associate
-origins with issuers and saturate issuer limits for the origin.
+Browser carries the following steps on redemption query.
+
+ 1. Reject if the document is not in a secure context [[secure-contexts]].
+ 2. If the issuer is not associated with the top level origin, return false.
+ 3. Look up the key commitments from storage. If there are key commitments,
+         discard tokens from issuer that are signed with keys other than those
+         from the issuer's most recent commitments.
+ 4. If there is a redemption record for the issuer and topl level pair,
+       return true, return false otherwise.
+
+Similar to token query, redemption query might modify the browser state. Unlike
+token query, redemption query does not associate issuer with the top level
+origin. There is no need to associate the issuer queried with the top level
+origin, because, answer to the redemption query does not leak information about
+the issuers of the currently stored tokens. Similar to token query, redemption
+query clears stale tokens.
 
 
-Privacy and Security Considerations {#p-c}
-==========================================
+Privacy Considerations {#privacy}
+=================================
 
+Unlinkability {#unlinkability}
+------------------------------
+
+Cryptographic protocols [[VOPRF]] and [[PMB]] provide blind signatures. At
+redemption time, issuers can recognize their signature on the provided token,
+however they can not determine at what time and context they signed the
+token. This prevents issuers to correlate their issuances on an origin with
+redemptions on another origin. Issuers learn only the aggregate information
+about the origins users visit.
+
+
+Limiting Encoded Information {#limit-encoded-info}
+--------------------------------------------------
+
+Browsers enforce limit on the number of keys for an issuer. For [[VOPRF]]
+number of keys are limited to six and for [[PMB]] number of keys are limited to
+three. This is to prevent issuers de-anonymizing the clients by using a unique
+keys for each clients. At issuance time, when using [[VOPRF]], the issuer can
+label browser by one of the six available labels by using one of the six
+keys. Similarly, when using [[PMB]], the issuer labels the browser in of the
+three labels by using its three keys and store an additional private bit value.
+This indicates it also places browser into one of six buckets (2 x 3 = 6). Both
+[[VOPRF]] and [[PMB]] encode the same amount of information in a token. The
+difference is [[PMB]] having a private bit.
+
+### Potential Attack: Side Channel Fingerprinting
+
+Unlinkability is lost if the issuer is able to use network-level fingerprinting
+or any other side-channel and can associate the browser at redemption time with
+the browser at token issuance time, even though the Trust Token API itself has
+only stored and revealed limited amount of information about the browser.
+
+Cross-site Information Transfer {#cross-site-info}
+--------------------------------------------------
+
+Trust tokens transfer limited information between first-party contexts It
+provides cryptographic guarantees that each token only contains a small amount
+of information. Still, if we allow many token redemptions on a single page, the
+first-party cookie for user U on domain A can be encoded in the trust token
+information channel and decoded on domain B, allowing domain B to learn the
+user's domain A cookie until either 1p cookie is cleared. Separate from the
+concern of channels allowing arbitrary communication between domains, some
+identification attacks---for instance, a malicious redeemer attempting to learn
+the exact set of issuers that have granted tokens to a particular user, which
+could be identifying---have similar mitigations.
+
+### Mitigation: Dynamic Issuance/Redemption Limits
+
+To mitigate this attack, browser places limits on both issuance and
+redemption. User activation with the issuing site is required in the issuing
+operation. Browser does not allow a third redemption in a 48 hour window.
+
+### Mitigation: Per-Site Issuer Limits
+
+The rate of identity leakage from one origin to another increases with the
+number of issuers allowed in an origin. To avoid abuse, browser allows
+association of at most two issers per top level origin. Issuers are associated
+with top level origins for token query API as well, see [[#token-query]].
+
+Security Considerations {#security}
+===================================
 
 Preventing Token Exhaustion {#token-exhaustion}
-===============================================
+-----------------------------------------------
 
-Malicious origins might attempt to exhaust all user tokens by redeeming them
-all. To prevent this, browser limits redemption allowed. In an origin first two
-redemptions are allowed, however, the third redemption is not allowed in a 48
-hour window. The third redemption is allowed once more than 48 hours have
-elapsed since the first redemption.
+Malicious origins might attempt to exhaust all tokens stored in the browser by
+redeeming them all. To prevent this, browser limits number of redemption
+operations. In an origin first two redemptions are allowed, however, the third
+redemption is not allowed in a 48 hour window. The third redemption is allowed
+once more than 48 hours have elapsed since the first redemption.
+
+Preventing Double Spending {#preventing-double-spend}
+-----------------------------------------------------
+
+Issuers can verify that each token is seen only once, because every redemption
+is sent to the same token issuer. This means that even if a malicious piece of
+malware exfiltrates all of a user's tokens, the tokens will run out over
+time. Issuers can sign fewer tokens at a time to mitigate the risk.
