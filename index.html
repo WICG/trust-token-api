@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 44af0bf3e, updated Fri Jul 29 17:05:16 2022 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="626309b3cc0334946d5d288264c5e1a2de80dcce" name="document-revision">
+  <meta content="bb228bff7d58e50a784e620ce7d7ef99ae973ccd" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -526,7 +526,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Trust Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-09-27">27 September 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-09-30">30 September 2022</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -580,9 +580,34 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <ol class="toc">
       <li><a href="#redemption-records"><span class="secno">5.1</span> <span class="content">Redemption Records</span></a>
      </ol>
-    <li><a href="#query-apis"><span class="secno">6</span> <span class="content">Query APIs</span></a>
-    <li><a href="#p-c"><span class="secno">7</span> <span class="content">Privacy and Security Considerations</span></a>
-    <li><a href="#token-exhaustion"><span class="secno">8</span> <span class="content">Preventing Token Exhaustion</span></a>
+    <li>
+     <a href="#query-apis"><span class="secno">6</span> <span class="content">Query APIs</span></a>
+     <ol class="toc">
+      <li><a href="#token-query"><span class="secno">6.1</span> <span class="content">Token Query</span></a>
+      <li><a href="#redemption-record-query"><span class="secno">6.2</span> <span class="content">Redemption Record Query</span></a>
+     </ol>
+    <li>
+     <a href="#privacy"><span class="secno">7</span> <span class="content">Privacy Considerations</span></a>
+     <ol class="toc">
+      <li><a href="#unlinkability"><span class="secno">7.1</span> <span class="content">Unlinkability</span></a>
+      <li>
+       <a href="#limit-encoded-info"><span class="secno">7.2</span> <span class="content">Limiting Encoded Information</span></a>
+       <ol class="toc">
+        <li><a href="#potential-attack-side-channel-fingerprinting"><span class="secno">7.2.1</span> <span class="content">Potential Attack: Side Channel Fingerprinting</span></a>
+       </ol>
+      <li>
+       <a href="#cross-site-info"><span class="secno">7.3</span> <span class="content">Cross-site Information Transfer</span></a>
+       <ol class="toc">
+        <li><a href="#mitigation-dynamic-issuance-redemption-limits"><span class="secno">7.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span></a>
+        <li><a href="#mitigation-per-site-issuer-limits"><span class="secno">7.3.2</span> <span class="content">Mitigation: Per-Site Issuer Limits</span></a>
+       </ol>
+     </ol>
+    <li>
+     <a href="#security"><span class="secno">8</span> <span class="content">Security Considerations</span></a>
+     <ol class="toc">
+      <li><a href="#token-exhaustion"><span class="secno">8.1</span> <span class="content">Preventing Token Exhaustion</span></a>
+      <li><a href="#preventing-double-spend"><span class="secno">8.2</span> <span class="content">Preventing Double Spending</span></a>
+     </ol>
     <li>
      <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
      <ol class="toc">
@@ -614,7 +639,7 @@ cookies <a data-link-type="biblio" href="#biblio-rfc6265">[RFC6265]</a>. Cookies
 fail to provide anonymity.</p>
    <p>Authentication of the clients and token signing are both carried by the same
 entity referred as the <strong>issuer</strong>. This is the joint attester and issuer
-architecture described in <a data-link-type="biblio" href="#biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]</a>.</p>
+architecture described in <a data-link-type="biblio" href="#biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]</a>, <a data-link-type="biblio" href="#biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]</a>.</p>
    <p>Browser store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
 tokens. Spending tokens are called <strong>redeeming</strong>.</p>
@@ -739,35 +764,43 @@ steps are carried out when an issue request is fetched.</p>
      <p>Look up the key commitments from storage. Error out if key commitments are
      unavailable.</p>
     <li data-md>
-     <p>Generate the right number of blinded tokens identified in step 6.</p>
+     <p>Identify right number of tokens considering issuer batch size and current
+ number of tokens from the issuer.</p>
     <li data-md>
-     <p>Configure the HTTP request. Set a load flag to bypass the HTTP cache. Add
-           a <code>Sec-Trust-Token</code> request header containing a base64-encoded
-          version of the bytestring as value. Add <code>Sec-Trust-Token-Version</code> that specifies the version of the cryptographic protocol used.</p>
+     <p>Generate the right number of blinded tokens identified in Step 10.</p>
+    <li data-md>
+     <p>Configure the HTTP request.
+           a. Set a load flag to bypass the HTTP cache.
+           b. Add <code>Sec-Trust-Token</code> request header containing a
+                  base64-encoded version of the bytestring of tokens
+                  generated in Step 11.
+           c. Add <code>Sec-Trust-Token-Version</code> request header that specifies
+                  the version of the cryptographic protocol used.</p>
    </ol>
-   <p>Information to be encoded in the tokens are passed in the URL parameters with <code>public</code> and <code>private</code> keys. VOPRF can encode only <code>public</code> values. PMB can encode
-3 buckets for public an a single bit for <code>private</code> key. In VOPRF <code>public</code> value
-can be 0 to 5. In PMB <code>public</code> value can be 0 to 2 and <code>private</code> value is
-either 0 or 1.</p>
-   <p>Trust token HTTP request headers created for a typical fetch isas follows.</p>
+   <p>Trust token HTTP request headers created for a typical fetch is as follows.</p>
 <pre>Sec-Trust-Token: &lt;blinded tokens encoded as base64 string>
 Sec-Trust-Token-Version: &lt;cryptographic protocol version, VOPRF or PMB>
 </pre>
    <h3 class="heading settled" data-level="4.2" id="issuer-signing-tokens"><span class="secno">4.2. </span><span class="content">Issuer Signing Tokens</span><a class="self-link" href="#issuer-signing-tokens"></a></h3>
+   <p>This section explains the signing of tokens that happens in the issuer
+servers. Information to be encoded in the tokens are passed in the URL <code>public</code> and <code>private</code> parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
+passed in the URL <code>public</code> parameter. PMB can encode a value from set {0,1,2}
+in <code>public</code> and a value from set {0,1} in <code>private</code> parameter.</p>
    <p>Using its private keys, issuer signs the blinded tokens obtained in the <code>Sec-Trust-Token</code> request header value. Issuer uses the cryptographic protocol
 specified in the request <code>Sec-Trust-Token-Version</code> header. Encoding the values
-passes in URL parameter keys <code>private</code> and <code>public</code> happens at this
+passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
 step. Issuer returns the signed tokens in the <code>Sec-Trust-Token</code> response header
-value encoded as base64 byte string. Issuer returns the number of tokens issued
+value encoded as a base64 byte string. The number of tokens issued is returned
 in <code>Sec-TT-Count</code> header. Value of this header is the string message of <code>Issuing &lt;number of tokens> tokens.</code> with the right nonnegative integer value
 that specifies the tokens issued.</p>
-   <p>A response displaying Trust Token related headers.</p>
+   <p>Following snippet displays a typical response demonstrating the Trust Token
+related headers.</p>
 <pre>Sec-Trust-Token: &lt;token encoded as base64 string>
 Sec-TT-Count: Issuing 3 tokens.
 </pre>
-   <p>Additionally, the issuer may include an optional <code>Sec-Trust-Token-Clear-Data</code> header in the response. If the value of the header is <code>"all"</code>, then browser
+   <p>Additionally, the issuer may include an optional <code>Sec-Trust-Token-Clear-Data</code> header in the response. If the value of the header is <code>all</code>, then browser
 should discard all previously stored tokens before the newly issued tokens are
-stored. <code>Sec-Trust-Token-Clear-Data</code> header should be ignored for all other
+stored. <code>Sec-Trust-Token-Clear-Data</code> header should be ignored for any other
 values.</p>
    <h3 class="heading settled" data-level="4.3" id="browser-issue-response"><span class="secno">4.3. </span><span class="content">Browser Steps For Issue Response</span><a class="self-link" href="#browser-issue-response"></a></h3>
    <p>To process a response to an issue request, browser follows the following steps.</p>
@@ -783,9 +816,9 @@ b. Else, ignore the header.</p>
     <li data-md>
      <p>Strip the <code>Sec-Trust-Token</code> header from the response and carry out the
 cryptographic procedures to obtain a list of unblinded tokens.
-a. If cryptographic procedure succeeds, associate the tokens with the
+a. If the cryptographic procedure succeeds, associate the tokens with the
       issuing key’s label and store the tokens.
-b. Else, return an error</p>
+b. Else, return an error.</p>
    </ol>
    <h2 class="heading settled" data-level="5" id="redeeming-tokens"><span class="secno">5. </span><span class="content">Redeeming Tokens</span><a class="self-link" href="#redeeming-tokens"></a></h2>
    <p>When browser navigates to an origin, top level origin or a third party site
@@ -861,22 +894,112 @@ expiration time for the redemption record provided. This expiration is
 specified as number of seconds in the <code>Sec-Trust-Token-Lifetime</code> HTTP response
 header value.</p>
    <h2 class="heading settled" data-level="6" id="query-apis"><span class="secno">6. </span><span class="content">Query APIs</span><a class="self-link" href="#query-apis"></a></h2>
-   <p>An origin might query whether browser has any tokens from a specific issuer using the following API.</p>
-<pre>document.hasTrustToken(&lt;issuer>)
+   <h3 class="heading settled" data-level="6.1" id="token-query"><span class="secno">6.1. </span><span class="content">Token Query</span><a class="self-link" href="#token-query"></a></h3>
+   <p>An origin might query whether browser has any tokens from a specific issuer
+using the following API.</p>
+<pre class="language-javascript highlight">document<c- p>.</c->hasTrustToken<c- p>(</c-><c- o>&lt;</c->issuer<c- o>></c-><c- p>)</c->
 </pre>
-   <p>Similarly an origin can check whether browser has already a valid redemption
-record for a specific issuer using following API.</p>
-<pre>document.hasRedemptionRecord(&lt;issuer>)
+   <p>Browser carries the following steps on this query.</p>
+   <ol>
+    <li data-md>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+    <li data-md>
+     <p>Reject if associating the issuer with the top level origin would exceed the
+       top level’s number-of-issuers limit of 2.</p>
+    <li data-md>
+     <p>Associate the issuer with the top level origin.</p>
+    <li data-md>
+     <p>Look up the key commitments from storage. If there are key commitments,
+     discard tokens from issuer that are signed with keys other than those
+     from the issuer’s most recent commitments.</p>
+    <li data-md>
+     <p>Return true if there are tokens stored for the given issuer, false
+       otherwise.</p>
+   </ol>
+   <p>Note that this query modifies the browser state. It associates the issuer
+argument with the current origin. Browser allows at most 2 issuers associated
+with an origin. This is to prevent leaking information through the issers a
+user has tokens from. Note that token query triggers removal of stale tokens
+at Step 4.</p>
+   <h3 class="heading settled" data-level="6.2" id="redemption-record-query"><span class="secno">6.2. </span><span class="content">Redemption Record Query</span><a class="self-link" href="#redemption-record-query"></a></h3>
+   <p>Similar to token query, an origin can check whether browser has a valid
+redemption record for a specific issuer using following API.</p>
+<pre class="language-javascript highlight">document<c- p>.</c->hasRedemptionRecord<c- p>(</c-><c- o>&lt;</c->issuer<c- o>></c-><c- p>)</c->
 </pre>
-   <p>Unlike checking for tokens, checking redemption records do not associate
-origins with issuers and saturate issuer limits for the origin.</p>
-   <h2 class="heading settled" data-level="7" id="p-c"><span class="secno">7. </span><span class="content">Privacy and Security Considerations</span><a class="self-link" href="#p-c"></a></h2>
-   <h2 class="heading settled" data-level="8" id="token-exhaustion"><span class="secno">8. </span><span class="content">Preventing Token Exhaustion</span><a class="self-link" href="#token-exhaustion"></a></h2>
-   <p>Malicious origins might attempt to exhaust all user tokens by redeeming them
-all. To prevent this, browser limits redemption allowed. In an origin first two
-redemptions are allowed, however, the third redemption is not allowed in a 48
-hour window. The third redemption is allowed once more than 48 hours have
-elapsed since the first redemption.</p>
+   <p>Browser carries the following steps on redemption query.</p>
+   <ol>
+    <li data-md>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+    <li data-md>
+     <p>If the issuer is not associated with the top level origin, return false.</p>
+    <li data-md>
+     <p>Look up the key commitments from storage. If there are key commitments,
+     discard tokens from issuer that are signed with keys other than those
+     from the issuer’s most recent commitments.</p>
+    <li data-md>
+     <p>If there is a redemption record for the issuer and topl level pair,
+   return true, return false otherwise.</p>
+   </ol>
+   <p>Similar to token query, redemption query might modify the browser state. Unlike
+token query, redemption query does not associate issuer with the top level
+origin. There is no need to associate the issuer queried with the top level
+origin, because, answer to the redemption query does not leak information about
+the issuers of the currently stored tokens. Similar to token query, redemption
+query clears stale tokens.</p>
+   <h2 class="heading settled" data-level="7" id="privacy"><span class="secno">7. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy"></a></h2>
+   <h3 class="heading settled" data-level="7.1" id="unlinkability"><span class="secno">7.1. </span><span class="content">Unlinkability</span><a class="self-link" href="#unlinkability"></a></h3>
+   <p>Cryptographic protocols <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> provide blind signatures. At
+redemption time, issuers can recognize their signature on the provided token,
+however they can not determine at what time and context they signed the
+token. This prevents issuers to correlate their issuances on an origin with
+redemptions on another origin. Issuers learn only the aggregate information
+about the origins users visit.</p>
+   <h3 class="heading settled" data-level="7.2" id="limit-encoded-info"><span class="secno">7.2. </span><span class="content">Limiting Encoded Information</span><a class="self-link" href="#limit-encoded-info"></a></h3>
+   <p>Browsers enforce limit on the number of keys for an issuer. For <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> number of keys are limited to six and for <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> number of keys are limited to
+three. This is to prevent issuers de-anonymizing the clients by using a unique
+keys for each clients. At issuance time, when using <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a>, the issuer can
+label browser by one of the six available labels by using one of the six
+keys. Similarly, when using <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a>, the issuer labels the browser in of the
+three labels by using its three keys and store an additional private bit value.
+This indicates it also places browser into one of six buckets (2 x 3 = 6). Both <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> encode the same amount of information in a token. The
+difference is <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> having a private bit.</p>
+   <h4 class="heading settled" data-level="7.2.1" id="potential-attack-side-channel-fingerprinting"><span class="secno">7.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting</span><a class="self-link" href="#potential-attack-side-channel-fingerprinting"></a></h4>
+   <p>Unlinkability is lost if the issuer is able to use network-level fingerprinting
+or any other side-channel and can associate the browser at redemption time with
+the browser at token issuance time, even though the Trust Token API itself has
+only stored and revealed limited amount of information about the browser.</p>
+   <h3 class="heading settled" data-level="7.3" id="cross-site-info"><span class="secno">7.3. </span><span class="content">Cross-site Information Transfer</span><a class="self-link" href="#cross-site-info"></a></h3>
+   <p>Trust tokens transfer limited information between first-party contexts It
+provides cryptographic guarantees that each token only contains a small amount
+of information. Still, if we allow many token redemptions on a single page, the
+first-party cookie for user U on domain A can be encoded in the trust token
+information channel and decoded on domain B, allowing domain B to learn the
+user’s domain A cookie until either 1p cookie is cleared. Separate from the
+concern of channels allowing arbitrary communication between domains, some
+identification attacks---for instance, a malicious redeemer attempting to learn
+the exact set of issuers that have granted tokens to a particular user, which
+could be identifying---have similar mitigations.</p>
+   <h4 class="heading settled" data-level="7.3.1" id="mitigation-dynamic-issuance-redemption-limits"><span class="secno">7.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#mitigation-dynamic-issuance-redemption-limits"></a></h4>
+   <p>To mitigate this attack, browser places limits on both issuance and
+redemption. User activation with the issuing site is required in the issuing
+operation. Browser does not allow a third redemption in a 48 hour window.</p>
+   <h4 class="heading settled" data-level="7.3.2" id="mitigation-per-site-issuer-limits"><span class="secno">7.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#mitigation-per-site-issuer-limits"></a></h4>
+   <p>The rate of identity leakage from one origin to another increases with the
+number of issuers allowed in an origin. To avoid abuse, browser allows
+association of at most two issers per top level origin. Issuers are associated
+with top level origins for token query API as well, see <a href="#token-query">§ 6.1 Token Query</a>.</p>
+   <h2 class="heading settled" data-level="8" id="security"><span class="secno">8. </span><span class="content">Security Considerations</span><a class="self-link" href="#security"></a></h2>
+   <h3 class="heading settled" data-level="8.1" id="token-exhaustion"><span class="secno">8.1. </span><span class="content">Preventing Token Exhaustion</span><a class="self-link" href="#token-exhaustion"></a></h3>
+   <p>Malicious origins might attempt to exhaust all tokens stored in the browser by
+redeeming them all. To prevent this, browser limits number of redemption
+operations. In an origin first two redemptions are allowed, however, the third
+redemption is not allowed in a 48 hour window. The third redemption is allowed
+once more than 48 hours have elapsed since the first redemption.</p>
+   <h3 class="heading settled" data-level="8.2" id="preventing-double-spend"><span class="secno">8.2. </span><span class="content">Preventing Double Spending</span><a class="self-link" href="#preventing-double-spend"></a></h3>
+   <p>Issuers can verify that each token is seen only once, because every redemption
+is sent to the same token issuer. This means that even if a malicious piece of
+malware exfiltrates all of a user’s tokens, the tokens will run out over
+time. Issuers can sign fewer tokens at a time to mitigate the risk.</p>
   </main>
   <div data-fill-with="conformance">
    <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
@@ -934,6 +1057,8 @@ elapsed since the first redemption.</p>
    <dd>Ben Kreuter; et al. <a href="https://eprint.iacr.org/2020/072"><cite>Anonymous Tokens with Private Metadata Bit</cite></a>. URL: <a href="https://eprint.iacr.org/2020/072">https://eprint.iacr.org/2020/072</a>
    <dt id="biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]
    <dd>A. Davidson; J. Iyengar; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html"><cite>Privacy Pass Architectural Framework</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html</a>
+   <dt id="biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]
+   <dd>T. Pauly; S. Valdez; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html"><cite>The Privacy Pass HTTP Authentication Scheme</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html</a>
    <dt id="biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]
    <dd>S. Celi; et al. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html"><cite>Privacy Pass Issuance Protocol</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html</a>
    <dt id="biblio-privacy-pass-wg">[PRIVACY-PASS-WG]
