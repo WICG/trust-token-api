@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 44af0bf3e, updated Fri Jul 29 17:05:16 2022 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="bb228bff7d58e50a784e620ce7d7ef99ae973ccd" name="document-revision">
+  <meta content="730775e82934c3fe2aef02141c06dc17e7a7c8db" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -526,7 +526,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Trust Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-09-30">30 September 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-10-04">4 October 2022</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -566,7 +566,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
    <ol class="toc" role="directory">
     <li><a href="#goals"><span class="secno">1</span> <span class="content">Goals</span></a>
-    <li><a href="#backgroud"><span class="secno">2</span> <span class="content">Backgroud</span></a>
+    <li><a href="#background"><span class="secno">2</span> <span class="content">Background</span></a>
     <li><a href="#issuer-public-keys"><span class="secno">3</span> <span class="content">Issuer Public Keys</span></a>
     <li>
      <a href="#issuing-protocol"><span class="secno">4</span> <span class="content">Issuing Protocol</span></a>
@@ -630,7 +630,7 @@ through time in a privacy preserving manner. It achieves this using privacy
 pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in working documents
 of privacy pass working group of IETF <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Trust Tokens can be
 considered as a web platform implementation of Privacy Pass.</p>
-   <h2 class="heading settled" data-level="2" id="backgroud"><span class="secno">2. </span><span class="content">Backgroud</span><a class="self-link" href="#backgroud"></a></h2>
+   <h2 class="heading settled" data-level="2" id="background"><span class="secno">2. </span><span class="content">Background</span><a class="self-link" href="#background"></a></h2>
    <p>Trust Token API provides a mechanism for anonymous authentication. Trust Token
 mechanism provided by browser does not authenticate clients, instead it
 facilitates transfer of authentication information. Trust Token API performs
@@ -640,9 +640,9 @@ fail to provide anonymity.</p>
    <p>Authentication of the clients and token signing are both carried by the same
 entity referred as the <strong>issuer</strong>. This is the joint attester and issuer
 architecture described in <a data-link-type="biblio" href="#biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]</a>, <a data-link-type="biblio" href="#biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]</a>.</p>
-   <p>Browser store tokens in persistent storage. Navigated origins might fetch/spend
+   <p>Browsers store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
-tokens. Spending tokens are called <strong>redeeming</strong>.</p>
+tokens. Spending tokens is called <strong>redeeming</strong>.</p>
    <p>Origins may ask browser to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.</p>
    <p>Trust Token operations rely on <a data-link-type="biblio" href="#biblio-fetch">[FETCH]</a>. A fetch request corresponding to a
@@ -886,7 +886,7 @@ access/send the RR via Trust Token Fetch APIs. The RR is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.</p>
    <h3 class="heading settled" data-level="5.1" id="redemption-records"><span class="secno">5.1. </span><span class="content">Redemption Records</span><a class="self-link" href="#redemption-records"></a></h3>
-   <p>To reduce communication overhead, browser might cache blobs returned in <code>Sec-Trust-Token</code> header value in redemption responses. These blobs are
+   <p>To reduce communication overhead, the browser might cache blobs returned in <code>Sec-Trust-Token</code> header value in redemption responses. These blobs are
 referred as <em>Redemption Records</em>. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
 validity. Issuer might choose to include optional <code>Sec-Trust-Token-Lifetime</code> header in the redemption response. The value of this header indicates the
@@ -895,7 +895,7 @@ specified as number of seconds in the <code>Sec-Trust-Token-Lifetime</code> HTTP
 header value.</p>
    <h2 class="heading settled" data-level="6" id="query-apis"><span class="secno">6. </span><span class="content">Query APIs</span><a class="self-link" href="#query-apis"></a></h2>
    <h3 class="heading settled" data-level="6.1" id="token-query"><span class="secno">6.1. </span><span class="content">Token Query</span><a class="self-link" href="#token-query"></a></h3>
-   <p>An origin might query whether browser has any tokens from a specific issuer
+   <p>An origin might query whether the browser has any tokens from a specific issuer
 using the following API.</p>
 <pre class="language-javascript highlight">document<c- p>.</c->hasTrustToken<c- p>(</c-><c- o>&lt;</c->issuer<c- o>></c-><c- p>)</c->
 </pre>
@@ -969,7 +969,7 @@ or any other side-channel and can associate the browser at redemption time with
 the browser at token issuance time, even though the Trust Token API itself has
 only stored and revealed limited amount of information about the browser.</p>
    <h3 class="heading settled" data-level="7.3" id="cross-site-info"><span class="secno">7.3. </span><span class="content">Cross-site Information Transfer</span><a class="self-link" href="#cross-site-info"></a></h3>
-   <p>Trust tokens transfer limited information between first-party contexts It
+   <p>Trust tokens transfer limited information between first-party contexts. They
 provides cryptographic guarantees that each token only contains a small amount
 of information. Still, if we allow many token redemptions on a single page, the
 first-party cookie for user U on domain A can be encoded in the trust token
@@ -985,13 +985,13 @@ redemption. User activation with the issuing site is required in the issuing
 operation. Browser does not allow a third redemption in a 48 hour window.</p>
    <h4 class="heading settled" data-level="7.3.2" id="mitigation-per-site-issuer-limits"><span class="secno">7.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#mitigation-per-site-issuer-limits"></a></h4>
    <p>The rate of identity leakage from one origin to another increases with the
-number of issuers allowed in an origin. To avoid abuse, browser allows
+number of issuers allowed in an origin. To avoid abuse, the browser allows
 association of at most two issers per top level origin. Issuers are associated
 with top level origins for token query API as well, see <a href="#token-query">§ 6.1 Token Query</a>.</p>
    <h2 class="heading settled" data-level="8" id="security"><span class="secno">8. </span><span class="content">Security Considerations</span><a class="self-link" href="#security"></a></h2>
    <h3 class="heading settled" data-level="8.1" id="token-exhaustion"><span class="secno">8.1. </span><span class="content">Preventing Token Exhaustion</span><a class="self-link" href="#token-exhaustion"></a></h3>
    <p>Malicious origins might attempt to exhaust all tokens stored in the browser by
-redeeming them all. To prevent this, browser limits number of redemption
+redeeming them all. To prevent this, the browser limits number of redemption
 operations. In an origin first two redemptions are allowed, however, the third
 redemption is not allowed in a 48 hour window. The third redemption is allowed
 once more than 48 hours have elapsed since the first redemption.</p>
