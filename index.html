@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 44af0bf3e, updated Fri Jul 29 17:05:16 2022 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="730775e82934c3fe2aef02141c06dc17e7a7c8db" name="document-revision">
+  <meta content="066bc9006b17297158a5e3571275d9993b4b5bc0" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -969,8 +969,8 @@ or any other side-channel and can associate the browser at redemption time with
 the browser at token issuance time, even though the Trust Token API itself has
 only stored and revealed limited amount of information about the browser.</p>
    <h3 class="heading settled" data-level="7.3" id="cross-site-info"><span class="secno">7.3. </span><span class="content">Cross-site Information Transfer</span><a class="self-link" href="#cross-site-info"></a></h3>
-   <p>Trust tokens transfer limited information between first-party contexts. They
-provides cryptographic guarantees that each token only contains a small amount
+   <p>Trust tokens transfer limited information between first-party contexts. Underlying
+cryptographic protocols guarantee that each token only contains a small amount
 of information. Still, if we allow many token redemptions on a single page, the
 first-party cookie for user U on domain A can be encoded in the trust token
 information channel and decoded on domain B, allowing domain B to learn the
