@@ -80,7 +80,7 @@ https://eprint.iacr.org/2020/072.pdf
 -->
 
 
-Backgroud {#backgroud}
+Background {#background}
 ======================
 
 Trust Token API provides a mechanism for anonymous authentication. Trust Token
@@ -95,9 +95,9 @@ entity referred as the **issuer**. This is the joint attester and issuer
 architecture described in [[PRIVACY-PASS-ARCHITECTURE]],
 [[PRIVACY-PASS-AUTH-SCHEME]].
 
-Browser store tokens in persistent storage. Navigated origins might fetch/spend
+Browsers store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
-tokens. Spending tokens are called **redeeming**.
+tokens. Spending tokens is called **redeeming**.
 
 Origins may ask browser to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.
@@ -372,7 +372,7 @@ downstream consumers.
 Redemption Records {#redemption-records}
 ----------------------------------------
 
-To reduce communication overhead, browser might cache blobs returned in
+To reduce communication overhead, the browser might cache blobs returned in
 `Sec-Trust-Token` header value in redemption responses. These blobs are
 referred as *Redemption Records*. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
@@ -389,7 +389,7 @@ Query APIs {#query-apis}
 Token Query {#token-query}
 --------------------------
 
-An origin might query whether browser has any tokens from a specific issuer
+An origin might query whether the browser has any tokens from a specific issuer
 using the following API.
 
 ```javascript
@@ -480,7 +480,7 @@ only stored and revealed limited amount of information about the browser.
 Cross-site Information Transfer {#cross-site-info}
 --------------------------------------------------
 
-Trust tokens transfer limited information between first-party contexts It
+Trust tokens transfer limited information between first-party contexts. They
 provides cryptographic guarantees that each token only contains a small amount
 of information. Still, if we allow many token redemptions on a single page, the
 first-party cookie for user U on domain A can be encoded in the trust token
@@ -500,7 +500,7 @@ operation. Browser does not allow a third redemption in a 48 hour window.
 ### Mitigation: Per-Site Issuer Limits
 
 The rate of identity leakage from one origin to another increases with the
-number of issuers allowed in an origin. To avoid abuse, browser allows
+number of issuers allowed in an origin. To avoid abuse, the browser allows
 association of at most two issers per top level origin. Issuers are associated
 with top level origins for token query API as well, see [[#token-query]].
 
@@ -511,7 +511,7 @@ Preventing Token Exhaustion {#token-exhaustion}
 -----------------------------------------------
 
 Malicious origins might attempt to exhaust all tokens stored in the browser by
-redeeming them all. To prevent this, browser limits number of redemption
+redeeming them all. To prevent this, the browser limits number of redemption
 operations. In an origin first two redemptions are allowed, however, the third
 redemption is not allowed in a 48 hour window. The third redemption is allowed
 once more than 48 hours have elapsed since the first redemption.
