@@ -480,8 +480,8 @@ only stored and revealed limited amount of information about the browser.
 Cross-site Information Transfer {#cross-site-info}
 --------------------------------------------------
 
-Trust tokens transfer limited information between first-party contexts. They
-provides cryptographic guarantees that each token only contains a small amount
+Trust tokens transfer limited information between first-party contexts. Underlying
+cryptographic protocols guarantee that each token only contains a small amount
 of information. Still, if we allow many token redemptions on a single page, the
 first-party cookie for user U on domain A can be encoded in the trust token
 information channel and decoded on domain B, allowing domain B to learn the
