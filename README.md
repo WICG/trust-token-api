@@ -65,7 +65,9 @@ When an issuer.example context wants to provide tokens to a user (i.e. when the 
 ```
 fetch('<issuer>/<issuance path>', {
   trustToken: {
-    type: 'token-request',
+    type: '0xFF53',
+    version: '1',
+    operation: 'token-request',
     issuer: <issuer>
   }
 }).then(...)
@@ -75,10 +77,10 @@ fetch('<issuer>/<issuance path>', {
 This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance protocol:
 
 *   Generate a set of nonces.
-*   Blind them and attach them (in a Sec-Trust-Token header) to the HTTP request
+*   Blind them and attach them (in a `Sec-Trust-Token` header) to the HTTP request
 *   Send a POST to the provided endpoint
 
-When a response comes back with blind signatures in a Sec-Trust-Token response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA. Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data` header in the response to indicate to the UA that it should discard all previously stored tokens. If the value of the header is `all`, then all previously stored tokens should be discarded before the newly issued tokens are stored. Other values in the header should be ignored.
+When a response comes back with blind signatures in a `Sec-Trust-Token` response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA. Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data` header in the response to indicate to the UA that it should discard all previously stored tokens. If the value of the header is `all`, then all previously stored tokens should be discarded before the newly issued tokens are stored. Other values in the header should be ignored.
 
 ### Trust Token Redemption
 
@@ -87,7 +89,7 @@ When the user is browsing another site (publisher.example), that site (or issuer
 
 
 ```
-document.hasTrustToken(<issuer>)
+document.hasTrustToken(<issuer>, '0xFF53')
 ```
 
 
@@ -97,9 +99,11 @@ This returns whether there are any valid trust tokens for a particular issuer, s
 ```
 fetch('<issuer>/<redemption path>', {
   trustToken: {
-    type: 'token-redemption',
+    type: '0xFF53',
+    version: '1',
+    operation: 'token-redemption',
     issuer: <issuer>,
-    refreshPolicy: {none, refresh}
+    refreshPolicy: {'none', 'refresh'}
   }
 }).then(...)
 ```
@@ -111,7 +115,7 @@ The RR is HTTP-only and JavaScript is only able to access/send the RR via Trust 
 UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using following API.
 
 ```
-document.hasRedemptionRecord(<issuer>)
+document.hasRedemptionRecord(<issuer>, '0xFF53')
 ```
 
 This returns whether there are any valid RRs from the given issuer.
@@ -129,7 +133,9 @@ Redemption Records are only accessible via a new option to the Fetch API:
 fetch(<resource-url>, {
   ...
   trustToken: {
-    type: 'send-redemption-record',
+    type: '0xFF53',
+    version: '1',
+    operation: 'send-redemption-record',
     issuers: [<issuer>, ...]
   }
   ...
@@ -170,7 +176,7 @@ This can be managed using the [PMBTokens construction](https://eprint.iacr.org/2
 
 ### Extension: iframe Activation
 
-Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trustToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `trustToken="{type:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trustToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `trustToken="{type: '0xFF53',version:'1',operation:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
 
 ## Privacy Considerations
 
@@ -284,14 +290,14 @@ foo.example - Site requiring a Trust Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.example`.
-1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {trustToken: {type: 'token-request', issuer: 'areyouahuman.example'}})`.
+1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {trustToken: {type: '0xFF53', version: '1', operation: 'token-request', issuer: 'areyouahuman.example'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.example`.
 1.  Sometime later, the user visits `coolwebsite.example`.
-1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {trustToken: {type: 'token-redemption', issuer: 'areyouahuman.example'}})`.
+1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {trustToken: {type: '0xFF53', version: '1', operation: 'token-redemption', issuer: 'areyouahuman.example'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an RR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the RR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {trustToken: {type: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
+1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {trustToken: {type: '0xFF53', version: '1', operation: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
     1.  The third-party receives the RR, and now has some indication that `areyouahuman.example` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
 
