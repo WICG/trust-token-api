@@ -59,7 +59,7 @@ When an issuer.example context wants to provide tokens to a user (i.e. when the 
 
 
 ```
-fetch('<issuer>/.well-known/trust-token', {
+fetch('<issuer>/<issuance path>', {
   trustToken: {
     type: 'token-request',
     issuer: <issuer>
@@ -91,7 +91,7 @@ This returns whether there are any valid trust tokens for a particular issuer, s
 
 
 ```
-fetch('<issuer>/.well-known/trust-token', {
+fetch('<issuer>/<redemption path>', {
   trustToken: {
     type: 'token-redemption',
     issuer: <issuer>,
@@ -280,10 +280,10 @@ foo.example - Site requiring a Trust Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.example`.
-1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/.well-known/trust-token', {trustToken: {type: 'token-request', issuer: 'areyouahuman.example'}})`.
+1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {trustToken: {type: 'token-request', issuer: 'areyouahuman.example'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.example`.
 1.  Sometime later, the user visits `coolwebsite.example`.
-1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/.well-known/trust-token', {trustToken: {type: 'token-redemption', issuer: 'areyouahuman.example'}})`.
+1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {trustToken: {type: 'token-redemption', issuer: 'areyouahuman.example'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an RR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the RR can be used in subsequent resource requests.
