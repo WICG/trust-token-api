@@ -8,6 +8,7 @@ Group: WICG
 Repository: WICG/trust-token-api
 URL: https://wicg.github.io/trust-token-api/
 Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
+Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
 Abstract: Trust Token is a web platform API that allows propagating trust across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
@@ -523,3 +524,8 @@ Issuers can verify that each token is seen only once, because every redemption
 is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user's tokens, the tokens will run out over
 time. Issuers can sign fewer tokens at a time to mitigate the risk.
+
+<h2 id=acknowledgments class=no-num>Acknowledgments</h2>
+
+Thanks to Charlie Harrison, David Van Cleve and Kaustubha Govind for their
+contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.
