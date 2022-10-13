@@ -4,9 +4,9 @@
   <title>Trust Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 11cdbd324, updated Fri Oct 7 18:14:16 2022 -0700" name="generator">
+  <meta content="Bikeshed version 07caf056f, updated Wed Oct 12 12:03:55 2022 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="aa90207064670b72dfe54fb74b578b0b97d6bda8" name="document-revision">
+  <meta content="c5d205943591f8caea1eae4e7a8082068d73ea1d" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -526,15 +526,16 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Trust Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-10-11">11 October 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-10-13">13 October 2022</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/trust-token-api/">https://wicg.github.io/trust-token-api/</a>
      <dt>Issue Tracking:
      <dd><a href="https://github.com/WICG/trust-token-api/issues/">GitHub</a>
-     <dt class="editor">Editor:
+     <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:aykutb@google.com">Aykut Bulut</a> (<a class="p-org org" href="https://www.google.com/">Google</a>)
+     <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:svaldez@google.com">Steven Valdez</a> (<a class="p-org org" href="https://www.google.com/">Google</a>)
      <dt>Participate:
      <dd><a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
      <dt>Commits:
@@ -608,6 +609,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#token-exhaustion"><span class="secno">8.1</span> <span class="content">Preventing Token Exhaustion</span></a>
       <li><a href="#preventing-double-spend"><span class="secno">8.2</span> <span class="content">Preventing Double Spending</span></a>
      </ol>
+    <li><a href="#acknowledgments"><span class="secno"></span> <span class="content">Acknowledgments</span></a>
     <li>
      <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
      <ol class="toc">
@@ -1000,6 +1002,9 @@ once more than 48 hours have elapsed since the first redemption.</p>
 is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user’s tokens, the tokens will run out over
 time. Issuers can sign fewer tokens at a time to mitigate the risk.</p>
+   <h2 class="no-num heading settled" id="acknowledgments"><span class="content">Acknowledgments</span><a class="self-link" href="#acknowledgments"></a></h2>
+   <p>Thanks to Charlie Harrison, David Van Cleve and Kaustubha Govind for their
+contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
   </main>
   <div data-fill-with="conformance">
    <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
