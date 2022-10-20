@@ -1,6 +1,8 @@
-# Trust Token API Explainer
+# Private State Token API Explainer
 
 This document is an explainer for a potential future web platform API that allows propagating trust across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
+
+This API was formerly called the Trust Token API and the repository and API surfaces are in the process of being updated with the new name.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
