@@ -1,7 +1,7 @@
 <pre class='metadata'>
-Title: Trust Token API
-H1: Trust Token API
-Shortname: trust-token-api
+Title: Private State Token API
+H1: Private State Token API
+Shortname: private-state-token-api
 Level: 1
 Status: CG-DRAFT
 Group: WICG
@@ -9,7 +9,7 @@ Repository: WICG/trust-token-api
 URL: https://wicg.github.io/trust-token-api/
 Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
 Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
-Abstract: Trust Token is a web platform API that allows propagating trust across sites, using the Privacy Pass protocol as an underlying primitive.
+Abstract: Private State Token API is a web platform API that allows propagating limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
 Markup Shorthands: css no, markdown yes
@@ -62,11 +62,12 @@ Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
 Goals {#goals}
 ==============
 
-Goal of Trust Token API is to transfer limited amount of signals across sites
-through time in a privacy preserving manner. It achieves this using privacy
-pass protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working documents
-of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Trust Tokens can be
-considered as a web platform implementation of Privacy Pass.
+Goal of Private State Token API is to transfer limited amount of signals across
+sites through time in a privacy preserving manner. It achieves this using
+privacy pass protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
+documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
+State Tokens can be considered as a web platform implementation of Privacy
+Pass.
 
 <!--
 
@@ -84,12 +85,12 @@ https://eprint.iacr.org/2020/072.pdf
 Background {#background}
 ======================
 
-Trust Token API provides a mechanism for anonymous authentication. Trust Token
-mechanism provided by browser does not authenticate clients, instead it
-facilitates transfer of authentication information. Trust Token API performs
-cross site anonymous authentication without using linkable state carrying
-cookies [[RFC6265]]. Cookies do provide cross site authentication, however,
-fail to provide anonymity.
+Private State Token API provides a mechanism for anonymous authentication. The
+API provided by browser does not authenticate clients, instead it facilitates
+transfer of authentication information. It performs cross site anonymous
+authentication without using linkable state carrying cookies
+[[RFC6265]]. Cookies do provide cross site authentication, however, fail to
+provide anonymity.
 
 Authentication of the clients and token signing are both carried by the same
 entity referred as the **issuer**. This is the joint attester and issuer
@@ -103,8 +104,8 @@ tokens. Spending tokens is called **redeeming**.
 Origins may ask browser to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.
 
-Trust Token operations rely on [[FETCH]]. A fetch request corresponding to a
-specific Trust Token operation can be created and used as a parameter to the
+Private State Token operations rely on [[FETCH]]. A fetch request corresponding to a
+specific Private State Token operation can be created and used as a parameter to the
 fetch function.
 
 
@@ -112,7 +113,7 @@ Issuer Public Keys {#issuer-public-keys}
 ========================================
 
 This section describes the public interfaces that an issuer is required to
-support to provide public keys to be used by Trust Token protocols.
+support to provide public keys to be used by Private State Token protocols.
 
 An issuer needs to maintain a set of keys and implement the **Issue** and
 **Redeem** cryptographic functions to sign and validate tokens. Issuers are
@@ -142,17 +143,17 @@ Requests to key commitment endpoints should result in a JSON response
 }
 ```
 
-* `<cryptographic protocol version>` is a string identifier for the Trust Token
+* `<cryptographic protocol version>` is a string identifier for the Private State Token
     protocol version used. The same string is used as a value of the inner
     `"protocol_version"` field. Protocol version string identifier is either
-    `"TrustTokenV3PMB"` or `"TrustTokenV3VOPRF"`. Both protocols have similar
+    `"PrivateStateTokenV3PMB"` or `"PrivateStateTokenV3VOPRF"`. Both protocols have similar
     properties in terms of privacy implications.
 
-    * Protocol version `“TrustTokenV3PMB”` implements [[PMB]] cryptographic
+    * Protocol version `“PrivateStateTokenV3PMB”` implements [[PMB]] cryptographic
                protocol. In this protocol, each token contains a private
                metadata bit.
 
-    * Protocol version `“TrustTokenV2VOPRF”` implements [[VOPRF]] cryptographic
+    * Protocol version `“PrivateStateTokenV2VOPRF”` implements [[VOPRF]] cryptographic
                protocol. Contrary to PMB, tokens do not contain private
                metadata bits. However, issuers can use twice as many
                concurrently valid token signing keys (six compared to three of
@@ -203,7 +204,7 @@ An issue request is created and fetched as demostrated in the following snippet.
 
 ```javascript
 issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
-  trustToken: {
+  privateStateToken: {
     type: "token-request",
     issuer: "https://example.issuer"
   }
@@ -234,17 +235,17 @@ steps are carried out when an issue request is fetched.
  11. Generate the right number of blinded tokens identified in Step 10.
  12. Configure the HTTP request.
                a. Set a load flag to bypass the HTTP cache.
-               b. Add `Sec-Trust-Token` request header containing a
+               b. Add `Sec-Private-State-Token` request header containing a
                       base64-encoded version of the bytestring of tokens
                       generated in Step 11.
-               c. Add `Sec-Trust-Token-Version` request header that specifies
+               c. Add `Sec-Private-State-Token-Version` request header that specifies
                       the version of the cryptographic protocol used.
 
-Trust token HTTP request headers created for a typical fetch is as follows.
+Private State Token HTTP request headers created for a typical fetch is as follows.
 
 ```
-Sec-Trust-Token: <blinded tokens encoded as base64 string>
-Sec-Trust-Token-Version: <cryptographic protocol version, VOPRF or PMB>
+Sec-Private-State-Token: <blinded tokens encoded as base64 string>
+Sec-Private-State-Token-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 
 
@@ -258,27 +259,27 @@ passed in the URL `public` parameter. PMB can encode a value from set {0,1,2}
 in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the blinded tokens obtained in the
-`Sec-Trust-Token` request header value. Issuer uses the cryptographic protocol
-specified in the request `Sec-Trust-Token-Version` header. Encoding the values
+`Sec-Private-State-Token` request header value. Issuer uses the cryptographic protocol
+specified in the request `Sec-Private-State-Token-Version` header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
-step. Issuer returns the signed tokens in the `Sec-Trust-Token` response header
+step. Issuer returns the signed tokens in the `Sec-Private-State-Token` response header
 value encoded as a base64 byte string. The number of tokens issued is returned
 in `Sec-TT-Count` header. Value of this header is the string message of
 `Issuing <number of tokens> tokens.` with the right nonnegative integer value
 that specifies the tokens issued.
 
-Following snippet displays a typical response demonstrating the Trust Token
+Following snippet displays a typical response demonstrating the Private State Token
 related headers.
 
 ```
-Sec-Trust-Token: <token encoded as base64 string>
-Sec-TT-Count: Issuing 3 tokens.
+Sec-Private-State-Token: <token encoded as base64 string>
+Sec-PST-Count: Issuing 3 tokens.
 ```
 
-Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data`
+Additionally, the issuer may include an optional `Sec-Private-State-Token-Clear-Data`
 header in the response. If the value of the header is `all`, then browser
 should discard all previously stored tokens before the newly issued tokens are
-stored. `Sec-Trust-Token-Clear-Data` header should be ignored for any other
+stored. `Sec-Private-State-Token-Clear-Data` header should be ignored for any other
 values.
 
 
@@ -287,13 +288,13 @@ Browser Steps For Issue Response {#browser-issue-response}
 
 To process a response to an issue request, browser follows the following steps.
 
- 1. If the response has no `Sec-Trust-Token` header, return an error.
- 2. If the response has an empty `Sec-Trust-Token` header, return; this is a
+ 1. If the response has no `Sec-Private-State-Token` header, return an error.
+ 2. If the response has an empty `Sec-Private-State-Token` header, return; this is a
        `Success` response bearing 0 tokens.
- 3. If the response has `Sec-Trust-Token-Clear-Data` header,
+ 3. If the response has `Sec-Private-State-Token-Clear-Data` header,
     a. If its value is `"all"` discard all previously stored tokens from the issuer.
     b. Else, ignore the header.
- 3. Strip the `Sec-Trust-Token` header from the response and carry out the
+ 3. Strip the `Sec-Private-State-Token` header from the response and carry out the
     cryptographic procedures to obtain a list of unblinded tokens.
     a. If the cryptographic procedure succeeds, associate the tokens with the
           issuing key’s label and store the tokens.
@@ -311,7 +312,7 @@ snippet.
 
 ```javascript
 redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
-  trustToken: {
+  privateStateToken: {
     type: 'token-redemption',
     issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
@@ -350,22 +351,22 @@ Browser carries the following steps when a redemption request is fetched.
  9. Retrieve a single token from persistent storage.
  10. Pass token to cryptographic redemption procedure, if procedure fails
          return error.
- 11. Set redemption procedure result in `Sec-Trust-Token` request header.
- 12. Set `Sec-Trust-Token-Version` header value to the cryptographic protocol
+ 11. Set redemption procedure result in `Sec-Private-State-Token` request header.
+ 12. Set `Sec-Private-State-Token-Version` header value to the cryptographic protocol
           used.
- 13. Optionally, set `Sec-Trust-Token-Lifetime` header.
+ 13. Optionally, set `Sec-Private-State-Token-Lifetime` header.
  14. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
 
-`Sec-Trust-Token-Lifetime` response header indicates how long (in seconds) the
-RR should be cached for. When `Sec-Trust-Token-Lifetime` response header value
+`Sec-Private-State-Token-Lifetime` response header indicates how long (in seconds) the
+RR should be cached for. When `Sec-Private-State-Token-Lifetime` response header value
 is invalid (too large, a negative number or non-numeric), UA should ignore the
-`Sec-Trust-Token-Lifetime` header. When `Sec-Trust-Token-Lifetime` header value
+`Sec-Private-State-Token-Lifetime` header. When `Sec-Private-State-Token-Lifetime` header value
 is zero, UA should treat the record as expired. In case of multiple
-`Sec-Trust-Token-Lifetime` headers, UA uses the last one. If
-`Sec-Trust-Token-Lifetime` header is omitted, the lifetime of the RR will be
-tied to the lifetime of the Trust Token verification key that confirmed the
+`Sec-Private-State-Token-Lifetime` headers, UA uses the last one. If
+`Sec-Private-State-Token-Lifetime` header is omitted, the lifetime of the RR will be
+tied to the lifetime of the Private State Token verification key that confirmed the
 redeemed token's issuance. The RR is HTTP-only and JavaScript is only able to
-access/send the RR via Trust Token Fetch APIs. The RR is treated as an
+access/send the RR via Private State Token Fetch APIs. The RR is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.
 
@@ -374,13 +375,13 @@ Redemption Records {#redemption-records}
 ----------------------------------------
 
 To reduce communication overhead, the browser might cache blobs returned in
-`Sec-Trust-Token` header value in redemption responses. These blobs are
+`Sec-Private-State-Token` header value in redemption responses. These blobs are
 referred as *Redemption Records*. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
-validity. Issuer might choose to include optional `Sec-Trust-Token-Lifetime`
+validity. Issuer might choose to include optional `Sec-Private-State-Token-Lifetime`
 header in the redemption response. The value of this header indicates the
 expiration time for the redemption record provided. This expiration is
-specified as number of seconds in the `Sec-Trust-Token-Lifetime` HTTP response
+specified as number of seconds in the `Sec-Private-State-Token-Lifetime` HTTP response
 header value.
 
 
@@ -394,7 +395,7 @@ An origin might query whether the browser has any tokens from a specific issuer
 using the following API.
 
 ```javascript
-document.hasTrustToken(<issuer>)
+document.hasPrivateTokens(<issuer>)
 ```
 
 Browser carries the following steps on this query.
@@ -475,16 +476,16 @@ difference is [[PMB]] having a private bit.
 
 Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the browser at redemption time with
-the browser at token issuance time, even though the Trust Token API itself has
+the browser at token issuance time, even though the Private State Token API itself has
 only stored and revealed limited amount of information about the browser.
 
 Cross-site Information Transfer {#cross-site-info}
 --------------------------------------------------
 
-Trust tokens transfer limited information between first-party contexts. Underlying
+Private State Tokens transfer limited information between first-party contexts. Underlying
 cryptographic protocols guarantee that each token only contains a small amount
 of information. Still, if we allow many token redemptions on a single page, the
-first-party cookie for user U on domain A can be encoded in the trust token
+first-party cookie for user U on domain A can be encoded in the Private State Token
 information channel and decoded on domain B, allowing domain B to learn the
 user's domain A cookie until either 1p cookie is cleared. Separate from the
 concern of channels allowing arbitrary communication between domains, some
