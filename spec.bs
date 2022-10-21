@@ -9,7 +9,7 @@ Repository: WICG/trust-token-api
 URL: https://wicg.github.io/trust-token-api/
 Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
 Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
-Abstract: Private State Token API is a web platform API that allows propagating limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.
+Abstract: Private State Token API is a web platform API that allows propagating a limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
 Markup Shorthands: css no, markdown yes
@@ -62,7 +62,7 @@ Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
 Goals {#goals}
 ==============
 
-Goal of Private State Token API is to transfer limited amount of signals across
+The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
 privacy pass protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
 documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
@@ -85,15 +85,15 @@ https://eprint.iacr.org/2020/072.pdf
 Background {#background}
 ======================
 
-Private State Token API provides a mechanism for anonymous authentication. The
-API provided by browser does not authenticate clients, instead it facilitates
+The Private State Token API provides a mechanism for anonymous authentication. The
+API provided by the browser does not authenticate clients, instead it facilitates
 transfer of authentication information. It performs cross site anonymous
 authentication without using linkable state carrying cookies
-[[RFC6265]]. Cookies do provide cross site authentication, however, fail to
+[[RFC6265]]. Cookies do provide cross site authentication, however, they fail to
 provide anonymity.
 
 Authentication of the clients and token signing are both carried by the same
-entity referred as the **issuer**. This is the joint attester and issuer
+entity referred to as the **issuer**. This is the joint attester and issuer
 architecture described in [[PRIVACY-PASS-ARCHITECTURE]],
 [[PRIVACY-PASS-AUTH-SCHEME]].
 
@@ -212,7 +212,7 @@ issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&pri
 fetch(issueRequest);
 ```
 
-An issuance request is parameterized by issuer and top level origins. Following
+An issuance request is parameterized by issuer and top level origins. The following
 steps are carried out when an issue request is fetched.
 
  1. Reject if the document is not in a secure context [[secure-contexts]].
@@ -286,7 +286,7 @@ values.
 Browser Steps For Issue Response {#browser-issue-response}
 ----------------------------------------------------------
 
-To process a response to an issue request, browser follows the following steps.
+To process a response to an issue request, browser carries out the following steps.
 
  1. If the response has no `Sec-Private-State-Token` header, return an error.
  2. If the response has an empty `Sec-Private-State-Token` header, return; this is a
@@ -330,7 +330,7 @@ browser uses the previously cached redemption record instead of redeeming a new
 token.
 -->
 
-Browser carries the following steps when a redemption request is fetched.
+Browser carries out the following steps when a redemption request is fetched.
 
  1. Reject if the document is not in a secure context [[secure-contexts]].
  2. Reject if associating the issuer with the top level origin would exceed the
@@ -398,7 +398,7 @@ using the following API.
 document.hasPrivateTokens(<issuer>)
 ```
 
-Browser carries the following steps on this query.
+Browser carries out the following steps on this query.
 
  1. Reject if the document is not in a secure context [[secure-contexts]].
  2. Reject if associating the issuer with the top level origin would exceed the
@@ -426,7 +426,7 @@ redemption record for a specific issuer using following API.
 document.hasRedemptionRecord(<issuer>)
 ```
 
-Browser carries the following steps on redemption query.
+Browser carries out the following steps on redemption query.
 
  1. Reject if the document is not in a secure context [[secure-contexts]].
  2. If the issuer is not associated with the top level origin, return false.
@@ -497,7 +497,7 @@ could be identifying---have similar mitigations.
 
 To mitigate this attack, browser places limits on both issuance and
 redemption. User activation with the issuing site is required in the issuing
-operation. Browser does not allow a third redemption in a 48 hour window.
+operation. The browser does not allow a third redemption in a 48 hour window.
 
 ### Mitigation: Per-Site Issuer Limits
 
