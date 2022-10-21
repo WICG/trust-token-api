@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b0de3432c, updated Thu Oct 13 09:16:59 2022 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="11f867de1da700443b4bc51bc9e95613ac2b73d5" name="document-revision">
+  <meta content="4cee39679aa713af0f8f8ed1e9281a8f1bc6c63d" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -526,7 +526,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-10-20">20 October 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-10-21">21 October 2022</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -549,7 +549,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   </div>
   <div class="p-summary" data-fill-with="abstract">
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-   <p>Private State Token API is a web platform API that allows propagating limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.</p>
+   <p>Private State Token API is a web platform API that allows propagating a limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.</p>
   </div>
   <div data-fill-with="at-risk"></div>
   <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
@@ -627,20 +627,20 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <main>
    <p><strong>This is a working version and is subject to change.</strong></p>
    <h2 class="heading settled" data-level="1" id="goals"><span class="secno">1. </span><span class="content">Goals</span><a class="self-link" href="#goals"></a></h2>
-   <p>Goal of Private State Token API is to transfer limited amount of signals across
+   <p>The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
 privacy pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in working
 documents of privacy pass working group of IETF <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Private
 State Tokens can be considered as a web platform implementation of Privacy
 Pass.</p>
    <h2 class="heading settled" data-level="2" id="background"><span class="secno">2. </span><span class="content">Background</span><a class="self-link" href="#background"></a></h2>
-   <p>Private State Token API provides a mechanism for anonymous authentication. The
-API provided by browser does not authenticate clients, instead it facilitates
+   <p>The Private State Token API provides a mechanism for anonymous authentication. The
+API provided by the browser does not authenticate clients, instead it facilitates
 transfer of authentication information. It performs cross site anonymous
-authentication without using linkable state carrying cookies <a data-link-type="biblio" href="#biblio-rfc6265">[RFC6265]</a>. Cookies do provide cross site authentication, however, fail to
+authentication without using linkable state carrying cookies <a data-link-type="biblio" href="#biblio-rfc6265">[RFC6265]</a>. Cookies do provide cross site authentication, however, they fail to
 provide anonymity.</p>
    <p>Authentication of the clients and token signing are both carried by the same
-entity referred as the <strong>issuer</strong>. This is the joint attester and issuer
+entity referred to as the <strong>issuer</strong>. This is the joint attester and issuer
 architecture described in <a data-link-type="biblio" href="#biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]</a>, <a data-link-type="biblio" href="#biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]</a>.</p>
    <p>Browsers store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
@@ -738,7 +738,7 @@ the issuing protocol steps happenning in browsers and issuers.</p>
 <c- p>});</c->
 fetch<c- p>(</c->issueRequest<c- p>);</c->
 </pre>
-   <p>An issuance request is parameterized by issuer and top level origins. Following
+   <p>An issuance request is parameterized by issuer and top level origins. The following
 steps are carried out when an issue request is fetched.</p>
    <ol>
     <li data-md>
@@ -805,7 +805,7 @@ should discard all previously stored tokens before the newly issued tokens are
 stored. <code>Sec-Private-State-Token-Clear-Data</code> header should be ignored for any other
 values.</p>
    <h3 class="heading settled" data-level="4.3" id="browser-issue-response"><span class="secno">4.3. </span><span class="content">Browser Steps For Issue Response</span><a class="self-link" href="#browser-issue-response"></a></h3>
-   <p>To process a response to an issue request, browser follows the following steps.</p>
+   <p>To process a response to an issue request, browser carries out the following steps.</p>
    <ol>
     <li data-md>
      <p>If the response has no <code>Sec-Private-State-Token</code> header, return an error.</p>
@@ -837,7 +837,7 @@ snippet.</p>
 <c- p>});</c->
 </pre>
    <p>Default value for refreshPolicy is <code>'none'</code>.</p>
-   <p>Browser carries the following steps when a redemption request is fetched.</p>
+   <p>Browser carries out the following steps when a redemption request is fetched.</p>
    <ol>
     <li data-md>
      <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
@@ -901,7 +901,7 @@ header value.</p>
 using the following API.</p>
 <pre class="language-javascript highlight">document<c- p>.</c->hasPrivateTokens<c- p>(</c-><c- o>&lt;</c->issuer<c- o>></c-><c- p>)</c->
 </pre>
-   <p>Browser carries the following steps on this query.</p>
+   <p>Browser carries out the following steps on this query.</p>
    <ol>
     <li data-md>
      <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
@@ -928,7 +928,7 @@ at Step 4.</p>
 redemption record for a specific issuer using following API.</p>
 <pre class="language-javascript highlight">document<c- p>.</c->hasRedemptionRecord<c- p>(</c-><c- o>&lt;</c->issuer<c- o>></c-><c- p>)</c->
 </pre>
-   <p>Browser carries the following steps on redemption query.</p>
+   <p>Browser carries out the following steps on redemption query.</p>
    <ol>
     <li data-md>
      <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
@@ -984,7 +984,7 @@ could be identifying---have similar mitigations.</p>
    <h4 class="heading settled" data-level="7.3.1" id="mitigation-dynamic-issuance-redemption-limits"><span class="secno">7.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#mitigation-dynamic-issuance-redemption-limits"></a></h4>
    <p>To mitigate this attack, browser places limits on both issuance and
 redemption. User activation with the issuing site is required in the issuing
-operation. Browser does not allow a third redemption in a 48 hour window.</p>
+operation. The browser does not allow a third redemption in a 48 hour window.</p>
    <h4 class="heading settled" data-level="7.3.2" id="mitigation-per-site-issuer-limits"><span class="secno">7.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#mitigation-per-site-issuer-limits"></a></h4>
    <p>The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the browser allows
