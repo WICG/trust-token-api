@@ -65,8 +65,8 @@ When an issuer.example context wants to provide tokens to a user (i.e. when the 
 ```
 fetch('<issuer>/<issuance path>', {
   trustToken: {
-    type: '0xFF53',
-    version: '1',
+    type: 'private-state-token',
+    version: 1,
     operation: 'token-request',
     issuer: <issuer>
   }
@@ -89,7 +89,7 @@ When the user is browsing another site (publisher.example), that site (or issuer
 
 
 ```
-document.hasTrustToken(<issuer>, '0xFF53')
+document.hasTrustToken(<issuer>, 'private-state-token')
 ```
 
 
@@ -99,8 +99,8 @@ This returns whether there are any valid trust tokens for a particular issuer, s
 ```
 fetch('<issuer>/<redemption path>', {
   trustToken: {
-    type: '0xFF53',
-    version: '1',
+    type: 'private-state-token',
+    version: 1,
     operation: 'token-redemption',
     issuer: <issuer>,
     refreshPolicy: {'none', 'refresh'}
@@ -115,7 +115,7 @@ The RR is HTTP-only and JavaScript is only able to access/send the RR via Trust 
 UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using following API.
 
 ```
-document.hasRedemptionRecord(<issuer>, '0xFF53')
+document.hasRedemptionRecord(<issuer>, 'private-state-token')
 ```
 
 This returns whether there are any valid RRs from the given issuer.
@@ -133,8 +133,8 @@ Redemption Records are only accessible via a new option to the Fetch API:
 fetch(<resource-url>, {
   ...
   trustToken: {
-    type: '0xFF53',
-    version: '1',
+    type: 'private-state-token',
+    version: 1,
     operation: 'send-redemption-record',
     issuers: [<issuer>, ...]
   }
@@ -176,7 +176,7 @@ This can be managed using the [PMBTokens construction](https://eprint.iacr.org/2
 
 ### Extension: iframe Activation
 
-Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trustToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `trustToken="{type: '0xFF53',version:'1',operation:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trustToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `trustToken="{type:'private-state-token',version:1,operation:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
 
 ## Privacy Considerations
 
@@ -290,14 +290,14 @@ foo.example - Site requiring a Trust Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.example`.
-1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {trustToken: {type: '0xFF53', version: '1', operation: 'token-request', issuer: 'areyouahuman.example'}})`.
+1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {trustToken: {type: 'private-state-token', version: 1, operation: 'token-request', issuer: 'areyouahuman.example'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.example`.
 1.  Sometime later, the user visits `coolwebsite.example`.
-1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {trustToken: {type: '0xFF53', version: '1', operation: 'token-redemption', issuer: 'areyouahuman.example'}})`.
+1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {trustToken: {type: 'private-state-token', version: 1, operation: 'token-redemption', issuer: 'areyouahuman.example'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an RR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the RR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {trustToken: {type: '0xFF53', version: '1', operation: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
+1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {trustToken: {type: 'private-state-token', version: 1, operation: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
     1.  The third-party receives the RR, and now has some indication that `areyouahuman.example` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
 
