@@ -2,6 +2,8 @@
 
 This document is an explainer for a potential future web platform API that allows propagating trust across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
 
+The current version of the spec is available at [https://wicg.github.io/trust-token-api/](https://wicg.github.io/trust-token-api/).
+
 This API was formerly called the Trust Token API and the repository and API surfaces are in the process of being updated with the new name.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
