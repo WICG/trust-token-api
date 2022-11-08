@@ -106,9 +106,10 @@ using linkable state carrying cookies [[RFC6265]]. Cookies do provide cross
 site authentication, however, fail to provide anonymity.
 
 Cookies store large amount of information. [[RFC6265]] requires at least 4096
-bytes per cookie and 50 cookies per domain. This means an origin has 50 * 4096
-* 2^8 unique identifiers at its disposal. When backed with back end databases,
-a server can store arbitrary data for that many unique users/sessions.
+bytes per cookie and 50 cookies per domain. This means an origin has
+50 x 4096 x 2^8 unique identifiers at its disposal. When backed with back end
+databases, a server can store arbitrary data for that many unique
+users/sessions.
 
 Compared to a cookie, amount of data stored in a Private State Token is very
 limited. A token stores a value from a set of six values (think of a value of
@@ -120,8 +121,8 @@ origins to track which tokens they issue to which user. When presented with
 their tokens, issuers can verify they issued them, however, can not link the
 tokens to the contex they are issued. Cookies do not have this property.
 
-Browsers can store up to 100 tokens, however, unlike cookies, due to
-unlinkability property this does not deteriorate the user privacy. Private
+Unlike cookies, storing multiple tokens from an issuer does not deteriorate
+privacy of the user due to unlinkability property of the tokens. Private
 State Token API allows at most 2 different issuers in a top level origin. This
 is to limit the information stored for a user when the issuers are
 collaborating.
