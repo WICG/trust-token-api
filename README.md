@@ -1,6 +1,6 @@
 # Private State Token API Explainer
 
-This document is an explainer for a potential future web platform API that allows propagating trust across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
+This document is an explainer for a potential future web platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
 
 The current version of the spec is available at [https://wicg.github.io/trust-token-api/](https://wicg.github.io/trust-token-api/).
 
@@ -13,8 +13,8 @@ This API was formerly called the Trust Token API and the repository and API surf
 - [Motivation](#motivation)
 - [Overview](#overview)
 - [Potential API](#potential-api)
-  - [Trust Token Issuance](#trust-token-issuance)
-  - [Trust Token Redemption](#trust-token-redemption)
+  - [Private State Token Issuance](#private-state-token-issuance)
+  - [Private State Token Redemption](#private-state-token-redemption)
   - [Forwarding Redemption Attestation](#forwarding-redemption-attestation)
   - [Extension: Private Metadata](#extension-private-metadata)
 - [Privacy Considerations](#privacy-considerations)
@@ -27,7 +27,7 @@ This API was formerly called the Trust Token API and the repository and API surf
     - [Mitigation: Per-Site Issuer Limits](#mitigation-per-site-issuer-limits)
   - [First Party Tracking Potential](#first-party-tracking-potential)
 - [Security Considerations](#security-considerations)
-  - [Trust Token Exhaustion](#trust-token-exhaustion)
+  - [Private State Token Exhaustion](#private-state-token-exhaustion)
   - [Double-Spend Prevention](#double-spend-prevention)
 - [Future Extensions](#future-extensions)
   - [Publicly Verifiable Tokens](#publicly-verifiable-tokens)
@@ -57,14 +57,14 @@ When an origin is in a context where they trust the user, they can issue the bro
 ## Potential API
 
 
-### Trust Token Issuance
+### Private State Token Issuance
 
-When an issuer.example context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the trustToken parameter:
+When an issuer.example context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the privateToken parameter:
 
 
 ```
 fetch('<issuer>/<issuance path>', {
-  trustToken: {
+  privateToken: {
     type: 'private-state-token',
     version: 1,
     operation: 'token-request',
@@ -77,28 +77,28 @@ fetch('<issuer>/<issuance path>', {
 This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance protocol:
 
 *   Generate a set of nonces.
-*   Blind them and attach them (in a `Sec-Trust-Token` header) to the HTTP request
+*   Blind them and attach them (in a `Sec-Private-State-Token` header) to the HTTP request
 *   Send a POST to the provided endpoint
 
-When a response comes back with blind signatures in a `Sec-Trust-Token` response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are trust tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA. Additionally, the issuer may include an optional `Sec-Trust-Token-Clear-Data` header in the response to indicate to the UA that it should discard all previously stored tokens. If the value of the header is `all`, then all previously stored tokens should be discarded before the newly issued tokens are stored. Other values in the header should be ignored.
+When a response comes back with blind signatures in a `Sec-Private-State-Token` response header, they will be unblinded, stored, and associated with the unblinded nonces internally in the browser. The pairs of nonces and signatures are private state tokens that can be redeemed later. Raw tokens are never accessible to JavaScript. The issuer can store a limited amount of metadata in the signature of a nonce by choosing one of a set of keys to use to sign the nonce and providing a zero-knowledge proof that it signed the nonce using a particular key or set of keys. The browser will verify the proof and may choose to keep or drop the token based on other metadata constraints and limits from the UA. Additionally, the issuer may include an optional `Sec-Private-State-Token-Clear-Data` header in the response to indicate to the UA that it should discard all previously stored tokens. If the value of the header is `all`, then all previously stored tokens should be discarded before the newly issued tokens are stored. Other values in the header should be ignored.
 
-### Trust Token Redemption
+### Private State Token Redemption
 
 
-When the user is browsing another site (publisher.example), that site (or issuer.example embedded on that site) can optionally redeem issuer.example tokens to learn something about the trust of a user. One way to do this would be via new APIs:
+When the user is browsing another site (```publisher.example```), that site (or ```issuer.example``` embedded on that site) can optionally redeem ```issuer.example``` tokens to learn something about the trust of a user. One way to do this would be via new APIs:
 
 
 ```
-document.hasTrustToken(<issuer>, 'private-state-token')
+document.hasPrivateToken(<issuer>, 'private-state-token')
 ```
 
 
-This returns whether there are any valid trust tokens for a particular issuer, so that the publisher can decide whether to attempt a token redemption.
+This returns whether there are any valid private state tokens for a particular issuer, so that the publisher can decide whether to attempt a token redemption.
 
 
 ```
 fetch('<issuer>/<redemption path>', {
-  trustToken: {
+  privateToken: {
     type: 'private-state-token',
     version: 1,
     operation: 'token-redemption',
@@ -109,8 +109,8 @@ fetch('<issuer>/<redemption path>', {
 ```
 
 
-If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the `Sec-Trust-Token` request header. The issuer can either consume the token and act based on the result, optionally including a Redemption Record (RR) in the `Sec-Trust-Token` response header to provide a redemption attestation to forward to other parties. Additionally, the issuer may include the `Sec-Trust-Token-Lifetime` header in the response to indicate to the UA how long (in seconds) the RR should be cached for. When `Sec-Trust-Token-Lifetime` header value is invalid (too large, a negative number or non-numeric), UA should ignore the `Sec-Trust-Token-Lifetime` header. When `Sec-Trust-Token-Lifetime` header value is zero UA should treat the record as expired. In case of multiple `Sec-Trust-Token-Lifetime` headers, UA uses the last one. If `Sec-Trust-Token-Lifetime` header is omitted, the lifetime of the RR will be tied to the lifetime of the Trust Token verification key that confirmed the redeemed token's issuance.
-The RR is HTTP-only and JavaScript is only able to access/send the RR via Trust Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The RR is treated as an arbitrary blob of bytes from the issuer, that may have semantic meaning to downstream consumers.
+If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the `Sec-Private-State-Token` request header. The issuer can either consume the token and act based on the result, optionally including a Redemption Record (RR) in the `Sec-Private-State-Token` response header to provide a redemption attestation to forward to other parties. Additionally, the issuer may include the `Sec-Private-State-Token-Lifetime` header in the response to indicate to the UA how long (in seconds) the RR should be cached for. When `Sec-Private-State-Token-Lifetime` header value is invalid (too large, a negative number or non-numeric), UA should ignore the `Sec-Private-State-Token-Lifetime` header. When `Sec-Private-State-Token-Lifetime` header value is zero UA should treat the record as expired. In case of multiple `Sec-Private-State-Token-Lifetime` headers, UA uses the last one. If `Sec-Private-State-Token-Lifetime` header is omitted, the lifetime of the RR will be tied to the lifetime of the Private State Token verification key that confirmed the redeemed token's issuance.
+The RR is HTTP-only and JavaScript is only able to access/send the RR via Private State Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The RR is treated as an arbitrary blob of bytes from the issuer, that may have semantic meaning to downstream consumers.
 
 UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using following API.
 
@@ -121,7 +121,7 @@ document.hasRedemptionRecord(<issuer>, 'private-state-token')
 This returns whether there are any valid RRs from the given issuer.
 
 
-To mitigate [token exhaustion](#trust-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired RRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
+To mitigate [token exhaustion](#private-state-token-exhaustion), a site can only redeem tokens for a particular issuer if they have no cached non-expired RRs from that issuer or if they are the same origin as the issuer and have set the `refresh` parameter.
 
 
 ### Forwarding Redemption Attestation
@@ -132,7 +132,7 @@ Redemption Records are only accessible via a new option to the Fetch API:
 ```
 fetch(<resource-url>, {
   ...
-  trustToken: {
+  privateToken: {
     type: 'private-state-token',
     version: 1,
     operation: 'send-redemption-record',
@@ -146,18 +146,18 @@ fetch(<resource-url>, {
 The RRs will be added as a new request header `Sec-Redemption-Record`. The header contains a list of issuer and redemption record pairs corresponding to each requested redemption record. This option to Fetch is only usable in the top-level document. If there are no RRs available, the request header will be empty.
 
 
-### Extension: Trust Token Versioning
+### Extension: Private State Token Versioning
 
-In order to allow multiple versions of Trust Token to be supported in the ecosystem, issuers include the version of the protocol (i.e. "TrustTokenV1") in their key commitments via the "protocol_version" field, and that is included in Trust Token requests via the Sec-Trust-Token-Version header. Trust Token operations should not be performed with issuers configured with an unknown protocol version.
+In order to allow multiple versions of Private State Token to be supported in the ecosystem, issuers include the version of the protocol (i.e. "PrivateStateTokenV1") in their key commitments via the ```protocol_version``` field, and that is included in Private State Token requests via the ```Sec-Private-State-Token-Version``` header. Private State Token operations should not be performed with issuers configured with an unknown protocol version.
 
-In addition to the core cryptographic layer, signed requests' formats (see the next section) might change from version to version. In order to make adapting to these changes easier, we could employ a mechanism like the Sec-Trust-Token-Version header, or an addition to the requests' payloads, to tell consumers the version of the client that generated the request.
+In addition to the core cryptographic layer, signed requests' formats (see the next section) might change from version to version. In order to make adapting to these changes easier, we could employ a mechanism like the ```Sec-Private-State-Token-Version``` header, or an addition to the requests' payloads, to tell consumers the version of the client that generated the request.
 
 
 ### Extension: Metadata
 
 In addition to attesting trust in a user, an issuer may want to provide a limited amount of metadata in the token (and forward it as part of the RR) to provide limited additional information about the token.
 
-This small change opens up a new application for Privacy Passes: embedding small amounts of information along with the token and RR. This increases the rate of cross-site information transfer somewhat, but introduces some new use-cases for trust tokens.
+This small change opens up a new application for Privacy Passes: embedding small amounts of information along with the token and RR. This increases the rate of cross-site information transfer somewhat, but introduces some new use-cases for private state tokens.
 
 Once the metadata has been passed along to the redemption request, the issuer can include the value in some form in the RR for downstream partneres to read.
 
@@ -176,7 +176,7 @@ This can be managed using the [PMBTokens construction](https://eprint.iacr.org/2
 
 ### Extension: iframe Activation
 
-Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `trustToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `trustToken="{type:'private-state-token',version:1,operation:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `privateToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `privateToken="{type:'private-state-token',version:1,operation:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
 
 ## Privacy Considerations
 
@@ -201,11 +201,11 @@ If the issuer is able to use network-level fingerprinting or other side-channels
 
 ### Cross-site Information Transfer
 
-Trust tokens transfer information about one first-party cookie to another, and we have cryptographic guarantees that each token only contains a small amount of information. Still, if we allow many token redemptions on a single page, the first-party cookie for user U on domain A can be encoded in the trust token information channel and decoded on domain B, allowing domain B to learn the user's domain A cookie until either 1p cookie is cleared. Separate from the concern of channels allowing arbitrary communication between domains, some identification attacks---for instance, a malicious redeemer attempting to learn the exact set of issuers that have granted tokens to a particular user, which could be identifying---have similar mitigations.
+Private state tokens transfer information about one first-party cookie to another, and we have cryptographic guarantees that each token only contains a small amount of information. Still, if we allow many token redemptions on a single page, the first-party cookie for user U on domain A can be encoded in the trust token information channel and decoded on domain B, allowing domain B to learn the user's domain A cookie until either 1p cookie is cleared. Separate from the concern of channels allowing arbitrary communication between domains, some identification attacks---for instance, a malicious redeemer attempting to learn the exact set of issuers that have granted tokens to a particular user, which could be identifying---have similar mitigations.
 
 #### Mitigation: Dynamic Issuance / Redemption Limits
 
-To mitigate this attack, we place limits on both issuance and redemption. At issuance, we require [user activation](https://html.spec.whatwg.org/multipage/interaction.html#activation) with the issuing site. At redemption, we can slow down the rate of redemption by returning cached Redemption Records when an issuer attempts too many refreshes (see also the [token exhaustion](#trust-token-exhaustion) problem). These mitigations should make the attack take a longer time and require many user visits to recover a full user ID.
+To mitigate this attack, we place limits on both issuance and redemption. At issuance, we require [user activation](https://html.spec.whatwg.org/multipage/interaction.html#activation) with the issuing site. At redemption, we can slow down the rate of redemption by returning cached Redemption Records when an issuer attempts too many refreshes (see also the [token exhaustion](#private-state-token-exhaustion) problem). These mitigations should make the attack take a longer time and require many user visits to recover a full user ID.
 
 
 #### Mitigation: Allowed/Blocked Issuer Lists
@@ -215,7 +215,7 @@ To prevent abuse of the API, browsers could maintain a list of allowed or disall
 
 #### Mitigation: Per-Site Issuer Limits
 
-The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per top-level origin (e.g. 2); this limit should apply for both issuance and redemption; and the issuers used on an origin should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits. This should also apply for `document.hasTrustToken`, as the presence of tokens can be used as a tracking vector.
+The rate of identity leakage from one site to another increases with the number of tokens redeemed on a page. To avoid abuse, there should be strict limits on the number of token issuers contacted per top-level origin (e.g. 2); this limit should apply for both issuance and redemption; and the issuers used on an origin should be persisted in browser storage to avoid excessively rotating issuers on subsequent visits. This should also apply for `document.hasPrivateToken`, as the presence of tokens can be used as a tracking vector.
 
 
 ### First Party Tracking Potential
@@ -230,9 +230,9 @@ In order to prevent the issuer from binding together multiple simultaneous redem
 ## Security Considerations
 
 
-### Trust Token Exhaustion
+### Private State Token Exhaustion
 
-The goal of a token exhaustion attack is to deplete a legitimate user's supply of tokens for a given issuer, so that user is less valuable to sites who depend on the issuer’s trust tokens.
+The goal of a token exhaustion attack is to deplete a legitimate user's supply of tokens for a given issuer, so that user is less valuable to sites who depend on the issuer’s private state tokens.
 
 We have a number of mitigations against this attack:
 
@@ -244,7 +244,7 @@ We have a number of mitigations against this attack:
 *   Browsers may choose to limit redemptions on a time-based schedule, and either return cached RRs if available, or require consumers to cache the RR.
 *   Issuers will be able to see the Referer, subject to the page's referrer policy, for any token redemption, so they'll be able to detect if any one site is redeeming suspiciously many tokens.
 
-When the issuer detects a site is attacking its trust token supply, it can fail redemption (before the token is revealed) based on the referring origin, and prevent browsers from spending tokens there.
+When the issuer detects a site is attacking its token supply, it can fail redemption (before the token is revealed) based on the referring origin, and prevent browsers from spending tokens there.
 
 
 ### Double-Spend Prevention
@@ -273,7 +273,7 @@ If the publisher can configure issuers in response headers (or otherwise early i
 
 ### Non-web sources of tokens
 
-Trust token issuance could be expanded to other entities (the operating system, or native applications) capable of making an informed decision about whether to grant tokens. Naturally, this would need to take into consideration different systems' security models in order for these tokens to maintain their meaning. (For instance, on some platforms, malicious applications might routinely have similar privileges to the operating system itself, which would at best reduce the signal-to-noise ratio of tokens created on those operating systems.)
+Private state token issuance could be expanded to other entities (the operating system, or native applications) capable of making an informed decision about whether to grant tokens. Naturally, this would need to take into consideration different systems' security models in order for these tokens to maintain their meaning. (For instance, on some platforms, malicious applications might routinely have similar privileges to the operating system itself, which would at best reduce the signal-to-noise ratio of tokens created on those operating systems.)
 
 ## Appendix
 
@@ -282,22 +282,22 @@ Trust token issuance could be expanded to other entities (the operating system, 
 
 
 ```
-areyouahuman.example - Trust Token Issuer
+areyouahuman.example - Private State Token Issuer
 coolwebsite.example - Publisher Top-Level Site
-foo.example - Site requiring a Trust Token to prove the user is trusted.
+foo.example - Site requiring a Private State Token to prove the user is trusted.
 
 ```
 
 
 1.  User visits `areyouahuman.example`.
-1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {trustToken: {type: 'private-state-token', version: 1, operation: 'token-request', issuer: 'areyouahuman.example'}})`.
+1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {privateToken: {type: 'private-state-token', version: 1, operation: 'token-request', issuer: 'areyouahuman.example'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.example`.
 1.  Sometime later, the user visits `coolwebsite.example`.
-1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {trustToken: {type: 'private-state-token', version: 1, operation: 'token-redemption', issuer: 'areyouahuman.example'}})`.
+1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {privateToken: {type: 'private-state-token', version: 1, operation: 'token-redemption', issuer: 'areyouahuman.example'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an RR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the RR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {trustToken: {type: 'private-state-token', version: 1, operation: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
+1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {privateToken: {type: 'private-state-token', version: 1, operation: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
     1.  The third-party receives the RR, and now has some indication that `areyouahuman.example` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
 
@@ -312,7 +312,7 @@ Different issuers/ecosystems should specify their own Redemption Record format s
     Publisher Origin
   },
   Metadata: {
-    Trust Token Key ID
+    Private State Token Key ID
   },
   Signature of the above verifiable by well-known public key of the issuer,
   SigAlg: <Well known algorithm identifier used to sign this RR>,

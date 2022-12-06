@@ -1,8 +1,8 @@
-# TrustTokenV3 Issuer Protocol
+# PrivateStateV3 Issuer Protocol
 
 *Version 3 is a working version and is subject to change.*
 
-This document documents the cryptographic protocol for the "TrustTokenV3PMB" and "TrustTokenV3VOPRF" experimental version of Trust Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Trust Tokens. Experimental versions of Trust Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe. Note that there is a distinct different between the issuer protocol version and the cryptographic protocol version, with the latter describing the underlying cryptographic primitives used in the issuer protocol.
+This document documents the cryptographic protocol for the "PrivateStateTokenV3PMB" and "PrivateStateTokenV3VOPRF" experimental version of Private State Token. An issuer needs to support maintaining a set of keys and a key commitment endpoint, as well as implementing the Issue and Redeem cryptographic functions to sign and validate Private State Tokens. Experimental versions of Private State Token are not intended to be backwards-compatible with each other and will undergo rapid design/implementation changes during the experiment timeframe. Note that there is a distinct different between the issuer protocol version and the cryptographic protocol version, with the latter describing the underlying cryptographic primitives used in the issuer protocol.
 
 This document uses TLS presentation language (https://tools.ietf.org/html/rfc8446#section-3) for structures and serialization.
 
@@ -12,18 +12,18 @@ This section describes the public issuer interfaces that an issuer will need to 
 
 ### Issuer Key Commitments
 
-A Trust Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Trust Token protocol. Requests to this endpoint should result in a JSON response of the following format:
+A Private State Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Private State Token protocol. Requests to this endpoint should result in a JSON response of the following format:
 
 
 ```
 Key commitment result
 {
   <protocol_version>: {
-    "protocol_version": <protocol version as a string, "TrustTokenV3PMB" or "TrustTokenV3VOPRF" for this>,
+    "protocol_version": <protocol version as a string, "PrivateStateTokenV3PMB" or "PrivateStateTokenV3VOPRF" for this>,
     "id": <key commitment identifier, as a monotonically increasing integer>
     "batchsize": <batch size>,
     "keys": {
-      <keyID>: { "Y": <base64-encoded TrustTokenPublicKey>,
+      <keyID>: { "Y": <base64-encoded PrivateStateTokenPublicKey>,
                          "expiry": <key expiry, encoded as a string representation of
                                     an integer timestamp in microseconds since the Unix
                                     epoch> },
@@ -44,17 +44,17 @@ and to allow comparing the freshness of key commitments (larger values indicate 
 
 ### Issuing Tokens
 
-To support the issuance of tokens made via Trust Token calls by the client, server paths that support token issuance should parse the "Sec-Trust-Token" header as a base64 binary blob. This decoded binary blob should be interpreted as a **Trust Token Issuance Request** and passed into the _Issue_ crypto protocol along with the Issuance metadata based on the rest of the request. The result of _Issue_ (a **Trust Token Issuance Response**) should be base64 encoded and returned via the "Sec-Trust-Token" header in the HTTP response.
+To support the issuance of tokens made via Private State Token calls by the client, server paths that support token issuance should parse the ```Sec-Private-State-Token``` header as a base64 binary blob. This decoded binary blob should be interpreted as a **Private State Token Issuance Request** and passed into the _Issue_ crypto protocol along with the Issuance metadata based on the rest of the request. The result of _Issue_ (a **Private State Token Issuance Response**) should be base64 encoded and returned via the ```Sec-Private-State-Token``` header in the HTTP response.
 
 
 #### Issuance Metadata
 
-As part of an issuance, two forms of metadata can be embedded into the token. Public metadata is embedded via the choice of key which is used as part of the issuance process and is passed into the _Issue_ method as the keypair selection. Private metadata is embedded via a cryptographically hidden bit in the signed token itself and is passed into the _Issue_ method as the private metadata boolean. TrustTokenV3VOPRF supports up to 6 buckets (keypairs) of public metadata and no private metadata, while TrustTokenV3PMB supports up to 3 buckets (keypairs) of public metadata and one bit of private metadata.
+As part of an issuance, two forms of metadata can be embedded into the token. Public metadata is embedded via the choice of key which is used as part of the issuance process and is passed into the _Issue_ method as the keypair selection. Private metadata is embedded via a cryptographically hidden bit in the signed token itself and is passed into the _Issue_ method as the private metadata boolean. ```PrivateStateTokenV3VOPRF``` supports up to 6 buckets (keypairs) of public metadata and no private metadata, while ```PrivateStateTokenV3PMB``` supports up to 3 buckets (keypairs) of public metadata and one bit of private metadata.
 
 
 ### Redeeming Tokens
 
-To support the redemption of tokens by the client, server paths that support token redemption should parse the "Sec-Trust-Token" header as a base64 binary blob. This decoded binary blob should be interpreted as a **Trust Token Redemption Request** and passed into the _Redeem_ crypto protocol. The result of _Redeem_ (a **Trust Token Redemption Response**) should be base64 encoded and returned via the "Sec-Trust-Token" header in the HTTP response. Additionally, the issuer should keep track of redeemed tokens to prevent token reuse from malicious clients.
+To support the redemption of tokens by the client, server paths that support token redemption should parse the ```Sec-Private-State-Token``` header as a base64 binary blob. This decoded binary blob should be interpreted as a **Private State Token Redemption Request** and passed into the _Redeem_ crypto protocol. The result of _Redeem_ (a **Private State Token Redemption Response**) should be base64 encoded and returned via the ```Sec-Private-State-Token``` header in the HTTP response. Additionally, the issuer should keep track of redeemed tokens to prevent token reuse from malicious clients.
 
 
 #### Redemption Metadata
@@ -66,20 +66,20 @@ At redemption time, the token is decoded and provided via the redemption API. Th
 In Version 3, the algorithm used for [request signing](https://github.com/WICG/trust-token-api#extension-trust-bound-keypair-and-request-signing) is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3).
 
 
-## TrustTokenV2PMB Crypto Protocol
+## PrivateStateTokenV2PMB Crypto Protocol
 
-This Trust Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. This crypto protocol is used in both the V2 and V3 Trust Token protocol versions.  The necessary keys and function mappings are described below.
+This Private State Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. This crypto protocol is used in both the V2 and V3 Private State Token protocol versions. The necessary keys and function mappings are described below.
 
 ### Keys
 
-The Trust Token protocol primarily requires keypairs consisting of each public metadata bucket:
+The Private State Token protocol primarily requires keypairs consisting of each public metadata bucket:
 
-*   TrustTokenSecretKey/TrustTokenPublicKey - A Trust Token keypair used to sign and verify Trust Tokens.
+*   PrivateStateTokenSecretKey/PrivateStateTokenPublicKey - A Trust Token keypair used to sign and verify Private State Tokens.
 
 
-#### TrustTokenSecretKey/TrustTokenPublicKey
+#### PrivateStateTokenSecretKey/PrivateStateTokenPublicKey
 
-These are keys used in Trust Token consisting of elliptic curve scalars and points. All scalars and points are sized based on the curve choice (P-384). Up to 3 keys may be configured in parallel in the key commitment.
+These are keys used in Private State Token consisting of elliptic curve scalars and points. All scalars and points are sized based on the curve choice (P-384). Up to 3 keys may be configured in parallel in the key commitment.
 
 Each keypair consist of the following:
 
@@ -104,7 +104,7 @@ struct {
   ECPoint pub0; // Corresponding to the FALSE private metadata bit.
   ECPoint pub1; // Corresponding to the TRUE private metadata bit.
   ECPoint pubs; // Corresponding to the token validity check.
-} TrustTokenPublicKey;
+} PrivateStateTokenPublicKey;
 ```
 
 ### Serialization/Hashing
@@ -235,7 +235,7 @@ DLEQbatched.P((X,T,S,W,Ws),(xs, ys, xb, yb)):
 
 Input Serialization:
 
-The Trust Token Issuance Request contains an `IssueRequest` structure defined below.
+The Private State Token Issuance Request contains an `IssueRequest` structure defined below.
 
 ```
 struct {
@@ -246,7 +246,7 @@ struct {
 
 Output Serialization:
 
-The Trust Token Issuance Response contains an `IssueResponse` structure defined below.
+The Private State Token Issuance Response contains an `IssueResponse` structure defined below.
 
 ```
 struct {
@@ -281,7 +281,7 @@ The _Redeem_ function corresponds to the **AT.VerValid** and **AT.ReadBit** stag
 
 Inputs:
 
-*   token (The trust token to redeem)
+*   token (The private state token to redeem)
 *   client\_data (the client data sent as part of the redemption request to include in the SRR)
 *   secretKey (the secret key that should be used to sign this request, determined by the public metadata)
 *   keys (dictionary from known key IDs to secret/public keys)
@@ -310,7 +310,7 @@ Redeem:
 
 Input Serialization:
 
-The Trust Token Redemption Request contains a `RedemptionRequest` structure as defined below.
+The Private State Token redemption request contains a `RedemptionRequest` structure as defined below.
 
 ```
 struct {
@@ -331,7 +331,7 @@ struct {
 
 Output Serialization:
 
-The Trust Token Redemption Response contains a `RedemptionResponse` structure as defined below.
+The Private State Token redemption response contains a `RedemptionResponse` structure as defined below.
 
 ```
 struct {
@@ -339,20 +339,20 @@ struct {
 } RedeemResponse;
 ```
 
-## TrustTokenV2VOPRF Crypto Protocol
+## PrivateStateTokenV2VOPRF Crypto Protocol
 
-This Trust Token crypto protocol is based on the VOPRF design in https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/. This crypto protocol is used in both the V2 and V3 Trust Token protocol versions.
+This Private State Token crypto protocol is based on the VOPRF design in https://datatracker.ietf.org/doc/draft-irtf-cfrg-voprf/. This crypto protocol is used in both the V2 and V3 Private State Token protocol versions.
 
 ### Keys
 
-The Trust Token protocol primarily requires keypairs consisting of each public metadata bucket:
+The Private State Token protocol primarily requires keypairs consisting of each public metadata bucket:
 
-*   TrustTokenSecretKey/TrustTokenPublicKey - A Trust Token keypair used to sign and verify Trust Tokens.
+*   PrivateStateTokenSecretKey/PrivateStateTokenPublicKey - A Private State Token keypair used to sign and verify Private State Tokens.
 
 
-#### TrustTokenSecretKey/TrustTokenPublicKey
+#### PrivateStateTokenSecretKey/PrivateStateTokenPublicKey
 
-These are keys used in Trust Token consisting of elliptic curve scalars and points. All scalars and points are sized based on the curve choice (P-384). Up to 6 keys may be configured in parallel in the key commitment.
+These are keys used in Private State Token consisting of elliptic curve scalars and points. All scalars and points are sized based on the curve choice (P-384). Up to 6 keys may be configured in parallel in the key commitment.
 
 Each keypair consist of the following:
 
@@ -363,11 +363,11 @@ opaque Scalar<Ns>; // big-endian bytestring
 
 struct {
   Scalar x;
-} TrustTokenSecretKey;
+} PrivateStateTokenSecretKey;
 
 struct {
   ECPoint pub;
-} TrustTokenPublicKey;
+} PrivateStateTokenPublicKey;
 ```
 
 ### Serialization/Hashing
@@ -375,11 +375,11 @@ struct {
 For the VOPRF functions, the following serialization schemes and hashes are used internally using draft 07 of the hash-to-curve specification (https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07):
 
 
-`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "TrustToken VOPRF Experiment V2 HashToGroup".
+`H2C(t)` is defined to be P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PrivateStateToken VOPRF Experiment V2 HashToGroup".
 
 The hash-to-curve document does not define hash to scalars, so `H2S(x)` is defined to be the output of the [hash_to_field](https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-07#section-5.2) function with the following parameters:
 
-* `DST` is "TrustToken VOPRF Experiment V3 HashToScalar"
+* `DST` is "PrivateStateToken VOPRF Experiment V3 HashToScalar"
 * `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO_.
 * `L` is 72, derived based on P384_XMD:SHA-512_SSWU_RO_'s security parameter `k` (192), and `p` defined above.
 * `expand_message` uses the corresponding function from P384_XMD:SHA-512_SSWU_RO_.
@@ -418,7 +418,7 @@ The _Issue_ **Blind**/**Evaluate**/**Unblind** stages of the VOPRF protocol.
 
 Input Serialization:
 
-The Trust Token Issuance Request contains an `IssueRequest` structure defined below.
+The Private State Token Issuance Request contains an `IssueRequest` structure defined below.
 
 ```
 struct {
@@ -429,7 +429,7 @@ struct {
 
 Output Serialization:
 
-The Trust Token Issuance Response contains an `IssueResponse` structure defined below.
+The Private State Token Issuance Response contains an `IssueResponse` structure defined below.
 
 ```
 struct {
@@ -457,7 +457,7 @@ The _Redeem_ function corresponds to the **VerifyFinalize** stage of the VOPRF p
 
 Input Serialization:
 
-The Trust Token Redemption Request contains a `RedemptionRequest` structure as defined below.
+The Private State Token redemption request contains a `RedemptionRequest` structure as defined below.
 
 ```
 struct {
@@ -476,7 +476,7 @@ struct {
 
 Output Serialization:
 
-The Trust Token Redemption Response contains a `RedemptionResponse` structure as defined below.
+The Private State Token redemption response contains a `RedemptionResponse` structure as defined below.
 
 ```
 struct {
