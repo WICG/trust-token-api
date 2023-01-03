@@ -4,9 +4,9 @@
   <title>Private State Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 63e66730b, updated Tue Oct 25 12:35:05 2022 -0700" name="generator">
+  <meta content="Bikeshed version 26e85e599, updated Thu Dec 8 15:29:31 2022 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="f9a0507884dc94522e8b3c75a66ecee57cd2755d" name="document-revision">
+  <meta content="e59eb098fcbf999adc976348d35645ea478002df" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -534,7 +534,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-12-06">6 December 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-01-03">3 January 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -551,7 +551,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2022 the Contributors to the Private State Token API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2023 the Contributors to the Private State Token API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -637,7 +637,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h2 class="heading settled" data-level="1" id="goals"><span class="secno">1. </span><span class="content">Goals</span><a class="self-link" href="#goals"></a></h2>
    <p>The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
-privacy pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in working
+privacy pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol" title="Privacy Pass Issuance Protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in working
 documents of privacy pass working group of IETF <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Private
 State Tokens can be considered as a web platform implementation of Privacy
 Pass.</p>
@@ -647,16 +647,16 @@ API provided by the browser does not authenticate clients, instead it facilitate
 transfer of authentication information.</p>
    <p>Authentication of the clients and token signing are both carried by the same
 entity referred to as the <strong>issuer</strong>. This is the joint attester and issuer
-architecture described in <a data-link-type="biblio" href="#biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]</a>, <a data-link-type="biblio" href="#biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]</a>.</p>
+architecture described in <a data-link-type="biblio" href="#biblio-privacy-pass-architecture" title="Privacy Pass Architectural Framework">[PRIVACY-PASS-ARCHITECTURE]</a>, <a data-link-type="biblio" href="#biblio-privacy-pass-auth-scheme" title="The Privacy Pass HTTP Authentication Scheme">[PRIVACY-PASS-AUTH-SCHEME]</a>.</p>
    <p>Browsers store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
 tokens. Spending tokens is called <strong>redeeming</strong>.</p>
    <p>Origins may ask browser to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.</p>
    <p>Private State Tokens API performs cross site anonymous authentication without
-using linkable state carrying cookies <a data-link-type="biblio" href="#biblio-rfc6265">[RFC6265]</a>. Cookies do provide cross
+using linkable state carrying cookies <a data-link-type="biblio" href="#biblio-rfc6265" title="HTTP State Management Mechanism">[RFC6265]</a>. Cookies do provide cross
 site authentication, however, fail to provide anonymity.</p>
-   <p>Cookies store large amount of information. <a data-link-type="biblio" href="#biblio-rfc6265">[RFC6265]</a> requires at least 4096
+   <p>Cookies store large amount of information. <a data-link-type="biblio" href="#biblio-rfc6265" title="HTTP State Management Mechanism">[RFC6265]</a> requires at least 4096
 bytes per cookie and 50 cookies per domain. This means an origin has
 50 x 4096 x 2^8 unique identifiers at its disposal. When backed with back end
 databases, a server can store arbitrary data for that many unique
@@ -674,7 +674,7 @@ privacy of the user due to unlinkability property of the tokens. Private
 State Token API allows at most 2 different issuers in a top level origin. This
 is to limit the information stored for a user when the issuers are
 collaborating.</p>
-   <p>Private State Token operations rely on <a data-link-type="biblio" href="#biblio-fetch">[FETCH]</a>. A fetch request corresponding to a
+   <p>Private State Token operations rely on <a data-link-type="biblio" href="#biblio-fetch" title="Fetch Standard">[FETCH]</a>. A fetch request corresponding to a
 specific Private State Token operation can be created and used as a parameter to the
 fetch function.</p>
    <h2 class="heading settled" data-level="3" id="issuer-public-keys"><span class="secno">3. </span><span class="content">Issuer Public Keys</span><a class="self-link" href="#issuer-public-keys"></a></h2>
@@ -684,9 +684,9 @@ support to provide public keys to be used by Private State Token protocols.</p>
 required to serve a <strong>key commitment</strong> endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
-through secure HTTP <a data-link-type="biblio" href="#biblio-rfc8446">[RFC8446]</a> endpoints. Browsers should fetch the key
+through secure HTTP <a data-link-type="biblio" href="#biblio-rfc8446" title="The Transport Layer Security (TLS) Protocol Version 1.3">[RFC8446]</a> endpoints. Browsers should fetch the key
 commitments periodically.</p>
-   <p>Requests to key commitment endpoints should result in a JSON response <a data-link-type="biblio" href="#biblio-rfc8259">[RFC8259]</a> of the following format.</p>
+   <p>Requests to key commitment endpoints should result in a JSON response <a data-link-type="biblio" href="#biblio-rfc8259" title="The JavaScript Object Notation (JSON) Data Interchange Format">[RFC8259]</a> of the following format.</p>
 <pre class="language-javascript highlight"><c- p>{</c->
   <c- o>&lt;</c->cryptographic protocol_version<c- o>>:</c-> <c- p>{</c->
     <c- u>"protocol_version"</c-><c- o>:</c-> <c- o>&lt;</c->cryptographic protocol version<c- o>></c-><c- p>,</c->
@@ -709,11 +709,11 @@ protocol version used. The same string is used as a value of the inner <code>"pr
 properties in terms of privacy implications.</p>
      <ul>
       <li data-md>
-       <p>Protocol version <code>“PrivateStateTokenV3PMB”</code> implements <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> cryptographic
+       <p>Protocol version <code>“PrivateStateTokenV3PMB”</code> implements <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> cryptographic
        protocol. In this protocol, each token contains a private
        metadata bit.</p>
       <li data-md>
-       <p>Protocol version <code>“PrivateStateTokenV2VOPRF”</code> implements <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> cryptographic
+       <p>Protocol version <code>“PrivateStateTokenV2VOPRF”</code> implements <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> cryptographic
        protocol. Contrary to PMB, tokens do not contain private
        metadata bits. However, issuers can use twice as many
        concurrently valid token signing keys (six compared to three of
@@ -740,14 +740,14 @@ properties in terms of privacy implications.</p>
    is within the range of an unsigned 32 bit integer type.</p>
       <li data-md>
        <p>Each key has a <code>"Y"</code> field which is a string representation of a
-    big-endian base64 encoding <a data-link-type="biblio" href="#biblio-rfc4648">[RFC4648]</a> of the byte string of
+    big-endian base64 encoding <a data-link-type="biblio" href="#biblio-rfc4648" title="The Base16, Base32, and Base64 Data Encodings">[RFC4648]</a> of the byte string of
     the key.</p>
       <li data-md>
        <p><code>"expiry"</code> field specifies how long the underlying key is valid. It
           is a string representation of a nonnegative integer that
           is within the range of an unsigned 64 bit integer type.
           Underlying key expires if this amount many or more
-          microseconds are elapsed since the POSIX epoch <a data-link-type="biblio" href="#biblio-rfc8536">[RFC8536]</a>.</p>
+          microseconds are elapsed since the POSIX epoch <a data-link-type="biblio" href="#biblio-rfc8536" title="The Time Zone Information Format (TZif)">[RFC8536]</a>.</p>
      </ul>
    </ul>
    <p>All field names and their values are strings. When new key commitments are
@@ -769,7 +769,7 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
 steps are carried out when an issue request is fetched.</p>
    <ol>
     <li data-md>
-     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts" title="Secure Contexts">[secure-contexts]</a>.</p>
     <li data-md>
      <p>Reject if associating the issuer with the top level origin would exceed the
        top level’s number-of-issuers limit of 2.</p>
@@ -820,8 +820,10 @@ specified in the request <code>Sec-Private-State-Token-Version</code> header. En
 passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
 step. Issuer returns the signed tokens in the <code>Sec-Private-State-Token</code> response header
 value encoded as a base64 byte string. The number of tokens issued is returned
-in <code>Sec-TT-Count</code> header. Value of this header is the string message of <code>Issuing &lt;number of tokens> tokens.</code> with the right nonnegative integer value
-that specifies the tokens issued.</p>
+in <code>Sec-TT-Count</code> header. Value of this header is the string message of</p>
+<pre>Issuing &lt;number of tokens> tokens.
+</pre>
+   <p>with the right nonnegative integer value that specifies the tokens issued.</p>
    <p>Following snippet displays a typical response demonstrating the Private State Token
 related headers.</p>
 <pre>Sec-Private-State-Token: &lt;token encoded as base64 string>
@@ -867,7 +869,7 @@ snippet.</p>
    <p>Browser carries out the following steps when a redemption request is fetched.</p>
    <ol>
     <li data-md>
-     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts" title="Secure Contexts">[secure-contexts]</a>.</p>
     <li data-md>
      <p>Reject if associating the issuer with the top level origin would exceed the
        top level’s number-of-issuers limit of 2.</p>
@@ -931,7 +933,7 @@ using the following API.</p>
    <p>Browser carries out the following steps on this query.</p>
    <ol>
     <li data-md>
-     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts" title="Secure Contexts">[secure-contexts]</a>.</p>
     <li data-md>
      <p>Reject if associating the issuer with the top level origin would exceed the
        top level’s number-of-issuers limit of 2.</p>
@@ -958,7 +960,7 @@ redemption record for a specific issuer using following API.</p>
    <p>Browser carries out the following steps on redemption query.</p>
    <ol>
     <li data-md>
-     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts">[secure-contexts]</a>.</p>
+     <p>Reject if the document is not in a secure context <a data-link-type="biblio" href="#biblio-secure-contexts" title="Secure Contexts">[secure-contexts]</a>.</p>
     <li data-md>
      <p>If the issuer is not associated with the top level origin, return false.</p>
     <li data-md>
@@ -977,41 +979,42 @@ the issuers of the currently stored tokens. Similar to token query, redemption
 query clears stale tokens.</p>
    <h2 class="heading settled" data-level="7" id="privacy"><span class="secno">7. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy"></a></h2>
    <h3 class="heading settled" data-level="7.1" id="unlinkability"><span class="secno">7.1. </span><span class="content">Unlinkability</span><a class="self-link" href="#unlinkability"></a></h3>
-   <p>Cryptographic protocols <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> provide blind signatures. At
+   <p>Cryptographic protocols <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> provide blind signatures. At
 redemption time, issuers can recognize their signature on the provided token,
-however they can not determine at what time and context they signed the
-token. This prevents issuers to correlate their issuances on an origin with
+however they can not determine at what time and context they signed the token.
+This prevents issuers to correlate their issuances on an origin with
 redemptions on another origin. Issuers learn only the aggregate information
 about the origins users visit.</p>
    <h3 class="heading settled" data-level="7.2" id="limit-encoded-info"><span class="secno">7.2. </span><span class="content">Limiting Encoded Information</span><a class="self-link" href="#limit-encoded-info"></a></h3>
-   <p>Browsers enforce limit on the number of keys for an issuer. For <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> number of keys are limited to six and for <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> number of keys are limited to
+   <p>Browsers enforce limit on the number of keys for an issuer. For <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> number of keys are limited to six and for <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> number of keys are limited to
 three. This is to prevent issuers de-anonymizing the clients by using a unique
-keys for each clients. At issuance time, when using <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a>, the issuer can
-label browser by one of the six available labels by using one of the six
-keys. Similarly, when using <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a>, the issuer labels the browser in of the
-three labels by using its three keys and store an additional private bit value.
-This indicates it also places browser into one of six buckets (2 x 3 = 6). Both <a data-link-type="biblio" href="#biblio-voprf">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> encode the same amount of information in a token. The
-difference is <a data-link-type="biblio" href="#biblio-pmb">[PMB]</a> having a private bit.</p>
+keys for each clients. At issuance time, when using <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a>, the issuer can
+label browser by one of the six available labels by using one of the six keys.
+Similarly, when using <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a>, the issuer labels the browser in of the three
+labels by using its three keys and store an additional private bit value.  This
+indicates it also places browser into one of six buckets (2 x 3 = 6). Both <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> encode the same amount of information in a token. The
+difference is <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> having a private bit.</p>
    <h4 class="heading settled" data-level="7.2.1" id="potential-attack-side-channel-fingerprinting"><span class="secno">7.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting</span><a class="self-link" href="#potential-attack-side-channel-fingerprinting"></a></h4>
    <p>Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the browser at redemption time with
-the browser at token issuance time, even though the Private State Token API itself has
-only stored and revealed limited amount of information about the browser.</p>
+the browser at token issuance time, even though the Private State Token API
+itself has only stored and revealed limited amount of information about the
+browser.</p>
    <h3 class="heading settled" data-level="7.3" id="cross-site-info"><span class="secno">7.3. </span><span class="content">Cross-site Information Transfer</span><a class="self-link" href="#cross-site-info"></a></h3>
-   <p>Private State Tokens transfer limited information between first-party contexts. Underlying
-cryptographic protocols guarantee that each token only contains a small amount
-of information. Still, if we allow many token redemptions on a single page, the
-first-party cookie for user U on domain A can be encoded in the Private State Token
-information channel and decoded on domain B, allowing domain B to learn the
-user’s domain A cookie until either 1p cookie is cleared. Separate from the
-concern of channels allowing arbitrary communication between domains, some
-identification attacks---for instance, a malicious redeemer attempting to learn
-the exact set of issuers that have granted tokens to a particular user, which
-could be identifying---have similar mitigations.</p>
+   <p>Private State Tokens transfer limited information between first-party contexts.
+Underlying cryptographic protocols guarantee that each token only contains a
+small amount of information. Still, if we allow many token redemptions on a
+single page, the first-party cookie for user U on domain A can be encoded in
+the Private State Token information channel and decoded on domain B, allowing
+domain B to learn the user’s domain A cookie until either 1p cookie is cleared.
+Separate from the concern of channels allowing arbitrary communication between
+domains, some identification attacks---for instance, a malicious redeemer
+attempting to learn the exact set of issuers that have granted tokens to a
+particular user, which could be identifying---have similar mitigations.</p>
    <h4 class="heading settled" data-level="7.3.1" id="mitigation-dynamic-issuance-redemption-limits"><span class="secno">7.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#mitigation-dynamic-issuance-redemption-limits"></a></h4>
-   <p>To mitigate this attack, browser places limits on both issuance and
-redemption. User activation with the issuing site is required in the issuing
-operation. The browser does not allow a third redemption in a 48 hour window.</p>
+   <p>To mitigate this attack, browser places limits on both issuance and redemption.
+User activation with the issuing site is required in the issuing operation. The
+browser does not allow a third redemption in a 48 hour window.</p>
    <h4 class="heading settled" data-level="7.3.2" id="mitigation-per-site-issuer-limits"><span class="secno">7.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#mitigation-per-site-issuer-limits"></a></h4>
    <p>The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the browser allows
@@ -1027,8 +1030,8 @@ once more than 48 hours have elapsed since the first redemption.</p>
    <h3 class="heading settled" data-level="8.2" id="preventing-double-spend"><span class="secno">8.2. </span><span class="content">Preventing Double Spending</span><a class="self-link" href="#preventing-double-spend"></a></h3>
    <p>Issuers can verify that each token is seen only once, because every redemption
 is sent to the same token issuer. This means that even if a malicious piece of
-malware exfiltrates all of a user’s tokens, the tokens will run out over
-time. Issuers can sign fewer tokens at a time to mitigate the risk.</p>
+malware exfiltrates all of a user’s tokens, the tokens will run out over time.
+Issuers can sign fewer tokens at a time to mitigate the risk.</p>
    <h2 class="no-num heading settled" id="acknowledgments"><span class="content">Acknowledgments</span><a class="self-link" href="#acknowledgments"></a></h2>
    <p>Thanks to Charlie Harrison, David Van Cleve and Kaustubha Govind for their
 contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
@@ -1045,7 +1048,7 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
     However, for readability,
     these words do not appear in all uppercase letters in this specification. </p>
    <p>All of the text of this specification is normative
-    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
+    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</a> </p>
    <p>Examples in this specification are introduced with the words “for example”
     or are set apart from the normative text
     with <code>class="example"</code>,
