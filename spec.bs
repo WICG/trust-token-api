@@ -296,8 +296,12 @@ passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the `Sec-Private-State-Token` response header
 value encoded as a base64 byte string. The number of tokens issued is returned
 in `Sec-TT-Count` header. Value of this header is the string message of
-`Issuing <number of tokens> tokens.` with the right nonnegative integer value
-that specifies the tokens issued.
+
+```
+Issuing <number of tokens> tokens.
+```
+
+with the right nonnegative integer value that specifies the tokens issued.
 
 Following snippet displays a typical response demonstrating the Private State Token
 related headers.
@@ -483,8 +487,8 @@ Unlinkability {#unlinkability}
 
 Cryptographic protocols [[VOPRF]] and [[PMB]] provide blind signatures. At
 redemption time, issuers can recognize their signature on the provided token,
-however they can not determine at what time and context they signed the
-token. This prevents issuers to correlate their issuances on an origin with
+however they can not determine at what time and context they signed the token.
+This prevents issuers to correlate their issuances on an origin with
 redemptions on another origin. Issuers learn only the aggregate information
 about the origins users visit.
 
@@ -496,10 +500,10 @@ Browsers enforce limit on the number of keys for an issuer. For [[VOPRF]]
 number of keys are limited to six and for [[PMB]] number of keys are limited to
 three. This is to prevent issuers de-anonymizing the clients by using a unique
 keys for each clients. At issuance time, when using [[VOPRF]], the issuer can
-label browser by one of the six available labels by using one of the six
-keys. Similarly, when using [[PMB]], the issuer labels the browser in of the
-three labels by using its three keys and store an additional private bit value.
-This indicates it also places browser into one of six buckets (2 x 3 = 6). Both
+label browser by one of the six available labels by using one of the six keys.
+Similarly, when using [[PMB]], the issuer labels the browser in of the three
+labels by using its three keys and store an additional private bit value.  This
+indicates it also places browser into one of six buckets (2 x 3 = 6). Both
 [[VOPRF]] and [[PMB]] encode the same amount of information in a token. The
 difference is [[PMB]] having a private bit.
 
@@ -507,28 +511,29 @@ difference is [[PMB]] having a private bit.
 
 Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the browser at redemption time with
-the browser at token issuance time, even though the Private State Token API itself has
-only stored and revealed limited amount of information about the browser.
+the browser at token issuance time, even though the Private State Token API
+itself has only stored and revealed limited amount of information about the
+browser.
 
 Cross-site Information Transfer {#cross-site-info}
 --------------------------------------------------
 
-Private State Tokens transfer limited information between first-party contexts. Underlying
-cryptographic protocols guarantee that each token only contains a small amount
-of information. Still, if we allow many token redemptions on a single page, the
-first-party cookie for user U on domain A can be encoded in the Private State Token
-information channel and decoded on domain B, allowing domain B to learn the
-user's domain A cookie until either 1p cookie is cleared. Separate from the
-concern of channels allowing arbitrary communication between domains, some
-identification attacks---for instance, a malicious redeemer attempting to learn
-the exact set of issuers that have granted tokens to a particular user, which
-could be identifying---have similar mitigations.
+Private State Tokens transfer limited information between first-party contexts.
+Underlying cryptographic protocols guarantee that each token only contains a
+small amount of information. Still, if we allow many token redemptions on a
+single page, the first-party cookie for user U on domain A can be encoded in
+the Private State Token information channel and decoded on domain B, allowing
+domain B to learn the user's domain A cookie until either 1p cookie is cleared.
+Separate from the concern of channels allowing arbitrary communication between
+domains, some identification attacks---for instance, a malicious redeemer
+attempting to learn the exact set of issuers that have granted tokens to a
+particular user, which could be identifying---have similar mitigations.
 
 ### Mitigation: Dynamic Issuance/Redemption Limits
 
-To mitigate this attack, browser places limits on both issuance and
-redemption. User activation with the issuing site is required in the issuing
-operation. The browser does not allow a third redemption in a 48 hour window.
+To mitigate this attack, browser places limits on both issuance and redemption.
+User activation with the issuing site is required in the issuing operation. The
+browser does not allow a third redemption in a 48 hour window.
 
 ### Mitigation: Per-Site Issuer Limits
 
@@ -554,8 +559,8 @@ Preventing Double Spending {#preventing-double-spend}
 
 Issuers can verify that each token is seen only once, because every redemption
 is sent to the same token issuer. This means that even if a malicious piece of
-malware exfiltrates all of a user's tokens, the tokens will run out over
-time. Issuers can sign fewer tokens at a time to mitigate the risk.
+malware exfiltrates all of a user's tokens, the tokens will run out over time.
+Issuers can sign fewer tokens at a time to mitigate the risk.
 
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
