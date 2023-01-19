@@ -311,12 +311,6 @@ Sec-Private-State-Token: <token encoded as base64 string>
 Sec-PST-Count: Issuing 3 tokens.
 ```
 
-Additionally, the issuer may include an optional `Sec-Private-State-Token-Clear-Data`
-header in the response. If the value of the header is `all`, then browser
-should discard all previously stored tokens before the newly issued tokens are
-stored. `Sec-Private-State-Token-Clear-Data` header should be ignored for any other
-values.
-
 
 Browser Steps For Issue Response {#browser-issue-response}
 ----------------------------------------------------------
@@ -326,9 +320,6 @@ To process a response to an issue request, browser carries out the following ste
  1. If the response has no `Sec-Private-State-Token` header, return an error.
  2. If the response has an empty `Sec-Private-State-Token` header, return; this is a
        `Success` response bearing 0 tokens.
- 3. If the response has `Sec-Private-State-Token-Clear-Data` header,
-    a. If its value is `"all"` discard all previously stored tokens from the issuer.
-    b. Else, ignore the header.
  3. Strip the `Sec-Private-State-Token` header from the response and carry out the
     cryptographic procedures to obtain a list of unblinded tokens.
     a. If the cryptographic procedure succeeds, associate the tokens with the
