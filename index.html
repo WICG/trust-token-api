@@ -4,9 +4,9 @@
   <title>Private State Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 26e85e599, updated Thu Dec 8 15:29:31 2022 -0800" name="generator">
+  <meta content="Bikeshed version d6f2d6445, updated Tue Jan 17 11:25:25 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="e59eb098fcbf999adc976348d35645ea478002df" name="document-revision">
+  <meta content="bd42b4b38d3c90f6882f8c498d5b56b798aaf498" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -534,7 +534,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-01-03">3 January 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-01-25">25 January 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -829,10 +829,6 @@ related headers.</p>
 <pre>Sec-Private-State-Token: &lt;token encoded as base64 string>
 Sec-PST-Count: Issuing 3 tokens.
 </pre>
-   <p>Additionally, the issuer may include an optional <code>Sec-Private-State-Token-Clear-Data</code> header in the response. If the value of the header is <code>all</code>, then browser
-should discard all previously stored tokens before the newly issued tokens are
-stored. <code>Sec-Private-State-Token-Clear-Data</code> header should be ignored for any other
-values.</p>
    <h3 class="heading settled" data-level="4.3" id="browser-issue-response"><span class="secno">4.3. </span><span class="content">Browser Steps For Issue Response</span><a class="self-link" href="#browser-issue-response"></a></h3>
    <p>To process a response to an issue request, browser carries out the following steps.</p>
    <ol>
@@ -840,10 +836,6 @@ values.</p>
      <p>If the response has no <code>Sec-Private-State-Token</code> header, return an error.</p>
     <li data-md>
      <p>If the response has an empty <code>Sec-Private-State-Token</code> header, return; this is a <code>Success</code> response bearing 0 tokens.</p>
-    <li data-md>
-     <p>If the response has <code>Sec-Private-State-Token-Clear-Data</code> header,
-a. If its value is <code>"all"</code> discard all previously stored tokens from the issuer.
-b. Else, ignore the header.</p>
     <li data-md>
      <p>Strip the <code>Sec-Private-State-Token</code> header from the response and carry out the
 cryptographic procedures to obtain a list of unblinded tokens.
