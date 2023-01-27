@@ -233,6 +233,23 @@ DLEQbatched.P((X,T,S,W,Ws),(xs, ys, xb, yb)):
   return dleqProof + dleqorProof
 ```
 
+`DLEQOR2.P` is specified by replacing `n = 2` in the above and `DLEQ2.P`
+is specified by replacing `n = 1` in the below procedure.
+
+```
+DLEQOR.P((X, T, S, W), (xb, yb)):
+  k0, k1 sampled uniformly from Z^2_p
+  Kb = k0 * (G; T) + k1 * (H; S)
+  for i in [n], i != b:
+    ci, ui, vi sampled uniformly from Z_p
+    K = ui * (G; T) + vi * (H; S) - ci * (Xi; W)
+  c = Hc((X, T, S, W), K0, ..., Nn)
+  cb = c - Sum(ci) // over i in [n] not equal to b
+  ub = k0 + cb * xb
+  vb = k1 + cb * yb
+  return (c, u, v)
+```
+
 Input Serialization:
 
 The Private State Token Issuance Request contains an `IssueRequest` structure defined below.
