@@ -410,33 +410,61 @@ expiration time for the redemption record provided. This expiration is
 specified as number of seconds in the `Sec-Private-State-Token-Lifetime` HTTP response
 header value.
 
+<h3 id="the-document-object">Changes to {{Document}}</h3>
+
+<pre class="idl">
+partial interface Document {
+  Promise&lt;boolean> hasPrivateTokens(USVString issuer);
+  Promise&lt;boolean> hasRedemptionRecord(USVString issuer);
+};
+</pre>
 
 Query APIs {#query-apis}
 ========================
 
+To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. Let |limit| be 2.
+2. TODO
+
+To <dfn>associate the issuer</dfn> |issuer| (an [=/origin=]) with the [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a given [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+
+1. TODO
+
 Token Query {#token-query}
 --------------------------
 
-An origin might query whether the browser has any tokens from a specific issuer
-using the following API.
+When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasPrivateTokens(issuer)</code></dfn> method must run these steps:
+1. Let |p| be [=a new promise=].
+1. If |doc| is not [=Document/fully active=], then [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+1. Let |global| be |doc|'s [=relevant global object=].
+1. If |global| is not a [=secure context=], then [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
+1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
+1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
+1. Let |origin| be |parsedURL|'s [=/origin=].
+1. Let |topLevel| be the [=top-level origin=] of |doc|'s [=relevant settings object=].
+1. Run the following steps [=in parallel=]:
+    1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], [=queue a global task=] on the [=networking task source=] given |global| to [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return.
+    1. [=Associate the issuer=] |origin| with |topLevel|.
+    1. [=Look up the key commitments=] for |origin| and |topLevel|. If there are key commitments,
+             [=discard tokens=] from |origin| that are signed with keys other than those
+             from the issuer's most recent commitments.
+    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there are tokens stored for the given issuer, with false otherwise.
+1. Return |p|.
 
-```javascript
-document.hasPrivateTokens(<issuer>)
-```
-
-Browser carries out the following steps on this query.
-
- 1. Reject if the document is not in a secure context [[secure-contexts]].
- 2. Reject if associating the issuer with the top level origin would exceed the
-           top level’s number-of-issuers limit of 2.
- 3. Associate the issuer with the top level origin.
- 4. Look up the key commitments from storage. If there are key commitments,
-         discard tokens from issuer that are signed with keys other than those
-         from the issuer's most recent commitments.
- 5. Return true if there are tokens stored for the given issuer, false
-           otherwise.
-
-Note that this query modifies the browser state. It associates the issuer
+Note: This query modifies the browser state. It associates the issuer
 argument with the current origin. Browser allows at most 2 issuers associated
 with an origin. This is to prevent leaking information through the issers a
 user has tokens from. Note that token query triggers removal of stale tokens
@@ -445,24 +473,25 @@ at Step 4.
 Redemption Record Query {#redemption-record-query}
 --------------------------------------------------
 
-Similar to token query, an origin can check whether browser has a valid
-redemption record for a specific issuer using following API.
+When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasRedemptionRecord(issuer)</code></dfn> method must run these steps:
 
-```javascript
-document.hasRedemptionRecord(<issuer>)
-```
+1. Let |p| be [=a new promise=].
+1. If |doc| is not [=Document/fully active=], then [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+1. Let |global| be |doc|'s [=relevant global object=].
+1. If |global| is not a [=secure context=], then [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
+1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
+1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
+1. Let |origin| be |parsedURL|'s [=/origin=].
+1. Let |topLevel| be the [=top-level origin=] of |doc|'s [=relevant settings object=].
+1. Run the following steps [=in parallel=]:
+    1. If |origin| [=is associated with|is not associated with=] |topLevel|, [=queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with false and return.
+    1. [=Look up the key commitments=] for |origin| and |topLevel|. If there are key commitments,
+             [=discard tokens=] from |origin| that are signed with keys other than those
+             from the issuer's most recent commitments.
+    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there is a redemption record for the issuer and top level pair, with false otherwise.
+1. Return |p|.
 
-Browser carries out the following steps on redemption query.
-
- 1. Reject if the document is not in a secure context [[secure-contexts]].
- 2. If the issuer is not associated with the top level origin, return false.
- 3. Look up the key commitments from storage. If there are key commitments,
-         discard tokens from issuer that are signed with keys other than those
-         from the issuer's most recent commitments.
- 4. If there is a redemption record for the issuer and topl level pair,
-       return true, return false otherwise.
-
-Similar to token query, redemption query might modify the browser state. Unlike
+Note: Similar to token query, redemption query might modify the browser state. Unlike
 token query, redemption query does not associate issuer with the top level
 origin. There is no need to associate the issuer queried with the top level
 origin, because, answer to the redemption query does not leak information about
