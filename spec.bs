@@ -16,6 +16,10 @@ Markup Shorthands: css no, markdown yes
 Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
 </pre>
 
+<pre class="anchors">
+urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
+    text: http-network-or-cache fetch; url: #concept-http-network-or-cache-fetch; type: dfn
+</pre>
 
 <pre class='biblio'>
 {
@@ -231,6 +235,100 @@ Requests to key commitment endpoints should result in a JSON response
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
 
+Algorithms {#algorithms}
+====================================
+
+To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. Let |limit| be 2.
+2. TODO
+
+To <dfn>associate the issuer</dfn> |issuer| (an [=/origin=]) with the [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a given [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
+
+1. TODO
+
+To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+
+1. TODO
+
+To get the <dfn>number of tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+
+1. TODO
+
+To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the following steps:
+
+1. TODO
+
+To <dfn>generate blinded tokens</dfn> given a number |numTokens|, run the following steps:
+
+1. TODO
+
+Integration with Fetch {#fetch-integration}
+====================================
+
+Definitions {#definitions}
+---------------------------------------------------------------
+
+<pre class=idl>
+enum RefreshPolicy { "none", "refresh" };
+</pre>
+
+<pre class=idl>
+enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
+</pre>
+
+<pre class=idl>
+enum SignRequestData { "omit", "include", "headers-only" };
+</pre>
+
+<pre class=idl>
+dictionary PrivateStateToken {
+  required OperationType operation;
+  RefreshPolicy refreshPolicy = "none";
+  sequence&lt;USVString> issuers;
+};
+</pre>
+
+Issue(151): Need to specify how `operation` and `issuers` are used.
+
+This specification adds a new property to the {{RequestInit}} dictionary:
+
+<pre class=idl>
+dictionary RequestInit {
+  // existing attributes ...
+  PrivateStateToken privateStateToken;
+};
+</pre>
+
+Modifications to request {#fetch-request}
+---------------------------------------------------------------
+
+A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is <code>"none"</code> or <code>"refresh"</code>. Unless stated otherwise it is <code>"none"</code>.
+
+Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
+
+ 1. If |init|["{{RequestInit/privateStateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateStateToken}}"]["{{PrivateStateToken/refreshPolicy}}"].
+
+Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
+---------------------------------------------------------------
+
+This specification adds the following steps to the [=http-network-or-cache fetch=] algorithm, before modifying the header list:
+
+    1. [=Append private state token issue request headers=] on |httpRequest|.
+    1. [=Append private state token redemption request headers=] on |httpRequest|.
+
 Issuing Protocol {#issuing-protocol}
 ====================================
 
@@ -240,10 +338,11 @@ the issuing protocol steps happenning in browsers and issuers.
 Browser Steps For Creating Issue Request {#browser-issue-steps}
 ---------------------------------------------------------------
 
-An issue request is created and fetched as demostrated in the following snippet.
+<div class=example>
+An issue request is created and fetched as demonstrated in the following snippet.
 
 ```javascript
-issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
+let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
   privateStateToken: {
     type: "token-request",
     issuer: "https://example.issuer"
@@ -251,29 +350,36 @@ issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&pri
 });
 fetch(issueRequest);
 ```
+</div>
 
-An issuance request is parameterized by issuer and top level origins. The following
-steps are carried out when an issue request is fetched.
+To <dfn>append private state token issue request headers</dfn> given a [=/request=] |request|, run the following steps:
 
- 1. Reject if the document is not in a secure context [[secure-contexts]].
- 2. Reject if associating the issuer with the top level origin would exceed the
-           top level’s number-of-issuers limit of 2.
- 3. Associate the issuer with the top level origin.
- 4. Reject if the number of tokens from the issuer is already at capacity
-           which is 500.
- 5. Reject if there are no key commitments stored for the issuer.
- 6. Pass issuer public keys to cryptographic procedures. Reject if keys are
+ 1. If |request|'s [=request/client=] is not a [=secure context=], return.
+ 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+ 1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
+ 1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
+ 1. [=Associate the issuer=] |issuer| with |topLevel|.
+ 1. If the [=number of tokens=] for |issuer| is at least 500, return.
+ 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer| and |topLevel|.
+ 1. If |commitments| is [=list/empty=], return.
+ 1. Pass issuer public keys to cryptographic procedures. Reject if keys are
          malformed.
- 7. Discard tokens from issuer that are signed with keys other than those from
+
+    Issue: How do we get the issuer public keys here?
+
+ 1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
             the issuer's most recent commitments.
- 8. Compare issuer's max batch size to global limit of 100 on batch size. Use
-            the smaller value.
- 9. Look up the key commitments from storage. Error out if key commitments are
-         unavailable.
- 10. Identify right number of tokens considering issuer batch size and current
+
+    Issue: This probably needs to be its own algorithm, how is "most recent" defined here?
+
+ 1. Let |maxSize| be |issuer|'s [=max batch size=] or the global limit of 100, whichever is smaller.
+ 1. Let |numTokens| be the right number of tokens considering issuer batch size and current
      number of tokens from the issuer.
- 11. Generate the right number of blinded tokens identified in Step 10.
- 12. Configure the HTTP request.
+
+    Issue: How does one determine the right number of tokens?
+
+ 1. Let |tokens| be the result of [=generate blinded tokens|generating blinded tokens=] with |numTokens|.
+ 1. Configure the HTTP request.
                a. Set a load flag to bypass the HTTP cache.
                b. Add `Sec-Private-State-Token` request header containing a
                       base64-encoded version of the bytestring of tokens
@@ -281,12 +387,16 @@ steps are carried out when an issue request is fetched.
                c. Add `Sec-Private-State-Token-Version` request header that specifies
                       the version of the cryptographic protocol used.
 
+     Issue: This step should append structured headers using [=header list/set a structured field value=]
+
+<div class=example>
 Private State Token HTTP request headers created for a typical fetch is as follows.
 
 ```
 Sec-Private-State-Token: <blinded tokens encoded as base64 string>
 Sec-Private-State-Token-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
+</div>
 
 
 Issuer Signing Tokens {#issuer-signing-tokens}
@@ -312,6 +422,7 @@ Issuing <number of tokens> tokens.
 
 with the right nonnegative integer value that specifies the tokens issued.
 
+<div class=example>
 Following snippet displays a typical response demonstrating the Private State Token
 related headers.
 
@@ -319,6 +430,7 @@ related headers.
 Sec-Private-State-Token: <token encoded as base64 string>
 Sec-PST-Count: Issuing 3 tokens.
 ```
+</div>
 
 
 Browser Steps For Issue Response {#browser-issue-response}
@@ -335,6 +447,7 @@ To process a response to an issue request, browser carries out the following ste
           issuing key’s label and store the tokens.
     b. Else, return an error.
 
+Issue: Define this in terms of fetch
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
@@ -342,11 +455,14 @@ Redeeming Tokens {#redeeming-tokens}
 When browser navigates to an origin, top level origin or a third party site
 embedded on the top level origin may redeem tokens stored in browser from a
 specific issuer to learn `public` and/or `private` data encoded in the
-tokens. Redemption is carried through fetch as demonstrated in the following
-snippet.
+tokens.
+
+<div class=example>
+Redemption is carried through fetch as demonstrated in the following
+snippet. The default value for refreshPolicy is `'none'`.
 
 ```javascript
-redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
+let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
   privateStateToken: {
     type: 'token-redemption',
     issuer: 'https://example.issuer',
@@ -354,8 +470,7 @@ redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
   }
 });
 ```
-
-Default value for refreshPolicy is `'none'`.
+</div>
 
 <!--
 checking fetch syntax, malformed input etc?
@@ -365,32 +480,43 @@ browser uses the previously cached redemption record instead of redeeming a new
 token.
 -->
 
-Browser carries out the following steps when a redemption request is fetched.
+To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
+ 1. Set redemption procedure result in `Sec-Private-State-Token` request header.
+ 1. Set `Sec-Private-State-Token-Version` header value to the cryptographic protocol used.
+ 1. Optionally, set `Sec-Private-State-Token-Lifetime` header.
+ 1. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
 
- 1. Reject if the document is not in a secure context [[secure-contexts]].
- 2. Reject if associating the issuer with the top level origin would exceed the
-           top level’s number-of-issuers limit of 2.
- 3. Associate the issuer with the top level origin.
- 4. If `refreshPolicy` is `'none'`,
-        a. If an unexpired redemption record exists in permenant storage,
-              return early, add this redemption record to corresponding
-              header value. Go to step 11.
-        b. Else continue redemption.
- 5. If this is the third token exhausting redemption request within the
+Issue: This algorithm should append structured headers using [=header list/set a structured field value=]
+
+To <dfn>append private state token redemption request headers</dfn> given a [=/request=] |request|, run the following steps:
+
+ 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+ 1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
+ 1. If |request|'s [=request/client=] is not a [=secure context=], return.
+ 1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
+ 1. [=Associate the issuer=] |issuer| with |topLevel|.
+ 1. If |request|'s [=request/token refresh policy=] is `"none"`:
+     1. Let |record| be the result of [=get an unexpired redemption record|getting an unexpired redemption record=].
+     1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
+ 1. If this is the third token exhausting redemption request within the
        last 48 hours, return error.
- 6. Look up the key commitments from storage. Error out if key commitments are
-         unavailable.
- 7. Discard tokens from issuer that are signed with keys other than those from
+
+      Issue: Need to define how that is determined
+
+ 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer| and |topLevel|.
+ 1. If |commitments| is [=list/empty=], return.
+ 1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
             the issuer's most recent commitments.
- 8. Return error if there are no tokens stored to redeem.
- 9. Retrieve a single token from persistent storage.
- 10. Pass token to cryptographic redemption procedure, if procedure fails
-         return error.
- 11. Set redemption procedure result in `Sec-Private-State-Token` request header.
- 12. Set `Sec-Private-State-Token-Version` header value to the cryptographic protocol
-          used.
- 13. Optionally, set `Sec-Private-State-Token-Lifetime` header.
- 14. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
+
+    Issue: This probably needs to be its own algorithm, how is "most recent" defined here?
+
+ 1. Let |token| be the result of [=retrieve a token|retrieving a token=] for |issuer|.
+ 1. If |token| is null, return.
+ 1. Let |record| be the result of running a cryptographic redemption procedure with |token|. If the procedure fails, return.
+
+    Issue: This needs to be specified more clearly
+
+ 1. [=Set redemption headers=] with |request| and |record|.
 
 `Sec-Private-State-Token-Lifetime` response header indicates how long (in seconds) the
 RR should be cached for. When `Sec-Private-State-Token-Lifetime` response header value
@@ -419,6 +545,14 @@ expiration time for the redemption record provided. This expiration is
 specified as number of seconds in the `Sec-Private-State-Token-Lifetime` HTTP response
 header value.
 
+A <dfn>Redemption Record</dfn> is a [=struct=] with the following items:
+
+ISSUE(150): Define RR here.
+
+To <dfn>get an unexpired [=Redemption Record=]</dfn> with an [=/origin=] |issuer| and an [=/origin=] |topLevel|:
+
+1. TODO
+
 <h3 id="the-document-object">Changes to {{Document}}</h3>
 
 <pre class="idl">
@@ -430,27 +564,6 @@ partial interface Document {
 
 Query APIs {#query-apis}
 ========================
-
-To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
-
-1. Let |limit| be 2.
-2. TODO
-
-To <dfn>associate the issuer</dfn> |issuer| (an [=/origin=]) with the [=/origin=] |topLevel|, run the following steps:
-
-1. TODO
-
-To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
-
-1. TODO
-
-To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a given [=/origin=] |topLevel|, run the following steps:
-
-1. TODO
-
-To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
-
-1. TODO
 
 Token Query {#token-query}
 --------------------------
