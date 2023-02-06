@@ -304,7 +304,7 @@ specified in the request `Sec-Private-State-Token-Version` header. Encoding the 
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the `Sec-Private-State-Token` response header
 value encoded as a base64 byte string. The number of tokens issued is returned
-in `Sec-PST-Count` header. Value of this header is the string message of
+in `Sec-Private-State-Token-Count` header. Value of this header is the string message of
 
 ```
 Issuing <number of tokens> tokens.
