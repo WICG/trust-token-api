@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 859efb4bd, updated Fri Jan 27 16:04:01 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="73fabafcfe64a3a80a06aa6a49b7a79632db16ab" name="document-revision">
+  <meta content="4700840116aef21b156698895056c5808a7af77d" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -585,13 +585,14 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-02-01">1 February 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-02-07">7 February 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/trust-token-api/">https://wicg.github.io/trust-token-api/</a>
      <dt>Issue Tracking:
      <dd><a href="https://github.com/WICG/trust-token-api/issues/">GitHub</a>
+     <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:aykutb@google.com">Aykut Bulut</a> (<a class="p-org org" href="https://www.google.com/">Google</a>)
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:svaldez@google.com">Steven Valdez</a> (<a class="p-org org" href="https://www.google.com/">Google</a>)
@@ -648,26 +649,42 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#redemption-record-query"><span class="secno">6.2</span> <span class="content">Redemption Record Query</span></a>
      </ol>
     <li>
-     <a href="#privacy"><span class="secno">7</span> <span class="content">Privacy Considerations</span></a>
+     <a href="#pst-http-header-fields"><span class="secno">7</span> <span class="content">Private State Token HTTP Header Fields</span></a>
      <ol class="toc">
-      <li><a href="#unlinkability"><span class="secno">7.1</span> <span class="content">Unlinkability</span></a>
+      <li><a href="#sec-private-state-token"><span class="secno">7.1</span> <span class="content">The 'Sec-Private-State-Token' Header Field</span></a>
+      <li><a href="#sec-private-state-token-count"><span class="secno">7.2</span> <span class="content">The 'Sec-Private-State-Token-Count' Header Field</span></a>
+      <li><a href="#sec-private-state-token-lifetime"><span class="secno">7.3</span> <span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span></a>
+      <li><a href="#sec-private-state-token-version"><span class="secno">7.4</span> <span class="content">The 'Sec-Private-State-Token-Version' Header Field</span></a>
+     </ol>
+    <li>
+     <a href="#privacy"><span class="secno">8</span> <span class="content">Privacy Considerations</span></a>
+     <ol class="toc">
+      <li><a href="#unlinkability"><span class="secno">8.1</span> <span class="content">Unlinkability</span></a>
       <li>
-       <a href="#limit-encoded-info"><span class="secno">7.2</span> <span class="content">Limiting Encoded Information</span></a>
+       <a href="#limit-encoded-info"><span class="secno">8.2</span> <span class="content">Limiting Encoded Information</span></a>
        <ol class="toc">
-        <li><a href="#potential-attack-side-channel-fingerprinting"><span class="secno">7.2.1</span> <span class="content">Potential Attack: Side Channel Fingerprinting</span></a>
+        <li><a href="#potential-attack-side-channel-fingerprinting"><span class="secno">8.2.1</span> <span class="content">Potential Attack: Side Channel Fingerprinting</span></a>
        </ol>
       <li>
-       <a href="#cross-site-info"><span class="secno">7.3</span> <span class="content">Cross-site Information Transfer</span></a>
+       <a href="#cross-site-info"><span class="secno">8.3</span> <span class="content">Cross-site Information Transfer</span></a>
        <ol class="toc">
-        <li><a href="#mitigation-dynamic-issuance-redemption-limits"><span class="secno">7.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span></a>
-        <li><a href="#mitigation-per-site-issuer-limits"><span class="secno">7.3.2</span> <span class="content">Mitigation: Per-Site Issuer Limits</span></a>
+        <li><a href="#mitigation-dynamic-issuance-redemption-limits"><span class="secno">8.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span></a>
+        <li><a href="#mitigation-per-site-issuer-limits"><span class="secno">8.3.2</span> <span class="content">Mitigation: Per-Site Issuer Limits</span></a>
        </ol>
      </ol>
     <li>
-     <a href="#security"><span class="secno">8</span> <span class="content">Security Considerations</span></a>
+     <a href="#security"><span class="secno">9</span> <span class="content">Security Considerations</span></a>
      <ol class="toc">
-      <li><a href="#token-exhaustion"><span class="secno">8.1</span> <span class="content">Preventing Token Exhaustion</span></a>
-      <li><a href="#preventing-double-spend"><span class="secno">8.2</span> <span class="content">Preventing Double Spending</span></a>
+      <li><a href="#token-exhaustion"><span class="secno">9.1</span> <span class="content">Preventing Token Exhaustion</span></a>
+      <li><a href="#preventing-double-spend"><span class="secno">9.2</span> <span class="content">Preventing Double Spending</span></a>
+     </ol>
+    <li>
+     <a href="#iana-considerations"><span class="secno">10</span> <span class="content">IANA Considerations</span></a>
+     <ol class="toc">
+      <li><a href="#iana-sec-private-state-token"><span class="secno">10.1</span> <span class="content">'Sec-Private-State-Token' Header Field</span></a>
+      <li><a href="#iana-sec-private-state-token-count"><span class="secno">10.2</span> <span class="content">'Sec-Private-State-Token-Count' Header Field</span></a>
+      <li><a href="#iana-sec-private-state-token-lifetime"><span class="secno">10.3</span> <span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span></a>
+      <li><a href="#iana-sec-private-state-token-version"><span class="secno">10.4</span> <span class="content">'Sec-Private-State-Token-Version' Header Field</span></a>
      </ol>
     <li><a href="#acknowledgments"><span class="secno"></span> <span class="content">Acknowledgments</span></a>
     <li>
@@ -689,6 +706,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
      </ol>
     <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
+    <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
    </ol>
   </nav>
   <main>
@@ -879,7 +897,7 @@ specified in the request <code>Sec-Private-State-Token-Version</code> header. En
 passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
 step. Issuer returns the signed tokens in the <code>Sec-Private-State-Token</code> response header
 value encoded as a base64 byte string. The number of tokens issued is returned
-in <code>Sec-TT-Count</code> header. Value of this header is the string message of</p>
+in <code>Sec-Private-State-Token-Count</code> header. Value of this header is the string message of</p>
 <pre>Issuing &lt;number of tokens> tokens.
 </pre>
    <p>with the right nonnegative integer value that specifies the tokens issued.</p>
@@ -1088,15 +1106,55 @@ origin. There is no need to associate the issuer queried with the top level
 origin, because, answer to the redemption query does not leak information about
 the issuers of the currently stored tokens. Similar to token query, redemption
 query clears stale tokens.</p>
-   <h2 class="heading settled" data-level="7" id="privacy"><span class="secno">7. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy"></a></h2>
-   <h3 class="heading settled" data-level="7.1" id="unlinkability"><span class="secno">7.1. </span><span class="content">Unlinkability</span><a class="self-link" href="#unlinkability"></a></h3>
+   <h2 class="heading settled" data-level="7" id="pst-http-header-fields"><span class="secno">7. </span><span class="content">Private State Token HTTP Header Fields</span><a class="self-link" href="#pst-http-header-fields"></a></h2>
+   <h3 class="heading settled" data-level="7.1" id="sec-private-state-token"><span class="secno">7.1. </span><span class="content">The 'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#sec-private-state-token"></a></h3>
+   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token">Sec-Private-State-Token</dfn> <em>request</em> header field sends
+a collection of unsigned, masked tokens during issuance. During redemption, it
+sends a singled signed, unmasked token along with associated redemption
+metadata.</p>
+   <p class="issue" id="issue-ed20d0c8"><a class="self-link" href="#issue-ed20d0c8"></a> Define and link issuance, redemption, masked (formerly blinded), unmasked,
+signed, unsigned</p>
+   <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token">Sec-Private-State-Token</a> <em>response</em> header field sends
+a collection of signed, masked tokens. During redemption it sends the
+just-created signed redemption record.</p>
+   <p class="issue" id="issue-0f07ef70"><a class="self-link" href="#issue-0f07ef70"></a> Link stuff here too.</p>
+   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="termref-for-">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
+   <p>The header’s ABNF is:</p>
+<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token</c-> <c- o>=</c-> <c- nc>sf-string</c->
+</pre>
+   <h3 class="heading settled" data-level="7.2" id="sec-private-state-token-count"><span class="secno">7.2. </span><span class="content">The 'Sec-Private-State-Token-Count' Header Field</span><a class="self-link" href="#sec-private-state-token-count"></a></h3>
+   <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-count"><code>Sec-Private-State-Token-Count</code><a class="self-link" href="#http-headerdef-sec-private-state-token-count"></a></dfn> header field gives
+the number of tokens issued in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①"><code>Sec-Private-State-Token</code></a> response header.</p>
+   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="termref-for-①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
+   <p>The header’s ABNF is:</p>
+<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Count</c-> <c- o>=</c-> <c- l>%s"Issuing "</c-> <c- nc>sf-integer</c-> <c- l>%s" tokens."</c->
+</pre>
+   <p class="issue" id="issue-7ece1607"><a class="self-link" href="#issue-7ece1607"></a> Do we really want to end the header with a period "."?</p>
+   <h3 class="heading settled" data-level="7.3" id="sec-private-state-token-lifetime"><span class="secno">7.3. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
+   <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code><a class="self-link" href="#http-headerdef-sec-private-state-token-lifetime"></a></dfn> response header
+field gives the expiration for the redemption record 
+given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
+   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="termref-for-②">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1①">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
+   <p>The header’s ABNF is:</p>
+<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
+</pre>
+   <h3 class="heading settled" data-level="7.4" id="sec-private-state-token-version"><span class="secno">7.4. </span><span class="content">The 'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-version"></a></h3>
+   <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code><a class="self-link" href="#http-headerdef-sec-private-state-token-version"></a></dfn> header field gives
+the "major version" of Private State Token protocol.</p>
+   <p class="issue" id="issue-411a11f5"><a class="self-link" href="#issue-411a11f5"></a> Define what "major version" actually means.</p>
+   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="termref-for-③">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3①">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
+   <p>The header’s ABNF is:</p>
+<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Version</c-> <c- o>=</c-> <c- nc>sf-string</c->
+</pre>
+   <h2 class="heading settled" data-level="8" id="privacy"><span class="secno">8. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy"></a></h2>
+   <h3 class="heading settled" data-level="8.1" id="unlinkability"><span class="secno">8.1. </span><span class="content">Unlinkability</span><a class="self-link" href="#unlinkability"></a></h3>
    <p>Cryptographic protocols <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> provide blind signatures. At
 redemption time, issuers can recognize their signature on the provided token,
 however they can not determine at what time and context they signed the token.
 This prevents issuers to correlate their issuances on an origin with
 redemptions on another origin. Issuers learn only the aggregate information
 about the origins users visit.</p>
-   <h3 class="heading settled" data-level="7.2" id="limit-encoded-info"><span class="secno">7.2. </span><span class="content">Limiting Encoded Information</span><a class="self-link" href="#limit-encoded-info"></a></h3>
+   <h3 class="heading settled" data-level="8.2" id="limit-encoded-info"><span class="secno">8.2. </span><span class="content">Limiting Encoded Information</span><a class="self-link" href="#limit-encoded-info"></a></h3>
    <p>Browsers enforce limit on the number of keys for an issuer. For <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> number of keys are limited to six and for <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> number of keys are limited to
 three. This is to prevent issuers de-anonymizing the clients by using a unique
 keys for each clients. At issuance time, when using <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a>, the issuer can
@@ -1105,13 +1163,13 @@ Similarly, when using <a data-link-type="biblio" href="#biblio-pmb" title="Anony
 labels by using its three keys and store an additional private bit value.  This
 indicates it also places browser into one of six buckets (2 x 3 = 6). Both <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> encode the same amount of information in a token. The
 difference is <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> having a private bit.</p>
-   <h4 class="heading settled" data-level="7.2.1" id="potential-attack-side-channel-fingerprinting"><span class="secno">7.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting</span><a class="self-link" href="#potential-attack-side-channel-fingerprinting"></a></h4>
+   <h4 class="heading settled" data-level="8.2.1" id="potential-attack-side-channel-fingerprinting"><span class="secno">8.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting</span><a class="self-link" href="#potential-attack-side-channel-fingerprinting"></a></h4>
    <p>Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the browser at redemption time with
 the browser at token issuance time, even though the Private State Token API
 itself has only stored and revealed limited amount of information about the
 browser.</p>
-   <h3 class="heading settled" data-level="7.3" id="cross-site-info"><span class="secno">7.3. </span><span class="content">Cross-site Information Transfer</span><a class="self-link" href="#cross-site-info"></a></h3>
+   <h3 class="heading settled" data-level="8.3" id="cross-site-info"><span class="secno">8.3. </span><span class="content">Cross-site Information Transfer</span><a class="self-link" href="#cross-site-info"></a></h3>
    <p>Private State Tokens transfer limited information between first-party contexts.
 Underlying cryptographic protocols guarantee that each token only contains a
 small amount of information. Still, if we allow many token redemptions on a
@@ -1122,30 +1180,58 @@ Separate from the concern of channels allowing arbitrary communication between
 domains, some identification attacks---for instance, a malicious redeemer
 attempting to learn the exact set of issuers that have granted tokens to a
 particular user, which could be identifying---have similar mitigations.</p>
-   <h4 class="heading settled" data-level="7.3.1" id="mitigation-dynamic-issuance-redemption-limits"><span class="secno">7.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#mitigation-dynamic-issuance-redemption-limits"></a></h4>
+   <h4 class="heading settled" data-level="8.3.1" id="mitigation-dynamic-issuance-redemption-limits"><span class="secno">8.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#mitigation-dynamic-issuance-redemption-limits"></a></h4>
    <p>To mitigate this attack, browser places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
 browser does not allow a third redemption in a 48 hour window.</p>
-   <h4 class="heading settled" data-level="7.3.2" id="mitigation-per-site-issuer-limits"><span class="secno">7.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#mitigation-per-site-issuer-limits"></a></h4>
+   <h4 class="heading settled" data-level="8.3.2" id="mitigation-per-site-issuer-limits"><span class="secno">8.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#mitigation-per-site-issuer-limits"></a></h4>
    <p>The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the browser allows
 association of at most two issers per top level origin. Issuers are associated
 with top level origins for token query API as well, see <a href="#token-query">§ 6.1 Token Query</a>.</p>
-   <h2 class="heading settled" data-level="8" id="security"><span class="secno">8. </span><span class="content">Security Considerations</span><a class="self-link" href="#security"></a></h2>
-   <h3 class="heading settled" data-level="8.1" id="token-exhaustion"><span class="secno">8.1. </span><span class="content">Preventing Token Exhaustion</span><a class="self-link" href="#token-exhaustion"></a></h3>
+   <h2 class="heading settled" data-level="9" id="security"><span class="secno">9. </span><span class="content">Security Considerations</span><a class="self-link" href="#security"></a></h2>
+   <h3 class="heading settled" data-level="9.1" id="token-exhaustion"><span class="secno">9.1. </span><span class="content">Preventing Token Exhaustion</span><a class="self-link" href="#token-exhaustion"></a></h3>
    <p>Malicious origins might attempt to exhaust all tokens stored in the browser by
 redeeming them all. To prevent this, the browser limits number of redemption
 operations. In an origin first two redemptions are allowed, however, the third
 redemption is not allowed in a 48 hour window. The third redemption is allowed
 once more than 48 hours have elapsed since the first redemption.</p>
-   <h3 class="heading settled" data-level="8.2" id="preventing-double-spend"><span class="secno">8.2. </span><span class="content">Preventing Double Spending</span><a class="self-link" href="#preventing-double-spend"></a></h3>
+   <h3 class="heading settled" data-level="9.2" id="preventing-double-spend"><span class="secno">9.2. </span><span class="content">Preventing Double Spending</span><a class="self-link" href="#preventing-double-spend"></a></h3>
    <p>Issuers can verify that each token is seen only once, because every redemption
 is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user’s tokens, the tokens will run out over time.
 Issuers can sign fewer tokens at a time to mitigate the risk.</p>
+   <h2 class="heading settled" data-level="10" id="iana-considerations"><span class="secno">10. </span><span class="content">IANA Considerations</span><a class="self-link" href="#iana-considerations"></a></h2>
+   <p>This document intends to define the <code>Sec-Private-State-Token</code>, <code>Sec-Private-State-Token-Count</code>, <code>Sec-Private-State-Token-Lifetime</code>, <code>Sec-Private-State-Token-Version</code>, HTTP request header fields, and register
+them in the permenant message header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="HTTP Semantics">[RFC9110]</a>).</p>
+   <h3 class="heading settled" data-level="10.1" id="iana-sec-private-state-token"><span class="secno">10.1. </span><span class="content">'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#iana-sec-private-state-token"></a></h3>
+   <p>Header field name: Sec-Private-State-Token</p>
+   <p>Applicable protocol: http</p>
+   <p>Status: standard</p>
+   <p>Author/Change controller: IETF</p>
+   <p>Specification document: this specification (<a href="#sec-private-state-token">§ 7.1 The 'Sec-Private-State-Token' Header Field</a>)</p>
+   <h3 class="heading settled" data-level="10.2" id="iana-sec-private-state-token-count"><span class="secno">10.2. </span><span class="content">'Sec-Private-State-Token-Count' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-count"></a></h3>
+   <p>Header field name: Sec-Private-State-Token-Count</p>
+   <p>Applicable protocol: http</p>
+   <p>Status: standard</p>
+   <p>Author/Change controller: IETF</p>
+   <p>Specification document: this specification (<a href="#sec-private-state-token-count">§ 7.2 The 'Sec-Private-State-Token-Count' Header Field</a>)</p>
+   <h3 class="heading settled" data-level="10.3" id="iana-sec-private-state-token-lifetime"><span class="secno">10.3. </span><span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-lifetime"></a></h3>
+   <p>Header field name: Sec-Private-State-Token-Lifetime</p>
+   <p>Applicable protocol: http</p>
+   <p>Status: standard</p>
+   <p>Author/Change controller: IETF</p>
+   <p>Specification document: this specification (<a href="#sec-private-state-token-lifetime">§ 7.3 The 'Sec-Private-State-Token-Lifetime' Header Field</a>)</p>
+   <h3 class="heading settled" data-level="10.4" id="iana-sec-private-state-token-version"><span class="secno">10.4. </span><span class="content">'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-version"></a></h3>
+   <p>Header field name: Sec-Private-State-Token-Version</p>
+   <p>Applicable protocol: http</p>
+   <p>Status: standard</p>
+   <p>Author/Change controller: IETF</p>
+   <p>Specification document: this specification (<a href="#sec-private-state-token-version">§ 7.4 The 'Sec-Private-State-Token-Version' Header Field</a>)</p>
    <h2 class="no-num heading settled" id="acknowledgments"><span class="content">Acknowledgments</span><a class="self-link" href="#acknowledgments"></a></h2>
-   <p>Thanks to Charlie Harrison, David Van Cleve and Kaustubha Govind for their
-contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
+   <p>Thanks to Charlie Harrison, David Van Cleve, Johann Hofmann, Kaustubha Govind,
+and Mike Taylor for their contributions. Thanks to Chris Wilson for reviewing
+and mentoring this spec.</p>
   </main>
   <div data-fill-with="conformance">
    <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
@@ -1199,6 +1285,10 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#dom-document-hasredemptionrecord">hasRedemptionRecord(issuer)</a><span>, in § 6.2</span>
    <li><a href="#is-associated-with">is associated with</a><span>, in § 6</span>
    <li><a href="#look-up-the-key-commitments">look up the key commitments</a><span>, in § 6</span>
+   <li><a href="#http-headerdef-sec-private-state-token">Sec-Private-State-Token</a><span>, in § 7.1</span>
+   <li><a href="#http-headerdef-sec-private-state-token-count">Sec-Private-State-Token-Count</a><span>, in § 7.2</span>
+   <li><a href="#http-headerdef-sec-private-state-token-lifetime">Sec-Private-State-Token-Lifetime</a><span>, in § 7.3</span>
+   <li><a href="#http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a><span>, in § 7.4</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-document">
    <a href="https://dom.spec.whatwg.org/#document">https://dom.spec.whatwg.org/#document</a><b>Referenced in:</b>
@@ -1270,6 +1360,29 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
    <ul>
     <li><a href="#ref-for-concept-environment-top-level-origin">6.1. Token Query</a>
     <li><a href="#ref-for-concept-environment-top-level-origin①">6.2. Redemption Record Query</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-section-3.3.1">
+   <a href="https://tools.ietf.org/html/rfc8941#section-3.3.1">https://tools.ietf.org/html/rfc8941#section-3.3.1</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-section-3.3.1">7.2. The 'Sec-Private-State-Token-Count' Header Field</a>
+    <li><a href="#ref-for-section-3.3.1①">7.3. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-section-3.3.3">
+   <a href="https://tools.ietf.org/html/rfc8941#section-3.3.3">https://tools.ietf.org/html/rfc8941#section-3.3.3</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-section-3.3.3">7.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#ref-for-section-3.3.3①">7.4. The 'Sec-Private-State-Token-Version' Header Field</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://tools.ietf.org/html/rfc8941#">https://tools.ietf.org/html/rfc8941#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">7.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#termref-for-">7.2. The 'Sec-Private-State-Token-Count' Header Field</a>
+    <li><a href="#termref-for-">7.3. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#termref-for-">7.4. The 'Sec-Private-State-Token-Version' Header Field</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-url-parser">
@@ -1369,6 +1482,13 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
      <li><span class="dfn-paneled" id="term-for-concept-environment-top-level-origin">top-level origin</span>
     </ul>
    <li>
+    <a data-link-type="biblio">[RFC8941]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-section-3.3.1">integer</span>
+     <li><span class="dfn-paneled" id="term-for-section-3.3.3">string</span>
+     <li><span class="dfn-paneled" id="term-for-">structured header</span>
+    </ul>
+   <li>
     <a data-link-type="biblio">[URL]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-concept-url-parser">url parser</span>
@@ -1397,6 +1517,8 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/"><cite>HTML Standard</cite></a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
+   <dt id="biblio-rfc8941">[RFC8941]
+   <dd>M. Nottingham; P-H. Kamp. <a href="https://www.rfc-editor.org/rfc/rfc8941"><cite>Structured Field Values for HTTP</cite></a>. February 2021. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc8941">https://www.rfc-editor.org/rfc/rfc8941</a>
    <dt id="biblio-url">[URL]
    <dd>Anne van Kesteren. <a href="https://url.spec.whatwg.org/"><cite>URL Standard</cite></a>. Living Standard. URL: <a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
    <dt id="biblio-webidl">[WEBIDL]
@@ -1426,6 +1548,8 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
    <dd>E. Rescorla. <a href="https://www.rfc-editor.org/rfc/rfc8446"><cite>The Transport Layer Security (TLS) Protocol Version 1.3</cite></a>. August 2018. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>
    <dt id="biblio-rfc8536">[RFC8536]
    <dd>A. Olson; P. Eggert; K. Murchison. <a href="https://www.rfc-editor.org/rfc/rfc8536"><cite>The Time Zone Information Format (TZif)</cite></a>. February 2019. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc8536">https://www.rfc-editor.org/rfc/rfc8536</a>
+   <dt id="biblio-rfc9110">[RFC9110]
+   <dd>R. Fielding, Ed.; M. Nottingham, Ed.; J. Reschke, Ed.. <a href="https://www.rfc-editor.org/rfc/rfc9110"><cite>HTTP Semantics</cite></a>. June 2022. Internet Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>
    <dt id="biblio-secure-contexts">[SECURE-CONTEXTS]
    <dd>Mike West. <a href="https://w3c.github.io/webappsec-secure-contexts/"><cite>Secure Contexts</cite></a>. URL: <a href="https://w3c.github.io/webappsec-secure-contexts/">https://w3c.github.io/webappsec-secure-contexts/</a>
    <dt id="biblio-voprf">[VOPRF]
@@ -1438,6 +1562,14 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
 };
 
 </pre>
+  <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
+  <div style="counter-reset:issue">
+   <div class="issue"> Define and link issuance, redemption, masked (formerly blinded), unmasked,
+signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to section">↵</a></div>
+   <div class="issue"> Link stuff here too. <a class="issue-return" href="#issue-0f07ef70" title="Jump to section">↵</a></div>
+   <div class="issue"> Do we really want to end the header with a period "."? <a class="issue-return" href="#issue-7ece1607" title="Jump to section">↵</a></div>
+   <div class="issue"> Define what "major version" actually means. <a class="issue-return" href="#issue-411a11f5" title="Jump to section">↵</a></div>
+  </div>
   <aside class="dfn-panel" data-for="determine-whether-associating-an-issuer-would-exceed-the-top-level-limit">
    <b><a href="#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit">#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit</a></b><b>Referenced in:</b>
    <ul>
@@ -1480,6 +1612,14 @@ contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.</p>
    <b><a href="#dom-document-hasredemptionrecord">#dom-document-hasredemptionrecord</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-document-hasredemptionrecord">5.2. Changes to Document</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="http-headerdef-sec-private-state-token">
+   <b><a href="#http-headerdef-sec-private-state-token">#http-headerdef-sec-private-state-token</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token">7.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token①">7.2. The 'Sec-Private-State-Token-Count' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token②">7.3. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
