@@ -54,6 +54,15 @@ Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
     }
 }
 </pre>
+<pre class="anchors">
+urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
+    type: dfn
+        text: structured header; url: #
+    for: structured header
+        type: dfn
+            text: integer; url: #section-3.3.1
+            text: string; url: #section-3.3.3
+</pre>
 
 
 **This is a working version and is subject to change.**
@@ -295,7 +304,7 @@ specified in the request `Sec-Private-State-Token-Version` header. Encoding the 
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the `Sec-Private-State-Token` response header
 value encoded as a base64 byte string. The number of tokens issued is returned
-in `Sec-TT-Count` header. Value of this header is the string message of
+in `Sec-Private-State-Token-Count` header. Value of this header is the string message of
 
 ```
 Issuing <number of tokens> tokens.
@@ -498,6 +507,90 @@ origin, because, answer to the redemption query does not leak information about
 the issuers of the currently stored tokens. Similar to token query, redemption
 query clears stale tokens.
 
+Private State Token HTTP Header Fields {#pst-http-header-fields}
+=================================
+
+The 'Sec-Private-State-Token' Header Field {#sec-private-state-token}
+----------------------------
+
+The <dfn http-header>Sec-Private-State-Token</dfn> *request* header field sends
+a collection of unsigned, masked tokens during issuance. During redemption, it
+sends a singled signed, unmasked token along with associated redemption
+metadata.
+
+Issue: Define and link issuance, redemption, masked (formerly blinded), unmasked,
+signed, unsigned
+
+The <a http-header>Sec-Private-State-Token</a> *response* header field sends
+a collection of signed, masked tokens. During redemption it sends the
+just-created signed redemption record.
+
+Issue: Link stuff here too.
+
+It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
+[[!RFC8941]].
+
+The header’s ABNF is:
+
+``` abnf
+Sec-Private-State-Token = sf-string
+```
+
+
+The 'Sec-Private-State-Token-Count' Header Field {#sec-private-state-token-count}
+----------------------------
+
+The <dfn http-header>`Sec-Private-State-Token-Count`</dfn> header field gives
+the number of tokens issued in the associated
+<a http-header>`Sec-Private-State-Token`</a> response header.
+
+It is a [=Structured Header=] whose value MUST be an [=structured header/integer=]
+[[!RFC8941]].
+
+The header’s ABNF is:
+
+``` abnf
+Sec-Private-State-Token-Count = %s"Issuing " sf-integer %s" tokens."
+```
+
+Issue: Do we really want to end the header with a period "."?
+
+
+The 'Sec-Private-State-Token-Lifetime' Header Field {#sec-private-state-token-lifetime}
+----------------------------
+
+The <dfn http-header>`Sec-Private-State-Token-Lifetime`</dfn> response header
+field gives the expiration for the redemption record <!-- TODO: link to dfn -->
+given in the associated <a http-header>`Sec-Private-State-Token`</a>
+response header. The expiration is given in seconds.
+
+It is a [=Structured Header=] whose value MUST be an [=structured header/integer=]
+[[!RFC8941]].
+
+The header’s ABNF is:
+
+``` abnf
+Sec-Private-State-Token-Lifetime = sf-integer
+```
+
+
+The 'Sec-Private-State-Token-Version' Header Field {#sec-private-state-token-version}
+----------------------------
+
+The <dfn http-header>`Sec-Private-State-Token-Version`</dfn> header field gives
+the "major version" of Private State Token protocol.
+
+ISSUE: Define what "major version" actually means.
+
+It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
+[[!RFC8941]].
+
+The header’s ABNF is:
+
+``` abnf
+Sec-Private-State-Token-Version = sf-string
+```
+
 
 Privacy Considerations {#privacy}
 =================================
@@ -582,7 +675,71 @@ is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user's tokens, the tokens will run out over time.
 Issuers can sign fewer tokens at a time to mitigate the risk.
 
+IANA Considerations {#iana-considerations}
+==========================================
+
+This document intends to define the `Sec-Private-State-Token`,
+`Sec-Private-State-Token-Count`, `Sec-Private-State-Token-Lifetime`,
+`Sec-Private-State-Token-Version`, HTTP request header fields, and register
+them in the permenant message header field registry ([[RFC9110]]).
+
+'Sec-Private-State-Token' Header Field {#iana-sec-private-state-token}
+------------------------
+
+Header field name: Sec-Private-State-Token
+
+Applicable protocol: http
+
+Status: standard
+
+Author/Change controller: IETF
+
+Specification document: this specification ([[#sec-private-state-token]])
+
+
+'Sec-Private-State-Token-Count' Header Field {#iana-sec-private-state-token-count}
+------------------------
+
+Header field name: Sec-Private-State-Token-Count
+
+Applicable protocol: http
+
+Status: standard
+
+Author/Change controller: IETF
+
+Specification document: this specification ([[#sec-private-state-token-count]])
+
+
+'Sec-Private-State-Token-Lifetime' Header Field {#iana-sec-private-state-token-lifetime}
+------------------------
+
+Header field name: Sec-Private-State-Token-Lifetime
+
+Applicable protocol: http
+
+Status: standard
+
+Author/Change controller: IETF
+
+Specification document: this specification ([[#sec-private-state-token-lifetime]])
+
+
+'Sec-Private-State-Token-Version' Header Field {#iana-sec-private-state-token-version}
+------------------------
+
+Header field name: Sec-Private-State-Token-Version
+
+Applicable protocol: http
+
+Status: standard
+
+Author/Change controller: IETF
+
+Specification document: this specification ([[#sec-private-state-token-version]])
+
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
-Thanks to Charlie Harrison, David Van Cleve and Kaustubha Govind for their
-contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.
+Thanks to Charlie Harrison, David Van Cleve, Johann Hofmann, Kaustubha Govind,
+and Mike Taylor for their contributions. Thanks to Chris Wilson for reviewing
+and mentoring this spec.
