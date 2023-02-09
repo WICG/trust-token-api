@@ -306,8 +306,7 @@ Issue(151): Need to specify how `operation` and `issuers` are used.
 This specification adds a new property to the {{RequestInit}} dictionary:
 
 <pre class=idl>
-dictionary RequestInit {
-  // existing attributes ...
+partial dictionary RequestInit {
   PrivateStateToken privateStateToken;
 };
 </pre>
