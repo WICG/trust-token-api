@@ -286,6 +286,10 @@ enum RefreshPolicy { "none", "refresh" };
 </pre>
 
 <pre class=idl>
+enum TokenType { "private-state-token" };
+</pre>
+
+<pre class=idl>
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
 </pre>
 
@@ -556,8 +560,8 @@ To <dfn>get an unexpired [=Redemption Record=]</dfn> with an [=/origin=] |issuer
 
 <pre class="idl">
 partial interface Document {
-  Promise&lt;boolean> hasPrivateTokens(USVString issuer);
-  Promise&lt;boolean> hasRedemptionRecord(USVString issuer);
+  Promise&lt;boolean> hasPrivateTokens(USVString issuer, USVString type);
+  Promise&lt;boolean> hasRedemptionRecord(USVString issuer, USVString type);
 };
 </pre>
 
@@ -567,11 +571,12 @@ Query APIs {#query-apis}
 Token Query {#token-query}
 --------------------------
 
-When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasPrivateTokens(issuer)</code></dfn> method must run these steps:
+When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}} |type|, the <dfn export method for=Document><code>hasPrivateTokens(issuer, type)</code></dfn> method must run these steps:
 1. Let |p| be [=a new promise=].
 1. If |doc| is not [=Document/fully active=], then [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
 1. Let |global| be |doc|'s [=relevant global object=].
 1. If |global| is not a [=secure context=], then [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
+1. If |type| is not `"private-state-token"`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
 1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |origin| be |parsedURL|'s [=/origin=].
@@ -594,12 +599,13 @@ at Step 4.
 Redemption Record Query {#redemption-record-query}
 --------------------------------------------------
 
-When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasRedemptionRecord(issuer)</code></dfn> method must run these steps:
+When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}} |type|, the <dfn export method for=Document><code>hasRedemptionRecord(issuer, type)</code></dfn> method must run these steps:
 
 1. Let |p| be [=a new promise=].
 1. If |doc| is not [=Document/fully active=], then [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
 1. Let |global| be |doc|'s [=relevant global object=].
 1. If |global| is not a [=secure context=], then [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
+1. If |type| is not `"private-state-token"`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
 1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |origin| be |parsedURL|'s [=/origin=].
