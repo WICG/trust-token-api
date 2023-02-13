@@ -732,7 +732,7 @@ indicates it also places browser into one of six buckets (2 x 3 = 6). Both
 [[VOPRF]] and [[PMB]] encode the same amount of information in a token. The
 difference is [[PMB]] having a private bit.
 
-### Potential Attack: Side Channel Fingerprinting
+### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
 
 Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the browser at redemption time with
@@ -754,13 +754,13 @@ domains, some identification attacks---for instance, a malicious redeemer
 attempting to learn the exact set of issuers that have granted tokens to a
 particular user, which could be identifying---have similar mitigations.
 
-### Mitigation: Dynamic Issuance/Redemption Limits
+### Mitigation: Dynamic Issuance/Redemption Limits {#api-usagee-limits}
 
 To mitigate this attack, browser places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
 browser does not allow a third redemption in a 48 hour window.
 
-### Mitigation: Per-Site Issuer Limits
+### Mitigation: Per-Site Issuer Limits {#per-issuer-limits}
 
 The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the browser allows
