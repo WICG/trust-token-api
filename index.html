@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 859efb4bd, updated Fri Jan 27 16:04:01 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="99974f4ffec8dc47a35c91faae274133140ee754" name="document-revision">
+  <meta content="9fb6604c24d1c2fb209562331ed31a37f8ea00c7" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -585,7 +585,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-02-13">13 February 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-02-14">14 February 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -676,7 +676,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li>
        <a href="#cross-site-info"><span class="secno">10.3</span> <span class="content">Cross-site Information Transfer</span></a>
        <ol class="toc">
-        <li><a href="#api-usagee-limits"><span class="secno">10.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits {#api-usagee-limits}</span></a>
+        <li><a href="#api-usage-limits"><span class="secno">10.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}</span></a>
         <li><a href="#per-issuer-limits"><span class="secno">10.3.2</span> <span class="content">Mitigation: Per-Site Issuer Limits {#per-issuer-limits}</span></a>
        </ol>
      </ol>
@@ -1282,7 +1282,7 @@ Separate from the concern of channels allowing arbitrary communication between
 domains, some identification attacks---for instance, a malicious redeemer
 attempting to learn the exact set of issuers that have granted tokens to a
 particular user, which could be identifying---have similar mitigations.</p>
-   <h4 class="heading settled" data-level="10.3.1" id="api-usagee-limits"><span class="secno">10.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits {#api-usagee-limits}</span><a class="self-link" href="#api-usagee-limits"></a></h4>
+   <h4 class="heading settled" data-level="10.3.1" id="api-usage-limits"><span class="secno">10.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}</span><a class="self-link" href="#api-usage-limits"></a></h4>
    <p>To mitigate this attack, browser places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
 browser does not allow a third redemption in a 48 hour window.</p>
