@@ -210,11 +210,9 @@ Requests to key commitment endpoints should result in a JSON response
 
 * `"batchsize"` specifies the maximum number of blinded tokens that the issuer
                 supports for each token issuance operation. Its value is a
-                string representation of a positive integer. Maximum value
-                allowed is 100. If a larger value is specified, 100 will be
-                used. Browser might send fewer tokens in a single operation,
-                but will generally default to sending `batchsize` many tokens
-                per operation.
+                string representation of a positive integer. Browser might send
+                fewer tokens in a single operation, but will generally default to
+                sending `batchsize` many tokens per operation.
 
 * `"keys"` field is a dictionary of public keys listed by their identifiers.
 
@@ -372,10 +370,8 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
     Issue: This probably needs to be its own algorithm, how is "most recent" defined here?
 
  1. Let |maxSize| be |issuer|'s [=max batch size=] or the global limit of 100, whichever is smaller.
- 1. Let |numTokens| be the right number of tokens considering issuer batch size and current
-     number of tokens from the issuer.
-
-    Issue: How does one determine the right number of tokens?
+ 1. Let |numTokens| be the number of tokens to request using the minimum of an [=implementation-defined=]
+     limit on the number of tokens and the issuer's batch size.
 
  1. Let |tokens| be the result of [=generate blinded tokens|generating blinded tokens=] with |numTokens|.
  1. Configure the HTTP request.
