@@ -59,7 +59,7 @@ When an origin is in a context where they trust the user, they can issue the bro
 
 ### Private State Token Issuance
 
-When an issuer.example context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the privateToken parameter:
+When an `issuer.example` context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the privateToken parameter:
 
 
 ```
@@ -76,7 +76,7 @@ fetch('<issuer>/<issuance path>', {
 
 This API will invoke the [Privacy Pass](https://privacypass.github.io) Issuance protocol:
 
-*   Generate a set of nonces.
+*   Generate a set of nonces
 *   Blind them and attach them (in a `Sec-Private-State-Token` header) to the HTTP request
 *   Send a POST to the provided endpoint
 
@@ -110,9 +110,10 @@ fetch('<issuer>/<redemption path>', {
 
 
 If there are no tokens available for the given issuer, the returned promise rejects with an error. Otherwise, it invokes the PrivacyPass redemption protocol against the issuer, with the token (potentially, if specified by an extension, along with associated redemption metadata) attached in the `Sec-Private-State-Token` request header. The issuer can either consume the token and act based on the result, optionally including a Redemption Record (RR) in the `Sec-Private-State-Token` response header to provide a redemption attestation to forward to other parties. Additionally, the issuer may include the `Sec-Private-State-Token-Lifetime` header in the response to indicate to the UA how long (in seconds) the RR should be cached for. When `Sec-Private-State-Token-Lifetime` header value is invalid (too large, a negative number or non-numeric), UA should ignore the `Sec-Private-State-Token-Lifetime` header. When `Sec-Private-State-Token-Lifetime` header value is zero UA should treat the record as expired. In case of multiple `Sec-Private-State-Token-Lifetime` headers, UA uses the last one. If `Sec-Private-State-Token-Lifetime` header is omitted, the lifetime of the RR will be tied to the lifetime of the Private State Token verification key that confirmed the redeemed token's issuance.
+
 The RR is HTTP-only and JavaScript is only able to access/send the RR via Private State Token Fetch APIs. It is also cached in new first-party storage accessible only by these APIs for subsequent visits to that first-party. The RR is treated as an arbitrary blob of bytes from the issuer, that may have semantic meaning to downstream consumers.
 
-UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using following API.
+UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using the following method.
 
 ```
 document.hasRedemptionRecord(<issuer>, 'private-state-token')
@@ -159,7 +160,7 @@ In addition to attesting trust in a user, an issuer may want to provide a limite
 
 This small change opens up a new application for Privacy Passes: embedding small amounts of information along with the token and RR. This increases the rate of cross-site information transfer somewhat, but introduces some new use-cases for private state tokens.
 
-Once the metadata has been passed along to the redemption request, the issuer can include the value in some form in the RR for downstream partneres to read.
+Once the metadata has been passed along to the redemption request, the issuer can include the value in some form in the RR for downstream partners to read.
 
 #### Extension: Public Metadata
 
