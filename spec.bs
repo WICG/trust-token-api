@@ -297,7 +297,7 @@ Integration with Fetch {#fetch-integration}
 Definitions {#definitions}
 ---------------------------------------------------------------
 
-The RefreshPolicy is attached to a redemption request, determining whether or not the
+The {{RefreshPolicy}} is attached to a redemption request, determining whether or not the
 redemption should result in a previously returned, unexpired [=redemption record=] or a
 new one.
 
