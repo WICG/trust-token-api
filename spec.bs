@@ -83,7 +83,7 @@ Goals {#goals}
 
 The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
-privacy pass protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
+privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
 documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
 State Tokens can be considered as a web platform implementation of Privacy
 Pass.
@@ -110,8 +110,8 @@ transfer of authentication information.
 
 Authentication of the clients and token signing are both carried by the same
 entity referred to as the **issuer**. This is the joint attester and issuer
-architecture described in [[PRIVACY-PASS-ARCHITECTURE]],
-[[PRIVACY-PASS-AUTH-SCHEME]].
+architecture described in [[!PRIVACY-PASS-ARCHITECTURE]],
+[[!PRIVACY-PASS-AUTH-SCHEME]].
 
 Browsers store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
@@ -146,11 +146,11 @@ State Token API allows at most 2 different issuers in a top level origin. This
 is to limit the information stored for a user when the issuers are
 collaborating.
 
-Private State Token operations rely on [[FETCH]]. A fetch request corresponding to a
+Private State Token operations rely on [[!FETCH]]. A fetch request corresponding to a
 specific Private State Token operation can be created and used as a parameter to the
 fetch function.
 
-Note: This specification uses the terms "masked" and "unmasked" where [[PMB]]
+Note: This specification uses the terms "masked" and "unmasked" where [[!PMB]]
 uses "blinded" and "unblinded", respectively.
 
 <!--
@@ -173,11 +173,11 @@ An issuer needs to maintain a set of keys and implement the **Issue** and
 required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
-through secure HTTP [[RFC8446]] endpoints. Browsers should fetch the key
+through secure HTTP [[!RFC8446]] endpoints. Browsers should fetch the key
 commitments periodically.
 
 Requests to key commitment endpoints should result in a JSON response
-[[RFC8259]] of the following format.
+[[!RFC8259]] of the following format.
 
 ```javascript
 {
@@ -202,15 +202,15 @@ Requests to key commitment endpoints should result in a JSON response
     `"PrivateStateTokenV3PMB"` or `"PrivateStateTokenV3VOPRF"`. Both protocols have similar
     properties in terms of privacy implications.
 
-    * Protocol version `“PrivateStateTokenV3PMB”` implements [[PMB]] cryptographic
+    * Protocol version `“PrivateStateTokenV3PMB”` implements [[!PMB]] cryptographic
                protocol. In this protocol, each token contains a private
                metadata bit.
 
-    * Protocol version `“PrivateStateTokenV2VOPRF”` implements [[VOPRF]] cryptographic
-               protocol. Contrary to PMB, tokens do not contain private
+    * Protocol version `“PrivateStateTokenV2VOPRF”` implements [[!VOPRF]] cryptographic
+               protocol. Contrary to [[!PMB]], tokens do not contain private
                metadata bits. However, issuers can use twice as many
                concurrently valid token signing keys (six compared to three of
-               PMB).
+               [[!PMB]]).
 
 * `"id"` field provides the identifier of the key commitment. It is a string
          representation of a non-negative integer that is within the range of
@@ -229,7 +229,7 @@ Requests to key commitment endpoints should result in a JSON response
                is within the range of an unsigned 32 bit integer type.
 
          * Each key has a `"Y"` field which is a string representation of a
-                big-endian base64 encoding [[RFC4648]] of the byte string of
+                big-endian base64 encoding [[!RFC4648]] of the byte string of
                 the key.
 
          * `"expiry"` field specifies how long the underlying key is valid. It
@@ -237,7 +237,7 @@ Requests to key commitment endpoints should result in a JSON response
                       is within the range of an unsigned 64 bit integer type.
                       Underlying key expires if this amount many or more
                       microseconds are elapsed since the POSIX epoch
-                      [[RFC8536]].
+                      [[!RFC8536]].
 
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
@@ -439,7 +439,7 @@ Issuer Signing Tokens {#issuer-signing-tokens}
 This section explains the signing of tokens that happens in the issuer
 servers. Information to be encoded in the tokens are passed in the URL `public`
 and `private` parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
-passed in the URL `public` parameter. PMB can encode a value from set {0,1,2}
+passed in the URL `public` parameter. [[!PMB]] can encode a value from set {0,1,2}
 in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the masked tokens obtained in the
@@ -719,7 +719,7 @@ Privacy Considerations {#privacy}
 Unlinkability {#unlinkability}
 ------------------------------
 
-Cryptographic protocols [[VOPRF]] and [[PMB]] provide masked signatures. At
+Cryptographic protocols [[!VOPRF]] and [[!PMB]] provide masked signatures. At
 redemption time, issuers can recognize their signature on the provided token,
 however they can not determine at what time and context they signed the token.
 This prevents issuers to correlate their issuances on an origin with
@@ -730,16 +730,16 @@ about the origins users visit.
 Limiting Encoded Information {#limit-encoded-info}
 --------------------------------------------------
 
-Browsers enforce limit on the number of keys for an issuer. For [[VOPRF]]
-number of keys are limited to six and for [[PMB]] number of keys are limited to
+Browsers enforce limit on the number of keys for an issuer. For [[!VOPRF]]
+number of keys are limited to six and for [[!PMB]] number of keys are limited to
 three. This is to prevent issuers de-anonymizing the clients by using a unique
 keys for each clients. At issuance time, when using [[VOPRF]], the issuer can
 label browser by one of the six available labels by using one of the six keys.
-Similarly, when using [[PMB]], the issuer labels the browser in of the three
+Similarly, when using [[!PMB]], the issuer labels the browser in of the three
 labels by using its three keys and store an additional private bit value.  This
 indicates it also places browser into one of six buckets (2 x 3 = 6). Both
-[[VOPRF]] and [[PMB]] encode the same amount of information in a token. The
-difference is [[PMB]] having a private bit.
+[[!VOPRF]] and [[!PMB]] encode the same amount of information in a token. The
+difference is [[!PMB]] having a private bit.
 
 ### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
 
@@ -802,7 +802,7 @@ IANA Considerations {#iana-considerations}
 This document intends to define the <a http-header>Sec-Private-State-Token</a>,
 <a http-header>Sec-Private-State-Token-Lifetime</a>, <a http-header>Sec-Private-State-Token-Version</a>,
 HTTP request header fields, and register them in the permanent message
-header field registry ([[RFC9110]]).
+header field registry ([[!RFC9110]]).
 
 'Sec-Private-State-Token' Header Field {#iana-sec-private-state-token}
 ------------------------
