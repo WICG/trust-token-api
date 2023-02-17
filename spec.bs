@@ -255,6 +255,15 @@ To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a giv
 
 1. TODO
 
+To <dfn>record redemption timestamp</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
+
+
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
 1. TODO
@@ -501,10 +510,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |request|'s [=request/token refresh policy=] is `"none"`:
      1. Let |record| be the result of [=get an unexpired redemption record|getting an unexpired redemption record=].
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
- 1. If this is the third token exhausting redemption request within the
-       last 48 hours, return error.
-
-      Issue: Need to define how that is determined
+ 1. Let |penultimate_redemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|, if the value is less than an [=implementation-defined=] timeperiod, return error.
 
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer| and |topLevel|.
  1. If |commitments| is [=list/empty=], return.
@@ -520,6 +526,8 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
     Issue: This needs to be specified more clearly
 
  1. [=Set redemption headers=] with |request| and |record|.
+
+ISSUE(165): Add redemption response handling, including calling [= record redemption timestamp =].
 
 `Sec-Private-State-Token-Lifetime` response header indicates how long (in seconds) the
 RR should be cached for. When `Sec-Private-State-Token-Lifetime` response header value
