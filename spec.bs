@@ -717,7 +717,7 @@ about the origins users visit.
 Limiting Encoded Information {#limit-encoded-info}
 --------------------------------------------------
 
-Browsers enforce limits on the number of unique keys an issuer can have at any point in time, to preserve client privacy.  Without limits, an issuer could de-anonymize clients by simply using a unique
+User agents should enforce limits on the number of unique keys an issuer can have at any point in time, to preserve client privacy.  Without limits, an issuer could de-anonymize clients by simply using a unique
 key for each client. For [[VOPRF]], the
 number of keys is limited to six, and for [[PMB]], the number is limited to
 three keys. 
