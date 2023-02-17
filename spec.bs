@@ -484,8 +484,6 @@ The following steps will be added to the [=HTTP fetch=] steps, before checking t
 1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
 1. If |issue response result| is a [=network error=], return |issue response result|.
 
-<span class=XXX>TODO: make the modification directly to the fetch spec.</span>
-
 Redeeming Tokens {#redeeming-tokens}
 ====================================
 
