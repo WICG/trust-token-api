@@ -708,8 +708,8 @@ Unlinkability {#unlinkability}
 
 Cryptographic protocols [[VOPRF]] and [[PMB]] provide masked signatures. At
 redemption time, issuers can recognize their signature on the provided token,
-however they can not determine at what time and context they signed the token.
-This prevents issuers to correlate their issuances on an origin with
+however they can not determine at what time or in which context they signed the token.
+This prevents issuers from correlating their issuances on an origin with
 redemptions on another origin. Issuers learn only the aggregate information
 about the origins users visit.
 
@@ -717,16 +717,14 @@ about the origins users visit.
 Limiting Encoded Information {#limit-encoded-info}
 --------------------------------------------------
 
-Browsers enforce limit on the number of keys for an issuer. For [[VOPRF]]
-number of keys are limited to six and for [[PMB]] number of keys are limited to
-three. This is to prevent issuers de-anonymizing the clients by using a unique
-keys for each clients. At issuance time, when using [[VOPRF]], the issuer can
-label browser by one of the six available labels by using one of the six keys.
-Similarly, when using [[PMB]], the issuer labels the browser in of the three
-labels by using its three keys and store an additional private bit value.  This
-indicates it also places browser into one of six buckets (2 x 3 = 6). Both
-[[VOPRF]] and [[PMB]] encode the same amount of information in a token. The
-difference is [[PMB]] having a private bit.
+Browsers enforce limits on the number of unique keys an issuer can have at any point in time, to preserve client privacy.  Without limits, an issuer could de-anonymize clients by simply using a unique
+key for each client. For [[VOPRF]], the
+number of keys is limited to six, and for [[PMB]], the number is limited to
+three keys. 
+    
+Issuers can utilize different keys to represent different "labels", which correspond to an arbritrary client state, such as client trust level or some other useful anti-fraud signal. Issuers are responsible for understanding this designation and sharing the key "labels" with token redeemers so they know how to interpret the significance of each token. This helps reduce reverse engineering from malicious actors and preserves client privacy over human-readable labels. When using [[VOPRF]], the issuer's 6 keys can effectively represent six labels. Similarly, when using [[PMB]], even though there are only up to three keys, the issuer can still utilize six labels by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels).   Both
+[[VOPRF]] and [[PMB]] encode the same amount of information in a token, however the
+difference is [[PMB]] utilizing a private bit.
 
 ### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
 
