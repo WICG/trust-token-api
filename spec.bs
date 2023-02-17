@@ -419,22 +419,14 @@ Using its private keys, issuer signs the masked tokens obtained in the
 specified in the request `Sec-Private-State-Token-Version` header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the `Sec-Private-State-Token` response header
-value encoded as a base64 byte string. The number of tokens issued is returned
-in `Sec-Private-State-Token-Count` header. Value of this header is the string message of
-
-```
-Issuing <number of tokens> tokens.
-```
-
-with the right nonnegative integer value that specifies the tokens issued.
+value encoded as a base64 byte string.
 
 <div class=example>
-Following snippet displays a typical response demonstrating the Private State Token
-related headers.
+The following snippet displays a typical response demonstrating the Private State Token
+header.
 
 ```
 Sec-Private-State-Token: <token encoded as base64 string>
-Sec-PST-Count: Issuing 3 tokens.
 ```
 </div>
 
@@ -658,25 +650,6 @@ Sec-Private-State-Token = sf-string
 ```
 
 
-The 'Sec-Private-State-Token-Count' Header Field {#sec-private-state-token-count}
-----------------------------
-
-The <dfn http-header>`Sec-Private-State-Token-Count`</dfn> header field gives
-the number of tokens issued in the associated
-<a http-header>`Sec-Private-State-Token`</a> response header.
-
-It is a [=Structured Header=] whose value MUST be an [=structured header/integer=]
-[[!RFC8941]].
-
-The header’s ABNF is:
-
-``` abnf
-Sec-Private-State-Token-Count = %s"Issuing " sf-integer %s" tokens."
-```
-
-Issue: Do we really want to end the header with a period "."?
-
-
 The 'Sec-Private-State-Token-Lifetime' Header Field {#sec-private-state-token-lifetime}
 ----------------------------
 
@@ -800,9 +773,9 @@ IANA Considerations {#iana-considerations}
 ==========================================
 
 This document intends to define the `Sec-Private-State-Token`,
-`Sec-Private-State-Token-Count`, `Sec-Private-State-Token-Lifetime`,
-`Sec-Private-State-Token-Version`, HTTP request header fields, and register
-them in the permenant message header field registry ([[RFC9110]]).
+`Sec-Private-State-Token-Lifetime`, `Sec-Private-State-Token-Version`,
+HTTP request header fields, and register them in the permanent message
+header field registry ([[RFC9110]]).
 
 'Sec-Private-State-Token' Header Field {#iana-sec-private-state-token}
 ------------------------
@@ -816,20 +789,6 @@ Status: standard
 Author/Change controller: IETF
 
 Specification document: this specification ([[#sec-private-state-token]])
-
-
-'Sec-Private-State-Token-Count' Header Field {#iana-sec-private-state-token-count}
-------------------------
-
-Header field name: Sec-Private-State-Token-Count
-
-Applicable protocol: http
-
-Status: standard
-
-Author/Change controller: IETF
-
-Specification document: this specification ([[#sec-private-state-token-count]])
 
 
 'Sec-Private-State-Token-Lifetime' Header Field {#iana-sec-private-state-token-lifetime}
