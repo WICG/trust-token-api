@@ -477,7 +477,7 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
 checking fetch syntax, malformed input etc?
 
 When `refreshPolicy` is `'none'`,
-browser uses the previously cached redemption record instead of redeeming a new
+browser uses the previously cached [=redemption record=] instead of redeeming a new
 token.
 -->
 
@@ -519,15 +519,15 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
 ISSUE(165): Add redemption response handling, including calling [= record redemption timestamp =].
 
 <a http-header>Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
-    RR should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
+    [=redemption record=] should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
 is invalid (too large, a negative number or non-numeric), UA should ignore the
 <a http-header>Sec-Private-State-Token-Lifetime</a> header. When <a http-header>Sec-Private-State-Token-Lifetime</a> header value
 is zero, UA should treat the record as expired. In case of multiple
 <a http-header>Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If
-<a http-header>Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the RR will be
+<a http-header>Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the [=redemption record=] will be
 tied to the lifetime of the Private State Token verification key that confirmed the
-redeemed token's issuance. The RR is HTTP-only and JavaScript is only able to
-access/send the RR via Private State Token Fetch APIs. The RR is treated as an
+redeemed token's issuance. The [=redemption record=] is HTTP-only and JavaScript is only able to
+access/send the [=redemption record=] via Private State Token Fetch APIs. The [=redemption record=] is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.
 
@@ -537,17 +537,15 @@ Redemption Records {#redemption-records}
 
 To reduce communication overhead, the browser might cache blobs returned in
 <a http-header>Sec-Private-State-Token</a> header value in redemption responses. These blobs are
-referred as *Redemption Records*. Browsers might choose to store these records
+referred as [=Redemption Records=]. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
 validity. Issuer might choose to include optional <a http-header>Sec-Private-State-Token-Lifetime</a>
 header in the redemption response. The value of this header indicates the
-expiration time for the redemption record provided. This expiration is
+expiration time for the [=redemption record=] provided. This expiration is
 specified as number of seconds in the <a http-header>Sec-Private-State-Token-Lifetime</a> HTTP response
 header value.
 
-A <dfn>Redemption Record</dfn> is a [=struct=] with the following items:
-
-ISSUE(150): Define RR here.
+A <dfn>Redemption Record</dfn> is a [=byte sequence=].
 
 To <dfn>get an unexpired [=Redemption Record=]</dfn> with an [=/origin=] |issuer| and an [=/origin=] |topLevel|:
 
@@ -612,7 +610,7 @@ When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}}
     1. [=Look up the key commitments=] for |origin| and |topLevel|. If there are key commitments,
              [=discard tokens=] from |origin| that are signed with keys other than those
              from the issuer's most recent commitments.
-    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there is a redemption record for the issuer and top level pair, with false otherwise.
+    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there is a [=redemption record=] for the issuer and top level pair, with false otherwise.
 1. Return |p|.
 
 Note: Similar to token query, redemption query might modify the browser state. Unlike
@@ -638,7 +636,7 @@ signed, unsigned
 
 The <a http-header>Sec-Private-State-Token</a> *response* header field sends
 a collection of signed, masked tokens. During redemption it sends the
-just-created signed redemption record.
+just-created signed [=redemption record=].
 
 Issue: Link stuff here too.
 
@@ -656,7 +654,7 @@ The 'Sec-Private-State-Token-Lifetime' Header Field {#sec-private-state-token-li
 ----------------------------
 
 The <dfn http-header>`Sec-Private-State-Token-Lifetime`</dfn> response header
-field gives the expiration for the redemption record <!-- TODO: link to dfn -->
+field gives the expiration for the [=redemption record=] 
 given in the associated <a http-header>`Sec-Private-State-Token`</a>
 response header. The expiration is given in seconds.
 
