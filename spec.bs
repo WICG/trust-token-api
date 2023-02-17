@@ -245,7 +245,7 @@ fetched for an issuer, previous commitments are discarded.
 Algorithms {#algorithms}
 ====================================
 
-An user agent has <dfn>issuerAssociations</dfn>, a [=map=] where the keys are [=/origin=] |topLevel|, and the values are [=list=] of [=origins=].
+An user agent has <dfn>issuerAssociations</dfn>, which is a [=map=] where the keys are [=/origin=] |topLevel|, and the values are a [=list=] of [=origins=].
 
 To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
