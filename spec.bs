@@ -462,7 +462,7 @@ The details for servers implementing this protocol can be found in [[!ISSUER-PRO
 Browser Steps For Issue Response {#browser-issue-response}
 ----------------------------------------------------------
 
-To <dfn>handle an issue request</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
+To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
 
 1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
