@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="ef5c2301bda2df37b9ce61b822671e5c9db044d2" name="document-revision">
+  <meta content="34d90c01dca817617c4b69aa0ff4b0c6666d42b9" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -974,10 +974,10 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Configure the HTTP request.
            a. Set a load flag to bypass the HTTP cache.
-           b. Add <code>Sec-Private-State-Token</code> request header containing a
+      b. Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token">Sec-Private-State-Token</a> request header containing a
                   base64-encoded version of the bytestring of tokens
                   generated in Step 11.
-           c. Add <code>Sec-Private-State-Token-Version</code> request header that specifies
+           c. Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a> request header that specifies
                   the version of the cryptographic protocol used.</p>
      <p class="issue" id="issue-cb4ffcd9"><a class="self-link" href="#issue-cb4ffcd9"></a> This step should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header">set a structured field value</a></p>
    </ol>
@@ -992,10 +992,10 @@ Sec-Private-State-Token-Version: &lt;cryptographic protocol version, VOPRF or PM
 servers. Information to be encoded in the tokens are passed in the URL <code>public</code> and <code>private</code> parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
 passed in the URL <code>public</code> parameter. PMB can encode a value from set {0,1,2}
 in <code>public</code> and a value from set {0,1} in <code>private</code> parameter.</p>
-   <p>Using its private keys, issuer signs the masked tokens obtained in the <code>Sec-Private-State-Token</code> request header value. Issuer uses the cryptographic protocol
-specified in the request <code>Sec-Private-State-Token-Version</code> header. Encoding the values
+   <p>Using its private keys, issuer signs the masked tokens obtained in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①">Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
+specified in the request <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version①">Sec-Private-State-Token-Version</a> header. Encoding the values
 passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
-step. Issuer returns the signed tokens in the <code>Sec-Private-State-Token</code> response header
+step. Issuer returns the signed tokens in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②">Sec-Private-State-Token</a> response header
 value encoded as a base64 byte string.</p>
    <div class="example" id="example-fd1d464a">
     <a class="self-link" href="#example-fd1d464a"></a> The following snippet displays a typical response demonstrating the Private State Token
@@ -1007,11 +1007,11 @@ header.
    <p>To process a response to an issue request, browser carries out the following steps.</p>
    <ol>
     <li data-md>
-     <p>If the response has no <code>Sec-Private-State-Token</code> header, return an error.</p>
+     <p>If the response has no <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token③">Sec-Private-State-Token</a> header, return an error.</p>
     <li data-md>
-     <p>If the response has an empty <code>Sec-Private-State-Token</code> header, return; this is a <code>Success</code> response bearing 0 tokens.</p>
+     <p>If the response has an empty <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token④">Sec-Private-State-Token</a> header, return; this is a <code>Success</code> response bearing 0 tokens.</p>
     <li data-md>
-     <p>Strip the <code>Sec-Private-State-Token</code> header from the response and carry out the
+     <p>Strip the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑤">Sec-Private-State-Token</a> header from the response and carry out the
 cryptographic procedures to obtain a list of unmasked tokens.
 a. If the cryptographic procedure succeeds, associate the tokens with the
       issuing key’s label and store the tokens.
@@ -1038,11 +1038,11 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="set-redemption-headers">set redemption headers</dfn> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a> <var>request</var> and a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record">Redemption Record</a> <var>record</var>:</p>
    <ol>
     <li data-md>
-     <p>Set redemption procedure result in <code>Sec-Private-State-Token</code> request header.</p>
+     <p>Set redemption procedure result in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑥">Sec-Private-State-Token</a> request header.</p>
     <li data-md>
-     <p>Set <code>Sec-Private-State-Token-Version</code> header value to the cryptographic protocol used.</p>
+     <p>Set <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version②">Sec-Private-State-Token-Version</a> header value to the cryptographic protocol used.</p>
     <li data-md>
-     <p>Optionally, set <code>Sec-Private-State-Token-Lifetime</code> header.</p>
+     <p>Optionally, set <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime">Sec-Private-State-Token-Lifetime</a> header.</p>
     <li data-md>
      <p>Configure the HTTP request. Set a load flag to bypass the HTTP cache.</p>
    </ol>
@@ -1089,22 +1089,22 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p><a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers①">Set redemption headers</a> with <var>request</var> and <var>record</var>.</p>
    </ol>
-   <p><code>Sec-Private-State-Token-Lifetime</code> response header indicates how long (in seconds) the
-RR should be cached for. When <code>Sec-Private-State-Token-Lifetime</code> response header value
-is invalid (too large, a negative number or non-numeric), UA should ignore the <code>Sec-Private-State-Token-Lifetime</code> header. When <code>Sec-Private-State-Token-Lifetime</code> header value
-is zero, UA should treat the record as expired. In case of multiple <code>Sec-Private-State-Token-Lifetime</code> headers, UA uses the last one. If <code>Sec-Private-State-Token-Lifetime</code> header is omitted, the lifetime of the RR will be
+   <p><a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime①">Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
+    RR should be cached for. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime②">Sec-Private-State-Token-Lifetime</a> response header value
+is invalid (too large, a negative number or non-numeric), UA should ignore the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime③">Sec-Private-State-Token-Lifetime</a> header. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime④">Sec-Private-State-Token-Lifetime</a> header value
+is zero, UA should treat the record as expired. In case of multiple <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑥">Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the RR will be
 tied to the lifetime of the Private State Token verification key that confirmed the
 redeemed token’s issuance. The RR is HTTP-only and JavaScript is only able to
 access/send the RR via Private State Token Fetch APIs. The RR is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.</p>
    <h3 class="heading settled" data-level="7.1" id="redemption-records"><span class="secno">7.1. </span><span class="content">Redemption Records</span><a class="self-link" href="#redemption-records"></a></h3>
-   <p>To reduce communication overhead, the browser might cache blobs returned in <code>Sec-Private-State-Token</code> header value in redemption responses. These blobs are
+   <p>To reduce communication overhead, the browser might cache blobs returned in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑦">Sec-Private-State-Token</a> header value in redemption responses. These blobs are
 referred as <em>Redemption Records</em>. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
-validity. Issuer might choose to include optional <code>Sec-Private-State-Token-Lifetime</code> header in the redemption response. The value of this header indicates the
+validity. Issuer might choose to include optional <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑦">Sec-Private-State-Token-Lifetime</a> header in the redemption response. The value of this header indicates the
 expiration time for the redemption record provided. This expiration is
-specified as number of seconds in the <code>Sec-Private-State-Token-Lifetime</code> HTTP response
+specified as number of seconds in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑧">Sec-Private-State-Token-Lifetime</a> HTTP response
 header value.</p>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="redemption-record">Redemption Record</dfn> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct">struct</a> with the following items:</p>
    <p class="issue" id="issue-713a59cb"><a class="self-link" href="#issue-713a59cb"></a> Define RR here. <a href="https://github.com/WICG/trust-token-api/issues/150">[Issue #150]</a></p>
@@ -1211,7 +1211,7 @@ sends a singled signed, unmasked token along with associated redemption
 metadata.</p>
    <p class="issue" id="issue-ed20d0c8"><a class="self-link" href="#issue-ed20d0c8"></a> Define and link issuance, redemption, masked (formerly blinded), unmasked,
 signed, unsigned</p>
-   <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token">Sec-Private-State-Token</a> <em>response</em> header field sends
+   <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑧">Sec-Private-State-Token</a> <em>response</em> header field sends
 a collection of signed, masked tokens. During redemption it sends the
 just-created signed redemption record.</p>
    <p class="issue" id="issue-0f07ef70"><a class="self-link" href="#issue-0f07ef70"></a> Link stuff here too.</p>
@@ -1220,15 +1220,15 @@ just-created signed redemption record.</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token</c-> <c- o>=</c-> <c- nc>sf-string</c->
 </pre>
    <h3 class="heading settled" data-level="9.2" id="sec-private-state-token-lifetime"><span class="secno">9.2. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
-   <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code><a class="self-link" href="#http-headerdef-sec-private-state-token-lifetime"></a></dfn> response header
+   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></dfn> response header
 field gives the expiration for the redemption record 
-given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
+given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
 </pre>
    <h3 class="heading settled" data-level="9.3" id="sec-private-state-token-version"><span class="secno">9.3. </span><span class="content">The 'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-version"></a></h3>
-   <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code><a class="self-link" href="#http-headerdef-sec-private-state-token-version"></a></dfn> header field gives
+   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code></dfn> header field gives
 the "major version" of Private State Token protocol.</p>
    <p class="issue" id="issue-411a11f5"><a class="self-link" href="#issue-411a11f5"></a> Define what "major version" actually means.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31②">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3①">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
@@ -1291,7 +1291,7 @@ is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user’s tokens, the tokens will run out over time.
 Issuers can sign fewer tokens at a time to mitigate the risk.</p>
    <h2 class="heading settled" data-level="12" id="iana-considerations"><span class="secno">12. </span><span class="content">IANA Considerations</span><a class="self-link" href="#iana-considerations"></a></h2>
-   <p>This document intends to define the <code>Sec-Private-State-Token</code>, <code>Sec-Private-State-Token-Lifetime</code>, <code>Sec-Private-State-Token-Version</code>,
+   <p>This document intends to define the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①⓪">Sec-Private-State-Token</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑨">Sec-Private-State-Token-Lifetime</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version③">Sec-Private-State-Token-Version</a>,
 HTTP request header fields, and register them in the permanent message
 header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="HTTP Semantics">[RFC9110]</a>).</p>
    <h3 class="heading settled" data-level="12.1" id="iana-sec-private-state-token"><span class="secno">12.1. </span><span class="content">'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#iana-sec-private-state-token"></a></h3>
@@ -1973,8 +1973,31 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
   <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token" class="dfn-panel" data-for="http-headerdef-sec-private-state-token" id="infopanel-for-http-headerdef-sec-private-state-token" role="dialog">
    <span id="infopaneltitle-for-http-headerdef-sec-private-state-token" style="display:none">Info about the 'Sec-Private-State-Token' definition.</span><b><a href="#http-headerdef-sec-private-state-token">#http-headerdef-sec-private-state-token</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token①">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token">6.1. Browser Steps For Creating Issue Request</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token①">6.2. Issuer Signing Tokens</a> <a href="#ref-for-http-headerdef-sec-private-state-token②">(2)</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token③">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-http-headerdef-sec-private-state-token④">(2)</a> <a href="#ref-for-http-headerdef-sec-private-state-token⑤">(3)</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑥">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑦">7.1. Redemption Records</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑧">9.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑨">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token①⓪">12. IANA Considerations</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-lifetime" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-lifetime" id="infopanel-for-http-headerdef-sec-private-state-token-lifetime" role="dialog">
+   <span id="infopaneltitle-for-http-headerdef-sec-private-state-token-lifetime" style="display:none">Info about the 'Sec-Private-State-Token-Lifetime' definition.</span><b><a href="#http-headerdef-sec-private-state-token-lifetime">#http-headerdef-sec-private-state-token-lifetime</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-lifetime">7. Redeeming Tokens</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime①">(2)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime②">(3)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime③">(4)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime④">(5)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑤">(6)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑥">(7)</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑦">7.1. Redemption Records</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑧">(2)</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑨">12. IANA Considerations</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-version" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-version" id="infopanel-for-http-headerdef-sec-private-state-token-version" role="dialog">
+   <span id="infopaneltitle-for-http-headerdef-sec-private-state-token-version" style="display:none">Info about the 'Sec-Private-State-Token-Version' definition.</span><b><a href="#http-headerdef-sec-private-state-token-version">#http-headerdef-sec-private-state-token-version</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version">6.1. Browser Steps For Creating Issue Request</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version①">6.2. Issuer Signing Tokens</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version②">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version③">12. IANA Considerations</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
