@@ -122,26 +122,26 @@ choice. Tokens can be redeemed from a different origin than the fetching one.
 
 Private State Tokens API performs cross site anonymous authentication without
 using linkable state carrying cookies [[!RFC6265]]. Cookies do provide cross
-site authentication, however, fail to provide anonymity.
+site authentication, however, they fail to provide anonymity.
 
-Cookies store large amount of information. [[!RFC6265]] requires at least 4096
+Cookies store large amounts of information. [[!RFC6265]] requires at least 4096
 bytes per cookie and 50 cookies per domain. This means an origin has
 50 x 4096 x 2^8 unique identifiers at its disposal. When backed with back end
 databases, a server can store arbitrary data for that many unique
 users/sessions.
 
-Compared to a cookie, amount of data stored in a Private State Token is very
+Compared to a cookie, the amount of data stored in a Private State Token is very
 limited. A token stores a value from a set of six values (think of a value of
 an enum type of six possible values). Hence a token stores data between 2 and 3
 bits (4 < 6 < 8). This is very small compared to 4096 bytes a cookie can store.
 
 Moreover, Private State Tokens API use cryptographic protocols that prevents
-origins to track which tokens they issue to which user. When presented with
-their tokens, issuers can verify they issued them, however, can not link the
-tokens to the contex they are issued. Cookies do not have this property.
+origins from tracking which tokens they issue to which user. When presented with
+their tokens, issuers can verify they issued them but cannot link the
+tokens to the context of their issuance. Cookies do not have this property.
 
 Unlike cookies, storing multiple tokens from an issuer does not deteriorate
-privacy of the user due to unlinkability property of the tokens. Private
+privacy of the user due to the unlinkability of the tokens. The Private
 State Token API allows at most 2 different issuers in a top level origin. This
 is to limit the information stored for a user when the issuers are
 collaborating.
