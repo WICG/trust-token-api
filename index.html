@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="0a21f5bf816d3a768ff9afa4f5a7d9520e72b604" name="document-revision">
+  <meta content="f178b5d338127c75924327a8f30b64daa5482310" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -983,7 +983,7 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
         the issuer’s most recent commitments.</p>
      <p class="issue" id="issue-f6043e49"><a class="self-link" href="#issue-f6043e49"></a> This probably needs to be its own algorithm, how is "most recent" defined here?</p>
     <li data-md>
-     <p>Let <var>numTokens</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> limit on the number of tokens, whichever is smaller.</p>
+     <p>Let <var>numTokens</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> limit on the number of tokens (which is recommended to be 100), whichever is smaller.</p>
     <li data-md>
      <p>Let <var>tokens</var> be the result of <a data-link-type="dfn" href="#generate-masked-tokens" id="ref-for-generate-masked-tokens">generating masked tokens</a> with <var>numTokens</var>.</p>
     <li data-md>
@@ -1093,7 +1093,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
        <p>If <var>record</var> is not null, <a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers">set redemption headers</a> with <var>request</var> and <var>record</var> and return.</p>
      </ol>
     <li data-md>
-     <p>Let <var>penultimate_redemption</var> be the result of <a data-link-type="dfn" href="#look-up-penultimate-redemption" id="ref-for-look-up-penultimate-redemption">look up penultimate redemption </a> with <var>issuer</var> and <var>topLevel</var>, if the value is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> timeperiod, return error.</p>
+     <p>Let <var>penultimate_redemption</var> be the result of <a data-link-type="dfn" href="#look-up-penultimate-redemption" id="ref-for-look-up-penultimate-redemption">look up penultimate redemption </a> with <var>issuer</var> and <var>topLevel</var>, if the value is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> time period (which is recommended to be 48 hours), return error.</p>
     <li data-md>
      <p>Let <var>commitments</var> be the result of <a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments①">looking up the key commitments</a> for <var>issuer</var> and <var>topLevel</var>.</p>
     <li data-md>
