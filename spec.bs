@@ -210,7 +210,7 @@ Requests to key commitment endpoints should result in a JSON response
 
 * `"batchsize"` specifies the maximum number of blinded tokens that the issuer
                 supports for each token issuance operation. Its value is a
-                string representation of a positive integer. The useragent might send
+                string representation of a positive integer. The user agent might send
                 fewer tokens in a single operation, but will generally default to
                 sending `batchsize` many tokens per operation.
 
