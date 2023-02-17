@@ -55,6 +55,12 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
         "href": "https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-13.html",
         "publisher": "IETF",
         "title": "Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups"
+    },
+    "ISSUER-PROTOCOL": {
+        "authors": ["S. Valdez", "A. Bulut", "S. Schlesinger"],
+        "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
+        "publisher": "Google",
+        "title": "ISSUER_PROTOCOL"
     }
 }
 </pre>
@@ -433,6 +439,7 @@ Sec-Private-State-Token: <token encoded as base64 string>
 ```
 </div>
 
+The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
 Browser Steps For Issue Response {#browser-issue-response}
 ----------------------------------------------------------
@@ -449,6 +456,8 @@ To process a response to an issue request, browser carries out the following ste
     b. Else, return an error.
 
 Issue: Define this in terms of fetch
+
+The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
@@ -530,7 +539,6 @@ redeemed token's issuance. The [=redemption record=] is HTTP-only and JavaScript
 access/send the [=redemption record=] via Private State Token Fetch APIs. The [=redemption record=] is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.
-
 
 Redemption Records {#redemption-records}
 ----------------------------------------
