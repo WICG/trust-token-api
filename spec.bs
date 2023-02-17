@@ -256,13 +256,20 @@ To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a giv
 
 1. TODO
 
+An useragent has <dfn>redemptionTimes</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|lastRedemption|, |penultimateRedemption|).
+
 To <dfn>record redemption timestamp</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
+1. Let |currentTime| be the current date and time.
+1. Let |previousRedemption| be earliest representable date and time.
+1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exist=]s, let |previousRedemption| to be the |lastRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
+1. [=map/set=] [=redemptionStore=][(|issuer|,|topLevel|)] to the tuple (|currentTime|, |previousRedemption|).
 
 To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
+1. Let |penultimateRedemption| be earliest representable date and time.
+1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exist=]s, let |penultimateRedemption| to be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
+1. Return the value |penultimateRedemption|.
 
 
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
