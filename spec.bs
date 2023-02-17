@@ -450,9 +450,9 @@ To process a response to an issue request, browser carries out the following ste
        `Success` response bearing 0 tokens.
  1. Strip the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the
     cryptographic procedures to obtain a list of unmasked tokens.
-    a. If the cryptographic procedure succeeds, associate the tokens with the
+    1. If the cryptographic procedure succeeds, associate the tokens with the
           issuing key’s label and store the tokens.
-    b. Else, return an error.
+    1. Else, return an error.
 
 Issue: Define this in terms of fetch
 
