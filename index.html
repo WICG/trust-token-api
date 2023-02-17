@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="ce7eac85d78050d2642048e31b71aac1c4dfb3a3" name="document-revision">
+  <meta content="cc53847d33d54ad52e50ca86d1f164577b94bd0f" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -1284,19 +1284,27 @@ the "major version" of Private State Token protocol.</p>
    <h3 class="heading settled" data-level="10.1" id="unlinkability"><span class="secno">10.1. </span><span class="content">Unlinkability</span><a class="self-link" href="#unlinkability"></a></h3>
    <p>Cryptographic protocols <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> provide masked signatures. At
 redemption time, issuers can recognize their signature on the provided token,
-however they can not determine at what time and context they signed the token.
-This prevents issuers to correlate their issuances on an origin with
+however they can not determine at what time or in which context they signed the token.
+This prevents issuers from correlating their issuances on an origin with
 redemptions on another origin. Issuers learn only the aggregate information
 about the origins users visit.</p>
    <h3 class="heading settled" data-level="10.2" id="limit-encoded-info"><span class="secno">10.2. </span><span class="content">Limiting Encoded Information</span><a class="self-link" href="#limit-encoded-info"></a></h3>
-   <p>Browsers enforce limit on the number of keys for an issuer. For <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> number of keys are limited to six and for <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> number of keys are limited to
-three. This is to prevent issuers de-anonymizing the clients by using a unique
-keys for each clients. At issuance time, when using <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a>, the issuer can
-label browser by one of the six available labels by using one of the six keys.
-Similarly, when using <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a>, the issuer labels the browser in of the three
-labels by using its three keys and store an additional private bit value.  This
-indicates it also places browser into one of six buckets (2 x 3 = 6). Both <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> encode the same amount of information in a token. The
-difference is <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> having a private bit.</p>
+   <p>User agents should enforce limits on the number of unique keys an issuer can have
+at any point in time, to preserve client privacy.  Without limits, an issuer could 
+de-anonymize clients by simply using a unique key for each client. For <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a>, the
+number of keys is limited to six, and for <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a>, the number is limited to
+three keys.</p>
+   <p>Issuers can utilize different keys to represent different "labels", which correspond
+to an arbritrary client state, such as client trust level or some other useful 
+anti-fraud signal. Issuers are responsible for understanding this designation and 
+sharing the key "labels" with token redeemers so they know how to interpret the 
+significance of each token. This helps reduce reverse engineering from malicious 
+actors and preserves client privacy over human-readable labels. When using <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a>, 
+the issuer’s 6 keys can effectively represent six labels. Similarly, when using <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a>, 
+even though there are only up to three keys, the issuer can still utilize six labels 
+by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels). 
+Both <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> encode the same amount of information in a token, however the
+difference is <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> utilizing a private bit.</p>
    <h4 class="heading settled" data-level="10.2.1" id="side-channel-fingerprinting"><span class="secno">10.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}</span><a class="self-link" href="#side-channel-fingerprinting"></a></h4>
    <p>Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the browser at redemption time with
