@@ -469,9 +469,9 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |header| is empty, return null.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens.
+1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
 1. If |unmasked tokens| is an error, return a [=network error=].
-1. Associate |unmasked tokens| with the issuing key's label and store the tokens.
+1. Associate |unmasked tokens| with the issuing key's label and store |unmasked tokens|.
 1. Return null.
 
 Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
