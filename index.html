@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version f043d3484, updated Fri Feb 17 10:53:48 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="00b8efdf8c03724f06071cdb5e592adcfc273fb7" name="document-revision">
+  <meta content="f082385eece8996e3449035cebee1859cd1d653e" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -645,6 +645,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#browser-issue-steps"><span class="secno">6.1</span> <span class="content">Browser Steps For Creating Issue Request</span></a>
       <li><a href="#issuer-signing-tokens"><span class="secno">6.2</span> <span class="content">Issuer Signing Tokens</span></a>
       <li><a href="#browser-issue-response"><span class="secno">6.3</span> <span class="content">Browser Steps For Issue Response</span></a>
+      <li><a href="#modification-to-http-fetch-steps-header"><span class="secno">6.4</span> <span class="content">Modification to HTTP fetch steps</span></a>
      </ol>
     <li>
      <a href="#redeeming-tokens"><span class="secno">7</span> <span class="content">Redeeming Tokens</span></a>
@@ -1039,26 +1040,37 @@ header.
    </div>
    <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
    <h3 class="heading settled" data-level="6.3" id="browser-issue-response"><span class="secno">6.3. </span><span class="content">Browser Steps For Issue Response</span><a class="self-link" href="#browser-issue-response"></a></h3>
-   <p>To process a response to an issue request, browser carries out the following steps.</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="handle-an-issue-response">handle an issue response</dfn>, given <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-record-request" id="ref-for-concept-fetch-record-request">request</a> <var>request</var> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response">response</a> <var>response</var>, run the following steps:</p>
    <ol>
     <li data-md>
-     <p>Let <var>p</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise">a new promise</a>.</p>
+     <p>If <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-header-list" id="ref-for-concept-request-header-list">header list</a> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains">does not contain</a> <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token③">Sec-Private-State-Token</a>, return null.</p>
     <li data-md>
-     <p>If the response has no <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token③">Sec-Private-State-Token</a> header, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject">reject</a> <var>p</var> with an "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list">header list</a> <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#header-list-contains" id="ref-for-header-list-contains①">does not contain</a> <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token④">Sec-Private-State-Token</a>, return a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error">network error</a>.</p>
     <li data-md>
-     <p>If the response has an empty <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token④">Sec-Private-State-Token</a> header, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve">resolve</a> <var>p</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined">undefined</a></code> and return <var>p</var>. (This is a <code>Success</code> response bearing 0 tokens.)</p>
+     <p>Let <var>header</var> be the result of <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-get" id="ref-for-concept-header-list-get">getting</a> <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑤">Sec-Private-State-Token</a> from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list①">header list</a>.</p>
     <li data-md>
-     <p>Remove the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑤">Sec-Private-State-Token</a> header from the response and carry out the cryptographic procedures to obtain a list of unmasked tokens.</p>
+     <p>If <var>header</var> is empty, return null.</p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-delete" id="ref-for-concept-header-list-delete">Delete</a> <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑥">Sec-Private-State-Token</a> from <var>response</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response-header-list" id="ref-for-concept-response-header-list②">header list</a>.</p>
+    <li data-md>
+     <p>Let <var>unmasked tokens</var> be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given <var>header</var>.</p>
+    <li data-md>
+     <p>If <var>unmasked tokens</var> is an error, return a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error①">network error</a>.</p>
+    <li data-md>
+     <p>Associate <var>unmasked tokens</var> with the issuing key’s label and store <var>unmasked tokens</var>.</p>
+    <li data-md>
+     <p>Return null.</p>
    </ol>
    <p class="issue" id="issue-63880884"><a class="self-link" href="#issue-63880884"></a> Define "cryptographic procedures to obtain a list of unmasked tokens" <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a></p>
+   <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
+   <h3 class="heading settled" data-level="6.4" id="modification-to-http-fetch-steps-header"><span class="secno">6.4. </span><span class="content">Modification to HTTP fetch steps</span><a class="self-link" href="#modification-to-http-fetch-steps-header"></a></h3>
+    The following steps will be added to the <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-http-fetch" id="ref-for-concept-http-fetch">HTTP fetch</a> steps, before checking the redirect status (i.e. "7. If <var>actualResponse</var>’s status is a redirect status, ..."): 
    <ol>
     <li data-md>
-     <p>If the cryptographic procedure succeeds, associate the tokens with the issuing key’s label and store the tokens. <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①">Resolve</a> <var>p</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined①">undefined</a></code> and return <var>p</var>.</p>
+     <p>Let <var>issue response result</var> be the result of <a data-link-type="dfn" href="#handle-an-issue-response" id="ref-for-handle-an-issue-response">handling an issue response</a>, given <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-fetch-record-request" id="ref-for-concept-fetch-record-request①">request</a> <var>request</var> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response①">response</a> <var>actualResponse</var> as input.</p>
     <li data-md>
-     <p>Else, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#dataerror" id="ref-for-dataerror">DataError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException①">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>issue response result</var> is a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-network-error" id="ref-for-concept-network-error②">network error</a>, return <var>issue response result</var>.</p>
    </ol>
-   <p class="issue" id="issue-bc47898b"><a class="self-link" href="#issue-bc47898b"></a> Define this in terms of fetch</p>
-   <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
    <h2 class="heading settled" data-level="7" id="redeeming-tokens"><span class="secno">7. </span><span class="content">Redeeming Tokens</span><a class="self-link" href="#redeeming-tokens"></a></h2>
    <p>When browser navigates to an origin, top level origin or a third party site
 embedded on the top level origin may redeem tokens stored in browser from a
@@ -1085,7 +1097,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p>Let <var>token-lifetime</var> be the expiration time of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record②">redemption record</a> in seconds.</p>
     <li data-md>
-     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header②">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑥"><code>Sec-Private-State-Token</code></a>, <var>redemption-result</var>)
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header②">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑦"><code>Sec-Private-State-Token</code></a>, <var>redemption-result</var>)
             in <var>request</var>’s header list.</p>
     <li data-md>
      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header③">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version②"><code>Sec-Private-State-Token-Version</code></a>, <var>version</var>)
@@ -1147,7 +1159,7 @@ access/send the <a data-link-type="dfn" href="#redemption-record" id="ref-for-re
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.</p>
    <h3 class="heading settled" data-level="7.1" id="redemption-records"><span class="secno">7.1. </span><span class="content">Redemption Records</span><a class="self-link" href="#redemption-records"></a></h3>
-   <p>To reduce communication overhead, the browser might cache blobs returned in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑦">Sec-Private-State-Token</a> header value in redemption responses. These blobs are
+   <p>To reduce communication overhead, the browser might cache blobs returned in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑧">Sec-Private-State-Token</a> header value in redemption responses. These blobs are
 referred as <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑧">Redemption Records</a>. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
 validity. Issuer might choose to include optional <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑦">Sec-Private-State-Token-Lifetime</a> header in the redemption response. The value of this header indicates the
@@ -1171,19 +1183,19 @@ header value.</p>
    <p>When invoked on <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document②">Document</a></code> <var>doc</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-USVString" id="ref-for-idl-USVString⑤">USVString</a></code> <var>issuer</var> and <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-USVString" id="ref-for-idl-USVString⑥">USVString</a></code> <var>type</var>, the <dfn class="dfn-paneled idl-code" data-dfn-for="Document" data-dfn-type="method" data-export id="dom-document-hasprivatetokens"><code>hasPrivateTokens(issuer, type)</code></dfn> method must run these steps:</p>
    <ol>
     <li data-md>
-     <p>Let <var>p</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise①">a new promise</a>.</p>
+     <p>Let <var>p</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise">a new promise</a>.</p>
     <li data-md>
-     <p>If <var>doc</var> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active">fully active</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②">reject</a> <var>p</var> with an "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror①">InvalidStateError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException②">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>doc</var> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active">fully active</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject">reject</a> <var>p</var> with an "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror">InvalidStateError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
      <p>Let <var>global</var> be <var>doc</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a>.</p>
     <li data-md>
-     <p>If <var>global</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context" id="ref-for-secure-context②">secure context</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException③">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>global</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context" id="ref-for-secure-context②">secure context</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException①">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
-     <p>If <var>type</var> is not <code>"private-state-token"</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject④">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException④">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>type</var> is not <code>"private-state-token"</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException②">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
      <p>Let <var>parsedURL</var> be the the result of running the <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-parser" id="ref-for-concept-url-parser">URL parser</a> on <var>issuer</var>.</p>
     <li data-md>
-     <p>If <var>parsedURL</var> is failure, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑤">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑤">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>parsedURL</var> is failure, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException③">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
      <p>Let <var>origin</var> be <var>parsedURL</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑨">origin</a>.</p>
     <li data-md>
@@ -1192,14 +1204,14 @@ header value.</p>
      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>:</p>
      <ol>
       <li data-md>
-       <p>If associating <var>issuer</var> with <var>topLevel</var> <a data-link-type="dfn" href="#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" id="ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit②">would exceed the top level’s number-of-issuers limit</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task">queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑥">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror①">NotAllowedError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑥">DOMException</a></code> and return.</p>
+       <p>If associating <var>issuer</var> with <var>topLevel</var> <a data-link-type="dfn" href="#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" id="ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit②">would exceed the top level’s number-of-issuers limit</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task">queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject④">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror①">NotAllowedError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException④">DOMException</a></code> and return.</p>
       <li data-md>
        <p><a data-link-type="dfn" href="#associate-the-issuer" id="ref-for-associate-the-issuer②">Associate the issuer</a> <var>origin</var> with <var>topLevel</var>.</p>
       <li data-md>
        <p><a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments②">Look up the key commitments</a> for <var>origin</var> and <var>topLevel</var>. If there are key commitments, <a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens②">discard tokens</a> from <var>origin</var> that are signed with keys other than those
      from the issuer’s most recent commitments.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task①">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source①">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②">resolve</a> <var>p</var> with true if there are tokens stored for the given issuer, with false otherwise.</p>
+       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task①">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source①">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve">resolve</a> <var>p</var> with true if there are tokens stored for the given issuer, with false otherwise.</p>
      </ol>
     <li data-md>
      <p>Return <var>p</var>.</p>
@@ -1213,19 +1225,19 @@ at Step 4.</p>
    <p>When invoked on <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#document" id="ref-for-document③">Document</a></code> <var>doc</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-USVString" id="ref-for-idl-USVString⑦">USVString</a></code> <var>issuer</var> and <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-USVString" id="ref-for-idl-USVString⑧">USVString</a></code> <var>type</var>, the <dfn class="dfn-paneled idl-code" data-dfn-for="Document" data-dfn-type="method" data-export id="dom-document-hasredemptionrecord"><code>hasRedemptionRecord(issuer, type)</code></dfn> method must run these steps:</p>
    <ol>
     <li data-md>
-     <p>Let <var>p</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise②">a new promise</a>.</p>
+     <p>Let <var>p</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise①">a new promise</a>.</p>
     <li data-md>
-     <p>If <var>doc</var> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active①">fully active</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑦">reject</a> <var>p</var> with an "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror②">InvalidStateError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑦">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>doc</var> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active①">fully active</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑤">reject</a> <var>p</var> with an "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror①">InvalidStateError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑤">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
      <p>Let <var>global</var> be <var>doc</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a>.</p>
     <li data-md>
-     <p>If <var>global</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context" id="ref-for-secure-context③">secure context</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑧">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror②">NotAllowedError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑧">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>global</var> is not a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context" id="ref-for-secure-context③">secure context</a>, then <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑥">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror②">NotAllowedError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑥">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
-     <p>If <var>type</var> is not <code>"private-state-token"</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑨">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror②">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑨">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>type</var> is not <code>"private-state-token"</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑦">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror②">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑦">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
      <p>Let <var>parsedURL</var> be the the result of running the <a data-link-type="dfn" href="https://url.spec.whatwg.org/#concept-url-parser" id="ref-for-concept-url-parser①">URL parser</a> on <var>issuer</var>.</p>
     <li data-md>
-     <p>If <var>parsedURL</var> is failure, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⓪">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror③">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException①⓪">DOMException</a></code> and return <var>p</var>.</p>
+     <p>If <var>parsedURL</var> is failure, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑧">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror③">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑧">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
      <p>Let <var>origin</var> be <var>parsedURL</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin②⓪">origin</a>.</p>
     <li data-md>
@@ -1234,12 +1246,12 @@ at Step 4.</p>
      <p>Run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①">in parallel</a>:</p>
      <ol>
       <li data-md>
-       <p>If <var>origin</var> <a data-link-type="dfn" href="#is-associated-with" id="ref-for-is-associated-with">is not associated with</a> <var>topLevel</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task②">queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source②">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve③">resolve</a> <var>p</var> with false and return.</p>
+       <p>If <var>origin</var> <a data-link-type="dfn" href="#is-associated-with" id="ref-for-is-associated-with">is not associated with</a> <var>topLevel</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task②">queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source②">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①">resolve</a> <var>p</var> with false and return.</p>
       <li data-md>
        <p><a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments③">Look up the key commitments</a> for <var>origin</var> and <var>topLevel</var>. If there are key commitments, <a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens③">discard tokens</a> from <var>origin</var> that are signed with keys other than those
      from the issuer’s most recent commitments.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task③">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source③">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve④">resolve</a> <var>p</var> with true if there is a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①①">redemption record</a> for the issuer and top level pair, with false otherwise.</p>
+       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task③">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source③">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②">resolve</a> <var>p</var> with true if there is a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①①">redemption record</a> for the issuer and top level pair, with false otherwise.</p>
      </ol>
     <li data-md>
      <p>Return <var>p</var>.</p>
@@ -1258,7 +1270,7 @@ sends a singled signed, unmasked token along with associated redemption
 metadata.</p>
    <p class="issue" id="issue-ed20d0c8"><a class="self-link" href="#issue-ed20d0c8"></a> Define and link issuance, redemption, masked (formerly blinded), unmasked,
 signed, unsigned</p>
-   <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑧">Sec-Private-State-Token</a> <em>response</em> header field sends
+   <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨">Sec-Private-State-Token</a> <em>response</em> header field sends
 a collection of signed, masked tokens. During redemption it sends the
 just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①②">redemption record</a>.</p>
    <p class="issue" id="issue-0f07ef70"><a class="self-link" href="#issue-0f07ef70"></a> Link stuff here too.</p>
@@ -1268,7 +1280,7 @@ just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-fo
 </pre>
    <h3 class="heading settled" data-level="9.2" id="sec-private-state-token-lifetime"><span class="secno">9.2. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></dfn> response header
-field gives the expiration for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①③">redemption record</a> given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
+field gives the expiration for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①③">redemption record</a> given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①⓪"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
@@ -1345,7 +1357,7 @@ is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user’s tokens, the tokens will run out over time.
 Issuers can sign fewer tokens at a time to mitigate the risk.</p>
    <h2 class="heading settled" data-level="12" id="iana-considerations"><span class="secno">12. </span><span class="content">IANA Considerations</span><a class="self-link" href="#iana-considerations"></a></h2>
-   <p>This document intends to define the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①⓪">Sec-Private-State-Token</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑨">Sec-Private-State-Token-Lifetime</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version③">Sec-Private-State-Token-Version</a>,
+   <p>This document intends to define the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①①">Sec-Private-State-Token</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑨">Sec-Private-State-Token-Lifetime</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version③">Sec-Private-State-Token-Version</a>,
 HTTP request header fields, and register them in the permanent message
 header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="HTTP Semantics">[RFC9110]</a>).</p>
    <h3 class="heading settled" data-level="12.1" id="iana-sec-private-state-token"><span class="secno">12.1. </span><span class="content">'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#iana-sec-private-state-token"></a></h3>
@@ -1423,6 +1435,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <li><a href="#discard-tokens">discard tokens</a><span>, in § 4</span>
    <li><a href="#generate-masked-tokens">generate masked tokens</a><span>, in § 4</span>
    <li><a href="#get-an-unexpired-redemption-record">get an unexpired Redemption Record</a><span>, in § 7.1</span>
+   <li><a href="#handle-an-issue-response">handle an issue response</a><span>, in § 6.3</span>
    <li><a href="#dom-document-hasprivatetokens">hasPrivateTokens(issuer, type)</a><span>, in § 8.1</span>
    <li><a href="#dom-document-hasredemptionrecord">hasRedemptionRecord(issuer, type)</a><span>, in § 8.2</span>
    <li><a href="#is-associated-with">is associated with</a><span>, in § 4</span>
@@ -1488,10 +1501,53 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-concept-request-client②">7. Redeeming Tokens</a> <a href="#ref-for-concept-request-client③">(2)</a>
    </ul>
   </aside>
+  <aside aria-labelledby="infopaneltitle-for-982a06b70b5b6719fe7a3fea8359cd5d" class="dfn-panel" data-for="982a06b70b5b6719fe7a3fea8359cd5d" id="infopanel-for-982a06b70b5b6719fe7a3fea8359cd5d">
+   <span id="infopaneltitle-for-982a06b70b5b6719fe7a3fea8359cd5d" style="display:none">Info about the 'contains' external reference.</span><a href="https://fetch.spec.whatwg.org/#header-list-contains">https://fetch.spec.whatwg.org/#header-list-contains</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-header-list-contains">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-header-list-contains①">(2)</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-fdb6c106dead7169eccfe54e56cec6bd" class="dfn-panel" data-for="fdb6c106dead7169eccfe54e56cec6bd" id="infopanel-for-fdb6c106dead7169eccfe54e56cec6bd">
+   <span id="infopaneltitle-for-fdb6c106dead7169eccfe54e56cec6bd" style="display:none">Info about the 'delete' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-header-list-delete">https://fetch.spec.whatwg.org/#concept-header-list-delete</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-header-list-delete">6.3. Browser Steps For Issue Response</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-6ef0be99a5b17cb515c6816ad5548e89" class="dfn-panel" data-for="6ef0be99a5b17cb515c6816ad5548e89" id="infopanel-for-6ef0be99a5b17cb515c6816ad5548e89">
+   <span id="infopaneltitle-for-6ef0be99a5b17cb515c6816ad5548e89" style="display:none">Info about the 'get' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-header-list-get">https://fetch.spec.whatwg.org/#concept-header-list-get</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-header-list-get">6.3. Browser Steps For Issue Response</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-4fd8d1762cd9c874700296c854598fda" class="dfn-panel" data-for="4fd8d1762cd9c874700296c854598fda" id="infopanel-for-4fd8d1762cd9c874700296c854598fda">
+   <span id="infopaneltitle-for-4fd8d1762cd9c874700296c854598fda" style="display:none">Info about the 'header list (for request)' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-header-list">https://fetch.spec.whatwg.org/#concept-request-header-list</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-request-header-list">6.3. Browser Steps For Issue Response</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-d94cb5e6252c9158478ebbe8a624e99c" class="dfn-panel" data-for="d94cb5e6252c9158478ebbe8a624e99c" id="infopanel-for-d94cb5e6252c9158478ebbe8a624e99c">
+   <span id="infopaneltitle-for-d94cb5e6252c9158478ebbe8a624e99c" style="display:none">Info about the 'header list (for response)' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-response-header-list">https://fetch.spec.whatwg.org/#concept-response-header-list</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-response-header-list">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-concept-response-header-list①">(2)</a> <a href="#ref-for-concept-response-header-list②">(3)</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-e094c825ead002ca7d4383f2aba777f9" class="dfn-panel" data-for="e094c825ead002ca7d4383f2aba777f9" id="infopanel-for-e094c825ead002ca7d4383f2aba777f9">
+   <span id="infopaneltitle-for-e094c825ead002ca7d4383f2aba777f9" style="display:none">Info about the 'http fetch' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-http-fetch">https://fetch.spec.whatwg.org/#concept-http-fetch</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-http-fetch">6.4. Modification to HTTP fetch steps</a>
+   </ul>
+  </aside>
   <aside aria-labelledby="infopaneltitle-for-87f2d30ab2be54b6f754efb1b0c5b2e9" class="dfn-panel" data-for="87f2d30ab2be54b6f754efb1b0c5b2e9" id="infopanel-for-87f2d30ab2be54b6f754efb1b0c5b2e9">
    <span id="infopaneltitle-for-87f2d30ab2be54b6f754efb1b0c5b2e9" style="display:none">Info about the 'http-network-or-cache fetch' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-http-network-or-cache-fetch">https://fetch.spec.whatwg.org/#concept-http-network-or-cache-fetch</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-http-network-or-cache-fetch">5.3. Modifications to http-network-or-cache fetch</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-92488b0d05da99120fd8466a06ec480f" class="dfn-panel" data-for="92488b0d05da99120fd8466a06ec480f" id="infopanel-for-92488b0d05da99120fd8466a06ec480f">
+   <span id="infopaneltitle-for-92488b0d05da99120fd8466a06ec480f" style="display:none">Info about the 'network error' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-network-error">https://fetch.spec.whatwg.org/#concept-network-error</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-network-error">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-concept-network-error①">(2)</a>
+    <li><a href="#ref-for-concept-network-error②">6.4. Modification to HTTP fetch steps</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-491791562dd138987138e7051a96c07c" class="dfn-panel" data-for="491791562dd138987138e7051a96c07c" id="infopanel-for-491791562dd138987138e7051a96c07c">
@@ -1506,6 +1562,20 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <span id="infopaneltitle-for-62eb8611855ca0d3551225567f68307a" style="display:none">Info about the 'request (for Request)' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-request">https://fetch.spec.whatwg.org/#concept-request-request</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-request-request">5.2. Modifications to request</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-65f732851ccd754b569b0561037e8997" class="dfn-panel" data-for="65f732851ccd754b569b0561037e8997" id="infopanel-for-65f732851ccd754b569b0561037e8997">
+   <span id="infopaneltitle-for-65f732851ccd754b569b0561037e8997" style="display:none">Info about the 'request (for fetch record)' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-fetch-record-request">https://fetch.spec.whatwg.org/#concept-fetch-record-request</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-fetch-record-request">6.3. Browser Steps For Issue Response</a>
+    <li><a href="#ref-for-concept-fetch-record-request①">6.4. Modification to HTTP fetch steps</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-d203414c2b48c23fddab90ef753bb7cf" class="dfn-panel" data-for="d203414c2b48c23fddab90ef753bb7cf" id="infopanel-for-d203414c2b48c23fddab90ef753bb7cf">
+   <span id="infopaneltitle-for-d203414c2b48c23fddab90ef753bb7cf" style="display:none">Info about the 'response' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-response">https://fetch.spec.whatwg.org/#concept-response</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-response">6.3. Browser Steps For Issue Response</a>
+    <li><a href="#ref-for-concept-response①">6.4. Modification to HTTP fetch steps</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" class="dfn-panel" data-for="a50d6de302855c18285652c8be59e5b0" id="infopanel-for-a50d6de302855c18285652c8be59e5b0">
@@ -1698,23 +1768,15 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
   <aside aria-labelledby="infopaneltitle-for-0ab204fb9cc9a746edaff83c0db0740a" class="dfn-panel" data-for="0ab204fb9cc9a746edaff83c0db0740a" id="infopanel-for-0ab204fb9cc9a746edaff83c0db0740a">
    <span id="infopaneltitle-for-0ab204fb9cc9a746edaff83c0db0740a" style="display:none">Info about the 'DOMException' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-DOMException">https://webidl.spec.whatwg.org/#idl-DOMException</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-DOMException">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-idl-DOMException①">(2)</a>
-    <li><a href="#ref-for-idl-DOMException②">8.1. Token Query</a> <a href="#ref-for-idl-DOMException③">(2)</a> <a href="#ref-for-idl-DOMException④">(3)</a> <a href="#ref-for-idl-DOMException⑤">(4)</a> <a href="#ref-for-idl-DOMException⑥">(5)</a>
-    <li><a href="#ref-for-idl-DOMException⑦">8.2. Redemption Record Query</a> <a href="#ref-for-idl-DOMException⑧">(2)</a> <a href="#ref-for-idl-DOMException⑨">(3)</a> <a href="#ref-for-idl-DOMException①⓪">(4)</a>
-   </ul>
-  </aside>
-  <aside aria-labelledby="infopaneltitle-for-932ea4ef25c6e7fae06ef561c6e9532f" class="dfn-panel" data-for="932ea4ef25c6e7fae06ef561c6e9532f" id="infopanel-for-932ea4ef25c6e7fae06ef561c6e9532f">
-   <span id="infopaneltitle-for-932ea4ef25c6e7fae06ef561c6e9532f" style="display:none">Info about the 'DataError' external reference.</span><a href="https://webidl.spec.whatwg.org/#dataerror">https://webidl.spec.whatwg.org/#dataerror</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dataerror">6.3. Browser Steps For Issue Response</a>
+    <li><a href="#ref-for-idl-DOMException">8.1. Token Query</a> <a href="#ref-for-idl-DOMException①">(2)</a> <a href="#ref-for-idl-DOMException②">(3)</a> <a href="#ref-for-idl-DOMException③">(4)</a> <a href="#ref-for-idl-DOMException④">(5)</a>
+    <li><a href="#ref-for-idl-DOMException⑤">8.2. Redemption Record Query</a> <a href="#ref-for-idl-DOMException⑥">(2)</a> <a href="#ref-for-idl-DOMException⑦">(3)</a> <a href="#ref-for-idl-DOMException⑧">(4)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" class="dfn-panel" data-for="e2a06375a2fb70c61a8b4cd0abe9d4f1" id="infopanel-for-e2a06375a2fb70c61a8b4cd0abe9d4f1">
    <span id="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" style="display:none">Info about the 'InvalidStateError' external reference.</span><a href="https://webidl.spec.whatwg.org/#invalidstateerror">https://webidl.spec.whatwg.org/#invalidstateerror</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-invalidstateerror">6.3. Browser Steps For Issue Response</a>
-    <li><a href="#ref-for-invalidstateerror①">8.1. Token Query</a>
-    <li><a href="#ref-for-invalidstateerror②">8.2. Redemption Record Query</a>
+    <li><a href="#ref-for-invalidstateerror">8.1. Token Query</a>
+    <li><a href="#ref-for-invalidstateerror①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-aa43258e2b51dc6ebe6268a36e6fd733" class="dfn-panel" data-for="aa43258e2b51dc6ebe6268a36e6fd733" id="infopanel-for-aa43258e2b51dc6ebe6268a36e6fd733">
@@ -1749,9 +1811,8 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
   <aside aria-labelledby="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" class="dfn-panel" data-for="bbe33fc7ac016834e4aaddbfd1b084a1" id="infopanel-for-bbe33fc7ac016834e4aaddbfd1b084a1">
    <span id="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" style="display:none">Info about the 'a new promise' external reference.</span><a href="https://webidl.spec.whatwg.org/#a-new-promise">https://webidl.spec.whatwg.org/#a-new-promise</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-a-new-promise">6.3. Browser Steps For Issue Response</a>
-    <li><a href="#ref-for-a-new-promise①">8.1. Token Query</a>
-    <li><a href="#ref-for-a-new-promise②">8.2. Redemption Record Query</a>
+    <li><a href="#ref-for-a-new-promise">8.1. Token Query</a>
+    <li><a href="#ref-for-a-new-promise①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-f8062b07e25ed0281f5cbfb9a54070b4" class="dfn-panel" data-for="f8062b07e25ed0281f5cbfb9a54070b4" id="infopanel-for-f8062b07e25ed0281f5cbfb9a54070b4">
@@ -1763,17 +1824,15 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
   <aside aria-labelledby="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" class="dfn-panel" data-for="f7204c0306e7ffcb24c31adf6e629e1d" id="infopanel-for-f7204c0306e7ffcb24c31adf6e629e1d">
    <span id="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" style="display:none">Info about the 'reject' external reference.</span><a href="https://webidl.spec.whatwg.org/#reject">https://webidl.spec.whatwg.org/#reject</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-reject">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-reject①">(2)</a>
-    <li><a href="#ref-for-reject②">8.1. Token Query</a> <a href="#ref-for-reject③">(2)</a> <a href="#ref-for-reject④">(3)</a> <a href="#ref-for-reject⑤">(4)</a> <a href="#ref-for-reject⑥">(5)</a>
-    <li><a href="#ref-for-reject⑦">8.2. Redemption Record Query</a> <a href="#ref-for-reject⑧">(2)</a> <a href="#ref-for-reject⑨">(3)</a> <a href="#ref-for-reject①⓪">(4)</a>
+    <li><a href="#ref-for-reject">8.1. Token Query</a> <a href="#ref-for-reject①">(2)</a> <a href="#ref-for-reject②">(3)</a> <a href="#ref-for-reject③">(4)</a> <a href="#ref-for-reject④">(5)</a>
+    <li><a href="#ref-for-reject⑤">8.2. Redemption Record Query</a> <a href="#ref-for-reject⑥">(2)</a> <a href="#ref-for-reject⑦">(3)</a> <a href="#ref-for-reject⑧">(4)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-f4f973f92274819781816b033aea1f11" class="dfn-panel" data-for="f4f973f92274819781816b033aea1f11" id="infopanel-for-f4f973f92274819781816b033aea1f11">
    <span id="infopaneltitle-for-f4f973f92274819781816b033aea1f11" style="display:none">Info about the 'resolve' external reference.</span><a href="https://webidl.spec.whatwg.org/#resolve">https://webidl.spec.whatwg.org/#resolve</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-resolve">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-resolve①">(2)</a>
-    <li><a href="#ref-for-resolve②">8.1. Token Query</a>
-    <li><a href="#ref-for-resolve③">8.2. Redemption Record Query</a> <a href="#ref-for-resolve④">(2)</a>
+    <li><a href="#ref-for-resolve">8.1. Token Query</a>
+    <li><a href="#ref-for-resolve①">8.2. Redemption Record Query</a> <a href="#ref-for-resolve②">(2)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" class="dfn-panel" data-for="38ab7db52e46bed36993204c29f67202" id="infopanel-for-38ab7db52e46bed36993204c29f67202">
@@ -1786,12 +1845,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <span id="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" style="display:none">Info about the 'this' external reference.</span><a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-this">5.2. Modifications to request</a>
-   </ul>
-  </aside>
-  <aside aria-labelledby="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" class="dfn-panel" data-for="cee863f1f2ec91066cfb7f5d309d59dc" id="infopanel-for-cee863f1f2ec91066cfb7f5d309d59dc">
-   <span id="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" style="display:none">Info about the 'undefined' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-idl-undefined">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-idl-undefined①">(2)</a>
    </ul>
   </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
@@ -1808,9 +1861,18 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
      <li><span class="dfn-paneled" id="bda9e897bec9e1501aae0e763c882527">Request(input)</span>
      <li><span class="dfn-paneled" id="4293976a2fc689fa38243bca91f1f402">RequestInit</span>
      <li><span class="dfn-paneled" id="136f2700e84634abd2f3d42487ba7f41">client</span>
+     <li><span class="dfn-paneled" id="982a06b70b5b6719fe7a3fea8359cd5d">contains</span>
+     <li><span class="dfn-paneled" id="fdb6c106dead7169eccfe54e56cec6bd">delete</span>
+     <li><span class="dfn-paneled" id="6ef0be99a5b17cb515c6816ad5548e89">get</span>
+     <li><span class="dfn-paneled" id="4fd8d1762cd9c874700296c854598fda">header list <small>(for request)</small></span>
+     <li><span class="dfn-paneled" id="d94cb5e6252c9158478ebbe8a624e99c">header list <small>(for response)</small></span>
+     <li><span class="dfn-paneled" id="e094c825ead002ca7d4383f2aba777f9">http fetch</span>
      <li><span class="dfn-paneled" id="87f2d30ab2be54b6f754efb1b0c5b2e9">http-network-or-cache fetch</span>
+     <li><span class="dfn-paneled" id="92488b0d05da99120fd8466a06ec480f">network error</span>
      <li><span class="dfn-paneled" id="491791562dd138987138e7051a96c07c">request</span>
      <li><span class="dfn-paneled" id="62eb8611855ca0d3551225567f68307a">request <small>(for Request)</small></span>
+     <li><span class="dfn-paneled" id="65f732851ccd754b569b0561037e8997">request <small>(for fetch record)</small></span>
+     <li><span class="dfn-paneled" id="d203414c2b48c23fddab90ef753bb7cf">response</span>
      <li><span class="dfn-paneled" id="a50d6de302855c18285652c8be59e5b0">set a structured field value</span>
      <li><span class="dfn-paneled" id="6f4775873c70787775f9c70f0f110709">url</span>
     </ul>
@@ -1859,7 +1921,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="0ab204fb9cc9a746edaff83c0db0740a">DOMException</span>
-     <li><span class="dfn-paneled" id="932ea4ef25c6e7fae06ef561c6e9532f">DataError</span>
      <li><span class="dfn-paneled" id="e2a06375a2fb70c61a8b4cd0abe9d4f1">InvalidStateError</span>
      <li><span class="dfn-paneled" id="aa43258e2b51dc6ebe6268a36e6fd733">NotAllowedError</span>
      <li><span class="dfn-paneled" id="93669c631ec1ef8e696b4c083bdbe12c">Promise</span>
@@ -1871,7 +1932,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
      <li><span class="dfn-paneled" id="f4f973f92274819781816b033aea1f11">resolve</span>
      <li><span class="dfn-paneled" id="38ab7db52e46bed36993204c29f67202">sequence</span>
      <li><span class="dfn-paneled" id="be0933df03cd63338f98de217c4158c7">this</span>
-     <li><span class="dfn-paneled" id="cee863f1f2ec91066cfb7f5d309d59dc">undefined</span>
     </ul>
   </ul>
   <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
@@ -1952,7 +2012,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <div class="issue"> How do we get the issuer public keys here? <a href="https://github.com/WICG/trust-token-api/issues/187">[Issue #187]</a> <a class="issue-return" href="#issue-c631389b" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
    <div class="issue"> Define "cryptographic procedures to obtain a list of unmasked tokens" <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a> <a class="issue-return" href="#issue-63880884" title="Jump to section">↵</a></div>
-   <div class="issue"> Define this in terms of fetch <a class="issue-return" href="#issue-bc47898b" title="Jump to section">↵</a></div>
    <div class="issue"> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-2131c336" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49①" title="Jump to section">↵</a></div>
    <div class="issue"> This needs to be specified more clearly <a class="issue-return" href="#issue-907127dc" title="Jump to section">↵</a></div>
@@ -2093,6 +2152,12 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-append-private-state-token-issue-request-headers">5.3. Modifications to http-network-or-cache fetch</a>
    </ul>
   </aside>
+  <aside aria-labelledby="infopaneltitle-for-handle-an-issue-response" class="dfn-panel" data-for="handle-an-issue-response" id="infopanel-for-handle-an-issue-response">
+   <span id="infopaneltitle-for-handle-an-issue-response" style="display:none">Info about the 'handle an issue response' definition.</span><b><a href="#handle-an-issue-response">#handle-an-issue-response</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-handle-an-issue-response">6.4. Modification to HTTP fetch steps</a>
+   </ul>
+  </aside>
   <aside aria-labelledby="infopaneltitle-for-set-redemption-headers" class="dfn-panel" data-for="set-redemption-headers" id="infopanel-for-set-redemption-headers">
    <span id="infopaneltitle-for-set-redemption-headers" style="display:none">Info about the 'set redemption headers' definition.</span><b><a href="#set-redemption-headers">#set-redemption-headers</a></b><b>Referenced in:</b>
    <ul>
@@ -2139,12 +2204,12 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
    <ul>
     <li><a href="#ref-for-http-headerdef-sec-private-state-token">6.1. Browser Steps For Creating Issue Request</a>
     <li><a href="#ref-for-http-headerdef-sec-private-state-token①">6.2. Issuer Signing Tokens</a> <a href="#ref-for-http-headerdef-sec-private-state-token②">(2)</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token③">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-http-headerdef-sec-private-state-token④">(2)</a> <a href="#ref-for-http-headerdef-sec-private-state-token⑤">(3)</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑥">7. Redeeming Tokens</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑦">7.1. Redemption Records</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑧">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑨">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token①⓪">12. IANA Considerations</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token③">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-http-headerdef-sec-private-state-token④">(2)</a> <a href="#ref-for-http-headerdef-sec-private-state-token⑤">(3)</a> <a href="#ref-for-http-headerdef-sec-private-state-token⑥">(4)</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑦">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑧">7.1. Redemption Records</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token⑨">9.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token①⓪">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token①①">12. IANA Considerations</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-lifetime" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-lifetime" id="infopanel-for-http-headerdef-sec-private-state-token-lifetime">
