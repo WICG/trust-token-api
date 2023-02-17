@@ -465,8 +465,8 @@ Browser Steps For Issue Response {#browser-issue-response}
 To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
 
 1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
+1. If |response|'s [=response/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return a [=network error=].
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. If |header| is null, return a [=network error=].
 1. If |header| is empty, return null.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens.
