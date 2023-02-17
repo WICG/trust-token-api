@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="27b481db9f8aaf0eec708fb871a151f71247b834" name="document-revision">
+  <meta content="5f1bc159a2f033601920cf3f30cc5c384f12a3a8" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -1007,6 +1007,7 @@ header.
 <pre>Sec-Private-State-Token: &lt;token encoded as base64 string>
 </pre>
    </div>
+   <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
    <h3 class="heading settled" data-level="6.3" id="browser-issue-response"><span class="secno">6.3. </span><span class="content">Browser Steps For Issue Response</span><a class="self-link" href="#browser-issue-response"></a></h3>
    <p>To process a response to an issue request, browser carries out the following steps.</p>
    <ol>
@@ -1022,6 +1023,7 @@ a. If the cryptographic procedure succeeds, associate the tokens with the
 b. Else, return an error.</p>
    </ol>
    <p class="issue" id="issue-bc47898b"><a class="self-link" href="#issue-bc47898b"></a> Define this in terms of fetch</p>
+   <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
    <h2 class="heading settled" data-level="7" id="redeeming-tokens"><span class="secno">7. </span><span class="content">Redeeming Tokens</span><a class="self-link" href="#redeeming-tokens"></a></h2>
    <p>When browser navigates to an origin, top level origin or a third party site
 embedded on the top level origin may redeem tokens stored in browser from a
@@ -1757,6 +1759,8 @@ Wilson for reviewing and mentoring this spec.</p>
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/"><cite>HTML Standard</cite></a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-infra">[INFRA]
    <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
+   <dt id="biblio-issuer-protocol">[ISSUER-PROTOCOL]
+   <dd>S. Valdez; A. Bulut; S. Schlesinger. <a href="https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md"><cite>ISSUER_PROTOCOL</cite></a>. URL: <a href="https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md">https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-rfc8941">[RFC8941]
