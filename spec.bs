@@ -465,14 +465,14 @@ Browser Steps For Issue Response {#browser-issue-response}
 
 To process a response to an issue request, browser carries out the following steps.
 
- 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, return an error.
- 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, return; this is a
-       `Success` response bearing 0 tokens.
- 1. Strip the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the
-    cryptographic procedures to obtain a list of unmasked tokens.
-    1. If the cryptographic procedure succeeds, associate the tokens with the
-          issuing key’s label and store the tokens.
-    1. Else, return an error.
+ 1. Let |p| be [=a new promise=].
+ 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+ 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, [=/resolve=] |p| with {{undefined}} and return |p|. (This is a `Success` response bearing 0 tokens.)
+ 1. Remove the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the cryptographic procedures to obtain a list of unmasked tokens.
+ 
+ Issue: Define "cryptographic procedures to obtain a list of unmasked tokens"
+    1. If the cryptographic procedure succeeds, associate the tokens with the issuing key's label and store the tokens. [=/Resolve=] |p| with {{undefined}} and return |p|.
+    1. Else, [=/reject=] |p| with a "{{DataError}}" {{DOMException}} and return |p|.
 
 Issue: Define this in terms of fetch
 
