@@ -144,6 +144,9 @@ Private State Token operations rely on [[FETCH]]. A fetch request corresponding 
 specific Private State Token operation can be created and used as a parameter to the
 fetch function.
 
+Note: This specification uses the terms "masked" and "unmasked" where [[PMB]]
+uses "blinded" and "unblinded", respectively.
+
 <!--
 * how this is not as powerful like cookies, privacy guarantees?
 * Between first and second para there is some gap. We should fill in.
@@ -208,7 +211,7 @@ Requests to key commitment endpoints should result in a JSON response
          an unsigned 32 bit integer type. Values should be montonically
          increasing.
 
-* `"batchsize"` specifies the maximum number of blinded tokens that the issuer
+* `"batchsize"` specifies the maximum number of masked tokens that the issuer
                 supports for each token issuance operation. Its value is a
                 string representation of a positive integer. Maximum value
                 allowed is 100. If a larger value is specified, 100 will be
@@ -271,7 +274,7 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 1. TODO
 
-To <dfn>generate blinded tokens</dfn> given a number |numTokens|, run the following steps:
+To <dfn>generate masked tokens</dfn> given a number |numTokens|, run the following steps:
 
 1. TODO
 
@@ -381,7 +384,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
 
     Issue: How does one determine the right number of tokens?
 
- 1. Let |tokens| be the result of [=generate blinded tokens|generating blinded tokens=] with |numTokens|.
+ 1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
  1. Configure the HTTP request.
                a. Set a load flag to bypass the HTTP cache.
                b. Add `Sec-Private-State-Token` request header containing a
@@ -396,7 +399,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
 Private State Token HTTP request headers created for a typical fetch is as follows.
 
 ```
-Sec-Private-State-Token: <blinded tokens encoded as base64 string>
+Sec-Private-State-Token: <masked tokens encoded as base64 string>
 Sec-Private-State-Token-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 </div>
@@ -411,7 +414,7 @@ and `private` parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
 passed in the URL `public` parameter. PMB can encode a value from set {0,1,2}
 in `public` and a value from set {0,1} in `private` parameter.
 
-Using its private keys, issuer signs the blinded tokens obtained in the
+Using its private keys, issuer signs the masked tokens obtained in the
 `Sec-Private-State-Token` request header value. Issuer uses the cryptographic protocol
 specified in the request `Sec-Private-State-Token-Version` header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
@@ -445,7 +448,7 @@ To process a response to an issue request, browser carries out the following ste
  2. If the response has an empty `Sec-Private-State-Token` header, return; this is a
        `Success` response bearing 0 tokens.
  3. Strip the `Sec-Private-State-Token` header from the response and carry out the
-    cryptographic procedures to obtain a list of unblinded tokens.
+    cryptographic procedures to obtain a list of unmasked tokens.
     a. If the cryptographic procedure succeeds, associate the tokens with the
           issuing key’s label and store the tokens.
     b. Else, return an error.
@@ -716,7 +719,7 @@ Privacy Considerations {#privacy}
 Unlinkability {#unlinkability}
 ------------------------------
 
-Cryptographic protocols [[VOPRF]] and [[PMB]] provide blind signatures. At
+Cryptographic protocols [[VOPRF]] and [[PMB]] provide masked signatures. At
 redemption time, issuers can recognize their signature on the provided token,
 however they can not determine at what time and context they signed the token.
 This prevents issuers to correlate their issuances on an origin with
@@ -859,5 +862,5 @@ Specification document: this specification ([[#sec-private-state-token-version]]
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
 Thanks to Charlie Harrison, David Van Cleve, Johann Hofmann, Kaustubha Govind,
-and Mike Taylor for their contributions. Thanks to Chris Wilson for reviewing
-and mentoring this spec.
+Mike Taylor, and Chris Fredrickson for their contributions. Thanks to Chris
+Wilson for reviewing and mentoring this spec.
