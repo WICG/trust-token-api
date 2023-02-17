@@ -121,7 +121,7 @@ Origins may ask browser to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.
 
 Private State Tokens API performs cross site anonymous authentication without
-using linkable state carrying cookies [[!RFC6265]]. Cookies do provide cross
+using linkable state carrying cookies [[RFC6265]]. Cookies do provide cross
 site authentication, however, they fail to provide anonymity.
 
 Cookies store large amounts of information. [[!RFC6265]] requires at least 4096
