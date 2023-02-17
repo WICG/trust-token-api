@@ -312,7 +312,7 @@ type that the specification supports at this time.
 enum TokenType { "private-state-token" };
 </pre>
 
-The OperationType refers to which operation the browser is attempting to complete.
+The {{OperationType}} refers to which operation the user agent is attempting to complete.
 
 <pre class=idl>
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
