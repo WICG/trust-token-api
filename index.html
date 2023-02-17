@@ -4,9 +4,9 @@
   <title>Private State Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
+  <meta content="Bikeshed version f043d3484, updated Fri Feb 17 10:53:48 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="8e652b1293649e128caf40ca32161719c618403b" name="document-revision">
+  <meta content="5bec9ecf867c04e5db4841ebfcf2281af5e8c28f" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -216,10 +216,10 @@ figcaption:not(.no-marker)::before {
 .dfn-panel {
     position: absolute;
     z-index: 35;
-    height: auto;
-    width: -webkit-fit-content;
-    width: fit-content;
+    width: 20em;
+    min-width: min-content;
     max-width: 300px;
+    height: auto;
     max-height: 500px;
     overflow: auto;
     padding: 0.5em 0.75em;
@@ -227,6 +227,7 @@ figcaption:not(.no-marker)::before {
     background: var(--dfnpanel-bg);
     color: var(--dfnpanel-text);
     border: outset 0.2em;
+    white-space: normal; /* in case it's moved into a pre */
 }
 .dfn-panel:not(.on) { display: none; }
 .dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
@@ -992,11 +993,11 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Pass issuer public keys to cryptographic procedures. Reject if keys are
      malformed.</p>
-     <p class="issue" id="issue-c631389b"><a class="self-link" href="#issue-c631389b"></a> How do we get the issuer public keys here?</p>
+     <p class="issue" id="issue-c631389b"><a class="self-link" href="#issue-c631389b"></a> How do we get the issuer public keys here? <a href="https://github.com/WICG/trust-token-api/issues/187">[Issue #187]</a></p>
     <li data-md>
      <p><a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens">Discard tokens</a> from <var>issuer</var> that are signed with keys other than those from
         the issuer’s most recent commitments.</p>
-     <p class="issue" id="issue-f6043e49"><a class="self-link" href="#issue-f6043e49"></a> This probably needs to be its own algorithm, how is "most recent" defined here?</p>
+     <p class="issue" id="issue-f6043e49"><a class="self-link" href="#issue-f6043e49"></a> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a></p>
     <li data-md>
      <p>Let <var>numTokens</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> limit on the number of tokens (which is recommended to be 100), whichever is smaller.</p>
     <li data-md>
@@ -1049,7 +1050,7 @@ header.
     <li data-md>
      <p>Remove the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑤">Sec-Private-State-Token</a> header from the response and carry out the cryptographic procedures to obtain a list of unmasked tokens.</p>
    </ol>
-   <p class="issue" id="issue-63880884"><a class="self-link" href="#issue-63880884"></a> Define "cryptographic procedures to obtain a list of unmasked tokens"</p>
+   <p class="issue" id="issue-63880884"><a class="self-link" href="#issue-63880884"></a> Define "cryptographic procedures to obtain a list of unmasked tokens" <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a></p>
    <ol>
     <li data-md>
      <p>If the cryptographic procedure succeeds, associate the tokens with the issuing key’s label and store the tokens. <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①">Resolve</a> <var>p</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined①">undefined</a></code> and return <var>p</var>.</p>
@@ -1125,7 +1126,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p><a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens①">Discard tokens</a> from <var>issuer</var> that are signed with keys other than those from
         the issuer’s most recent commitments.</p>
-     <p class="issue" id="issue-f6043e49①"><a class="self-link" href="#issue-f6043e49①"></a> This probably needs to be its own algorithm, how is "most recent" defined here?</p>
+     <p class="issue" id="issue-f6043e49①"><a class="self-link" href="#issue-f6043e49①"></a> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a></p>
     <li data-md>
      <p>Let <var>token</var> be the result of <a data-link-type="dfn" href="#retrieve-a-token" id="ref-for-retrieve-a-token">retrieving a token</a> for <var>issuer</var>.</p>
     <li data-md>
@@ -1275,7 +1276,7 @@ field gives the expiration for the <a data-link-type="dfn" href="#redemption-rec
    <h3 class="heading settled" data-level="9.3" id="sec-private-state-token-version"><span class="secno">9.3. </span><span class="content">The 'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-version"></a></h3>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code></dfn> header field gives
 the "major version" of Private State Token protocol.</p>
-   <p class="issue" id="issue-411a11f5"><a class="self-link" href="#issue-411a11f5"></a> Define what "major version" actually means.</p>
+   <p class="issue" id="issue-411a11f5"><a class="self-link" href="#issue-411a11f5"></a> Define what "major version" actually means. <a href="https://github.com/WICG/trust-token-api/issues/188">[Issue #188]</a></p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31②">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3①">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Version</c-> <c- o>=</c-> <c- nc>sf-string</c->
@@ -1454,7 +1455,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <li><a href="#dom-operationtype-token-request">"token-request"</a><span>, in § 5.1</span>
    <li><a href="#enumdef-tokentype">TokenType</a><span>, in § 5.1</span>
   </ul>
-  <aside aria-labelledby="infopaneltitle-for-07886e33695d0e7b473ef18f656ad7ac" class="dfn-panel" data-for="07886e33695d0e7b473ef18f656ad7ac" id="infopanel-for-07886e33695d0e7b473ef18f656ad7ac" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-07886e33695d0e7b473ef18f656ad7ac" class="dfn-panel" data-for="07886e33695d0e7b473ef18f656ad7ac" id="infopanel-for-07886e33695d0e7b473ef18f656ad7ac">
    <span id="infopaneltitle-for-07886e33695d0e7b473ef18f656ad7ac" style="display:none">Info about the 'Document' external reference.</span><a href="https://dom.spec.whatwg.org/#document">https://dom.spec.whatwg.org/#document</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-document">7.2. Changes to Document</a> <a href="#ref-for-document①">(2)</a>
@@ -1462,38 +1463,38 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-document③">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-9c5cdbb5c3dd225a70ea0af45a02c608" class="dfn-panel" data-for="9c5cdbb5c3dd225a70ea0af45a02c608" id="infopanel-for-9c5cdbb5c3dd225a70ea0af45a02c608" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-9c5cdbb5c3dd225a70ea0af45a02c608" class="dfn-panel" data-for="9c5cdbb5c3dd225a70ea0af45a02c608" id="infopanel-for-9c5cdbb5c3dd225a70ea0af45a02c608">
    <span id="infopaneltitle-for-9c5cdbb5c3dd225a70ea0af45a02c608" style="display:none">Info about the 'origin' external reference.</span><a href="https://dom.spec.whatwg.org/#concept-document-origin">https://dom.spec.whatwg.org/#concept-document-origin</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-document-origin">4. Algorithms</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-bda9e897bec9e1501aae0e763c882527" class="dfn-panel" data-for="bda9e897bec9e1501aae0e763c882527" id="infopanel-for-bda9e897bec9e1501aae0e763c882527" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-bda9e897bec9e1501aae0e763c882527" class="dfn-panel" data-for="bda9e897bec9e1501aae0e763c882527" id="infopanel-for-bda9e897bec9e1501aae0e763c882527">
    <span id="infopaneltitle-for-bda9e897bec9e1501aae0e763c882527" style="display:none">Info about the 'Request(input)' external reference.</span><a href="https://fetch.spec.whatwg.org/#dom-request">https://fetch.spec.whatwg.org/#dom-request</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-request">5.2. Modifications to request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-4293976a2fc689fa38243bca91f1f402" class="dfn-panel" data-for="4293976a2fc689fa38243bca91f1f402" id="infopanel-for-4293976a2fc689fa38243bca91f1f402" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-4293976a2fc689fa38243bca91f1f402" class="dfn-panel" data-for="4293976a2fc689fa38243bca91f1f402" id="infopanel-for-4293976a2fc689fa38243bca91f1f402">
    <span id="infopaneltitle-for-4293976a2fc689fa38243bca91f1f402" style="display:none">Info about the 'RequestInit' external reference.</span><a href="https://fetch.spec.whatwg.org/#requestinit">https://fetch.spec.whatwg.org/#requestinit</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-requestinit">5.1. Definitions</a> <a href="#ref-for-requestinit①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-136f2700e84634abd2f3d42487ba7f41" class="dfn-panel" data-for="136f2700e84634abd2f3d42487ba7f41" id="infopanel-for-136f2700e84634abd2f3d42487ba7f41" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-136f2700e84634abd2f3d42487ba7f41" class="dfn-panel" data-for="136f2700e84634abd2f3d42487ba7f41" id="infopanel-for-136f2700e84634abd2f3d42487ba7f41">
    <span id="infopaneltitle-for-136f2700e84634abd2f3d42487ba7f41" style="display:none">Info about the 'client' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-client">https://fetch.spec.whatwg.org/#concept-request-client</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-request-client">6.1. Browser Steps For Creating Issue Request</a> <a href="#ref-for-concept-request-client①">(2)</a>
     <li><a href="#ref-for-concept-request-client②">7. Redeeming Tokens</a> <a href="#ref-for-concept-request-client③">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-87f2d30ab2be54b6f754efb1b0c5b2e9" class="dfn-panel" data-for="87f2d30ab2be54b6f754efb1b0c5b2e9" id="infopanel-for-87f2d30ab2be54b6f754efb1b0c5b2e9" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-87f2d30ab2be54b6f754efb1b0c5b2e9" class="dfn-panel" data-for="87f2d30ab2be54b6f754efb1b0c5b2e9" id="infopanel-for-87f2d30ab2be54b6f754efb1b0c5b2e9">
    <span id="infopaneltitle-for-87f2d30ab2be54b6f754efb1b0c5b2e9" style="display:none">Info about the 'http-network-or-cache fetch' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-http-network-or-cache-fetch">https://fetch.spec.whatwg.org/#concept-http-network-or-cache-fetch</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-http-network-or-cache-fetch">5.3. Modifications to http-network-or-cache fetch</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-491791562dd138987138e7051a96c07c" class="dfn-panel" data-for="491791562dd138987138e7051a96c07c" id="infopanel-for-491791562dd138987138e7051a96c07c" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-491791562dd138987138e7051a96c07c" class="dfn-panel" data-for="491791562dd138987138e7051a96c07c" id="infopanel-for-491791562dd138987138e7051a96c07c">
    <span id="infopaneltitle-for-491791562dd138987138e7051a96c07c" style="display:none">Info about the 'request' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request">https://fetch.spec.whatwg.org/#concept-request</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-request">5.2. Modifications to request</a>
@@ -1501,48 +1502,48 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-concept-request②">7. Redeeming Tokens</a> <a href="#ref-for-concept-request③">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-62eb8611855ca0d3551225567f68307a" class="dfn-panel" data-for="62eb8611855ca0d3551225567f68307a" id="infopanel-for-62eb8611855ca0d3551225567f68307a" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-62eb8611855ca0d3551225567f68307a" class="dfn-panel" data-for="62eb8611855ca0d3551225567f68307a" id="infopanel-for-62eb8611855ca0d3551225567f68307a">
    <span id="infopaneltitle-for-62eb8611855ca0d3551225567f68307a" style="display:none">Info about the 'request (for Request)' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-request">https://fetch.spec.whatwg.org/#concept-request-request</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-request-request">5.2. Modifications to request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" class="dfn-panel" data-for="a50d6de302855c18285652c8be59e5b0" id="infopanel-for-a50d6de302855c18285652c8be59e5b0" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" class="dfn-panel" data-for="a50d6de302855c18285652c8be59e5b0" id="infopanel-for-a50d6de302855c18285652c8be59e5b0">
    <span id="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" style="display:none">Info about the 'set a structured field value' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-header-list-set-structured-header">6.1. Browser Steps For Creating Issue Request</a> <a href="#ref-for-concept-header-list-set-structured-header①">(2)</a>
     <li><a href="#ref-for-concept-header-list-set-structured-header②">7. Redeeming Tokens</a> <a href="#ref-for-concept-header-list-set-structured-header③">(2)</a> <a href="#ref-for-concept-header-list-set-structured-header④">(3)</a> <a href="#ref-for-concept-header-list-set-structured-header⑤">(4)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-6f4775873c70787775f9c70f0f110709" class="dfn-panel" data-for="6f4775873c70787775f9c70f0f110709" id="infopanel-for-6f4775873c70787775f9c70f0f110709" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-6f4775873c70787775f9c70f0f110709" class="dfn-panel" data-for="6f4775873c70787775f9c70f0f110709" id="infopanel-for-6f4775873c70787775f9c70f0f110709">
    <span id="infopaneltitle-for-6f4775873c70787775f9c70f0f110709" style="display:none">Info about the 'url' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-url">https://fetch.spec.whatwg.org/#concept-request-url</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-request-url">6.1. Browser Steps For Creating Issue Request</a>
     <li><a href="#ref-for-concept-request-url①">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-7594a09aa0c77c9e24726559a3a6da9d" class="dfn-panel" data-for="7594a09aa0c77c9e24726559a3a6da9d" id="infopanel-for-7594a09aa0c77c9e24726559a3a6da9d" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-7594a09aa0c77c9e24726559a3a6da9d" class="dfn-panel" data-for="7594a09aa0c77c9e24726559a3a6da9d" id="infopanel-for-7594a09aa0c77c9e24726559a3a6da9d">
    <span id="infopaneltitle-for-7594a09aa0c77c9e24726559a3a6da9d" style="display:none">Info about the 'fully active' external reference.</span><a href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active">https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-fully-active">8.1. Token Query</a>
     <li><a href="#ref-for-fully-active①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-3a2763fcaa6bc82693554cf36780c0dd" class="dfn-panel" data-for="3a2763fcaa6bc82693554cf36780c0dd" id="infopanel-for-3a2763fcaa6bc82693554cf36780c0dd" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-3a2763fcaa6bc82693554cf36780c0dd" class="dfn-panel" data-for="3a2763fcaa6bc82693554cf36780c0dd" id="infopanel-for-3a2763fcaa6bc82693554cf36780c0dd">
    <span id="infopaneltitle-for-3a2763fcaa6bc82693554cf36780c0dd" style="display:none">Info about the 'in parallel' external reference.</span><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-in-parallel">8.1. Token Query</a>
     <li><a href="#ref-for-in-parallel①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-a62bba5e3257149e6f7839babb61b77a" class="dfn-panel" data-for="a62bba5e3257149e6f7839babb61b77a" id="infopanel-for-a62bba5e3257149e6f7839babb61b77a" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-a62bba5e3257149e6f7839babb61b77a" class="dfn-panel" data-for="a62bba5e3257149e6f7839babb61b77a" id="infopanel-for-a62bba5e3257149e6f7839babb61b77a">
    <span id="infopaneltitle-for-a62bba5e3257149e6f7839babb61b77a" style="display:none">Info about the 'networking task source' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source">https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-networking-task-source">8.1. Token Query</a> <a href="#ref-for-networking-task-source①">(2)</a>
     <li><a href="#ref-for-networking-task-source②">8.2. Redemption Record Query</a> <a href="#ref-for-networking-task-source③">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-e66f9f7d45934e77669cb907bd0c7636" class="dfn-panel" data-for="e66f9f7d45934e77669cb907bd0c7636" id="infopanel-for-e66f9f7d45934e77669cb907bd0c7636" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-e66f9f7d45934e77669cb907bd0c7636" class="dfn-panel" data-for="e66f9f7d45934e77669cb907bd0c7636" id="infopanel-for-e66f9f7d45934e77669cb907bd0c7636">
    <span id="infopaneltitle-for-e66f9f7d45934e77669cb907bd0c7636" style="display:none">Info about the 'origin' external reference.</span><a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin">https://html.spec.whatwg.org/multipage/browsers.html#concept-origin</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-origin">4. Algorithms</a> <a href="#ref-for-concept-origin①">(2)</a> <a href="#ref-for-concept-origin②">(3)</a> <a href="#ref-for-concept-origin③">(4)</a> <a href="#ref-for-concept-origin④">(5)</a> <a href="#ref-for-concept-origin⑤">(6)</a> <a href="#ref-for-concept-origin⑥">(7)</a> <a href="#ref-for-concept-origin⑦">(8)</a> <a href="#ref-for-concept-origin⑧">(9)</a> <a href="#ref-for-concept-origin⑨">(10)</a> <a href="#ref-for-concept-origin①⓪">(11)</a> <a href="#ref-for-concept-origin①①">(12)</a> <a href="#ref-for-concept-origin①②">(13)</a> <a href="#ref-for-concept-origin①③">(14)</a> <a href="#ref-for-concept-origin①④">(15)</a> <a href="#ref-for-concept-origin①⑤">(16)</a> <a href="#ref-for-concept-origin①⑥">(17)</a>
@@ -1551,28 +1552,28 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-concept-origin②⓪">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-a8756513b792b8f203588906035a13bb" class="dfn-panel" data-for="a8756513b792b8f203588906035a13bb" id="infopanel-for-a8756513b792b8f203588906035a13bb" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-a8756513b792b8f203588906035a13bb" class="dfn-panel" data-for="a8756513b792b8f203588906035a13bb" id="infopanel-for-a8756513b792b8f203588906035a13bb">
    <span id="infopaneltitle-for-a8756513b792b8f203588906035a13bb" style="display:none">Info about the 'queue a global task' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-queue-a-global-task">8.1. Token Query</a> <a href="#ref-for-queue-a-global-task①">(2)</a>
     <li><a href="#ref-for-queue-a-global-task②">8.2. Redemption Record Query</a> <a href="#ref-for-queue-a-global-task③">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-2233058c8f0998915af8393ee2abbc1d" class="dfn-panel" data-for="2233058c8f0998915af8393ee2abbc1d" id="infopanel-for-2233058c8f0998915af8393ee2abbc1d" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-2233058c8f0998915af8393ee2abbc1d" class="dfn-panel" data-for="2233058c8f0998915af8393ee2abbc1d" id="infopanel-for-2233058c8f0998915af8393ee2abbc1d">
    <span id="infopaneltitle-for-2233058c8f0998915af8393ee2abbc1d" style="display:none">Info about the 'relevant global object' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-relevant-global">8.1. Token Query</a>
     <li><a href="#ref-for-concept-relevant-global①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-bfb9cb6617f81a424ab20212af73bae3" class="dfn-panel" data-for="bfb9cb6617f81a424ab20212af73bae3" id="infopanel-for-bfb9cb6617f81a424ab20212af73bae3" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-bfb9cb6617f81a424ab20212af73bae3" class="dfn-panel" data-for="bfb9cb6617f81a424ab20212af73bae3" id="infopanel-for-bfb9cb6617f81a424ab20212af73bae3">
    <span id="infopaneltitle-for-bfb9cb6617f81a424ab20212af73bae3" style="display:none">Info about the 'relevant settings object' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-relevant-settings-object">8.1. Token Query</a>
     <li><a href="#ref-for-relevant-settings-object①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-613400696de3e8f8a5001430db03abe8" class="dfn-panel" data-for="613400696de3e8f8a5001430db03abe8" id="infopanel-for-613400696de3e8f8a5001430db03abe8" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-613400696de3e8f8a5001430db03abe8" class="dfn-panel" data-for="613400696de3e8f8a5001430db03abe8" id="infopanel-for-613400696de3e8f8a5001430db03abe8">
    <span id="infopaneltitle-for-613400696de3e8f8a5001430db03abe8" style="display:none">Info about the 'secure context' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context">https://html.spec.whatwg.org/multipage/webappapis.html#secure-context</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-secure-context">6.1. Browser Steps For Creating Issue Request</a>
@@ -1581,7 +1582,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-secure-context③">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-fad46e4a016cd6e3ca0c81a3c004e4c3" class="dfn-panel" data-for="fad46e4a016cd6e3ca0c81a3c004e4c3" id="infopanel-for-fad46e4a016cd6e3ca0c81a3c004e4c3" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-fad46e4a016cd6e3ca0c81a3c004e4c3" class="dfn-panel" data-for="fad46e4a016cd6e3ca0c81a3c004e4c3" id="infopanel-for-fad46e4a016cd6e3ca0c81a3c004e4c3">
    <span id="infopaneltitle-for-fad46e4a016cd6e3ca0c81a3c004e4c3" style="display:none">Info about the 'top-level origin' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-top-level-origin">https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-top-level-origin</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-environment-top-level-origin">6.1. Browser Steps For Creating Issue Request</a>
@@ -1590,89 +1591,89 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-concept-environment-top-level-origin③">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-fcfc8b0ed220faa237969aed00e2586d" class="dfn-panel" data-for="fcfc8b0ed220faa237969aed00e2586d" id="infopanel-for-fcfc8b0ed220faa237969aed00e2586d" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-fcfc8b0ed220faa237969aed00e2586d" class="dfn-panel" data-for="fcfc8b0ed220faa237969aed00e2586d" id="infopanel-for-fcfc8b0ed220faa237969aed00e2586d">
    <span id="infopaneltitle-for-fcfc8b0ed220faa237969aed00e2586d" style="display:none">Info about the 'append' external reference.</span><a href="https://infra.spec.whatwg.org/#list-append">https://infra.spec.whatwg.org/#list-append</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-list-append">4. Algorithms</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-6a3d87a2ff9ed36e37a82055f7e141de" class="dfn-panel" data-for="6a3d87a2ff9ed36e37a82055f7e141de" id="infopanel-for-6a3d87a2ff9ed36e37a82055f7e141de" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-6a3d87a2ff9ed36e37a82055f7e141de" class="dfn-panel" data-for="6a3d87a2ff9ed36e37a82055f7e141de" id="infopanel-for-6a3d87a2ff9ed36e37a82055f7e141de">
    <span id="infopaneltitle-for-6a3d87a2ff9ed36e37a82055f7e141de" style="display:none">Info about the 'byte sequence' external reference.</span><a href="https://infra.spec.whatwg.org/#byte-sequence">https://infra.spec.whatwg.org/#byte-sequence</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-byte-sequence">7.1. Redemption Records</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-eb75379b05abc264a531a791358e1eba" class="dfn-panel" data-for="eb75379b05abc264a531a791358e1eba" id="infopanel-for-eb75379b05abc264a531a791358e1eba" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-eb75379b05abc264a531a791358e1eba" class="dfn-panel" data-for="eb75379b05abc264a531a791358e1eba" id="infopanel-for-eb75379b05abc264a531a791358e1eba">
    <span id="infopaneltitle-for-eb75379b05abc264a531a791358e1eba" style="display:none">Info about the 'contain' external reference.</span><a href="https://infra.spec.whatwg.org/#list-contain">https://infra.spec.whatwg.org/#list-contain</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-list-contain">4. Algorithms</a> <a href="#ref-for-list-contain①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-de8dad85bc31aef3359c7c7dbd918fe7" class="dfn-panel" data-for="de8dad85bc31aef3359c7c7dbd918fe7" id="infopanel-for-de8dad85bc31aef3359c7c7dbd918fe7" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-de8dad85bc31aef3359c7c7dbd918fe7" class="dfn-panel" data-for="de8dad85bc31aef3359c7c7dbd918fe7" id="infopanel-for-de8dad85bc31aef3359c7c7dbd918fe7">
    <span id="infopaneltitle-for-de8dad85bc31aef3359c7c7dbd918fe7" style="display:none">Info about the 'empty' external reference.</span><a href="https://infra.spec.whatwg.org/#list-empty">https://infra.spec.whatwg.org/#list-empty</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-list-empty">6.1. Browser Steps For Creating Issue Request</a>
     <li><a href="#ref-for-list-empty①">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-0d3ee326a162c16997e7bb20e8b7133c" class="dfn-panel" data-for="0d3ee326a162c16997e7bb20e8b7133c" id="infopanel-for-0d3ee326a162c16997e7bb20e8b7133c" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-0d3ee326a162c16997e7bb20e8b7133c" class="dfn-panel" data-for="0d3ee326a162c16997e7bb20e8b7133c" id="infopanel-for-0d3ee326a162c16997e7bb20e8b7133c">
    <span id="infopaneltitle-for-0d3ee326a162c16997e7bb20e8b7133c" style="display:none">Info about the 'exist' external reference.</span><a href="https://infra.spec.whatwg.org/#map-exists">https://infra.spec.whatwg.org/#map-exists</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-map-exists">4. Algorithms</a> <a href="#ref-for-map-exists①">(2)</a> <a href="#ref-for-map-exists②">(3)</a> <a href="#ref-for-map-exists③">(4)</a> <a href="#ref-for-map-exists④">(5)</a>
     <li><a href="#ref-for-map-exists⑤">5.2. Modifications to request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" class="dfn-panel" data-for="fd74d8159933c4a74d0b23390bed43e3" id="infopanel-for-fd74d8159933c4a74d0b23390bed43e3" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" class="dfn-panel" data-for="fd74d8159933c4a74d0b23390bed43e3" id="infopanel-for-fd74d8159933c4a74d0b23390bed43e3">
    <span id="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" style="display:none">Info about the 'implementation-defined' external reference.</span><a href="https://infra.spec.whatwg.org/#implementation-defined">https://infra.spec.whatwg.org/#implementation-defined</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-implementation-defined">6.1. Browser Steps For Creating Issue Request</a>
     <li><a href="#ref-for-implementation-defined①">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-fafd38d2108e357bcc9a6fd7f3cd04a7" class="dfn-panel" data-for="fafd38d2108e357bcc9a6fd7f3cd04a7" id="infopanel-for-fafd38d2108e357bcc9a6fd7f3cd04a7" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-fafd38d2108e357bcc9a6fd7f3cd04a7" class="dfn-panel" data-for="fafd38d2108e357bcc9a6fd7f3cd04a7" id="infopanel-for-fafd38d2108e357bcc9a6fd7f3cd04a7">
    <span id="infopaneltitle-for-fafd38d2108e357bcc9a6fd7f3cd04a7" style="display:none">Info about the 'list' external reference.</span><a href="https://infra.spec.whatwg.org/#list">https://infra.spec.whatwg.org/#list</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-list">4. Algorithms</a> <a href="#ref-for-list①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-4bf12d0cddf322a1e2a9fb52f4d85843" class="dfn-panel" data-for="4bf12d0cddf322a1e2a9fb52f4d85843" id="infopanel-for-4bf12d0cddf322a1e2a9fb52f4d85843" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-4bf12d0cddf322a1e2a9fb52f4d85843" class="dfn-panel" data-for="4bf12d0cddf322a1e2a9fb52f4d85843" id="infopanel-for-4bf12d0cddf322a1e2a9fb52f4d85843">
    <span id="infopaneltitle-for-4bf12d0cddf322a1e2a9fb52f4d85843" style="display:none">Info about the 'map' external reference.</span><a href="https://infra.spec.whatwg.org/#ordered-map">https://infra.spec.whatwg.org/#ordered-map</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-ordered-map">4. Algorithms</a> <a href="#ref-for-ordered-map①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-5c3d3462610d78bc92b91000cc511bc4" class="dfn-panel" data-for="5c3d3462610d78bc92b91000cc511bc4" id="infopanel-for-5c3d3462610d78bc92b91000cc511bc4" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-5c3d3462610d78bc92b91000cc511bc4" class="dfn-panel" data-for="5c3d3462610d78bc92b91000cc511bc4" id="infopanel-for-5c3d3462610d78bc92b91000cc511bc4">
    <span id="infopaneltitle-for-5c3d3462610d78bc92b91000cc511bc4" style="display:none">Info about the 'set' external reference.</span><a href="https://infra.spec.whatwg.org/#map-set">https://infra.spec.whatwg.org/#map-set</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-map-set">4. Algorithms</a> <a href="#ref-for-map-set①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-bed8381510f5967f5d37a33de776e857" class="dfn-panel" data-for="bed8381510f5967f5d37a33de776e857" id="infopanel-for-bed8381510f5967f5d37a33de776e857" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-bed8381510f5967f5d37a33de776e857" class="dfn-panel" data-for="bed8381510f5967f5d37a33de776e857" id="infopanel-for-bed8381510f5967f5d37a33de776e857">
    <span id="infopaneltitle-for-bed8381510f5967f5d37a33de776e857" style="display:none">Info about the 'size' external reference.</span><a href="https://infra.spec.whatwg.org/#list-size">https://infra.spec.whatwg.org/#list-size</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-list-size">4. Algorithms</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-decbbd3ee5a73b54e8e8996ce1fddbbc" class="dfn-panel" data-for="decbbd3ee5a73b54e8e8996ce1fddbbc" id="infopanel-for-decbbd3ee5a73b54e8e8996ce1fddbbc" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-decbbd3ee5a73b54e8e8996ce1fddbbc" class="dfn-panel" data-for="decbbd3ee5a73b54e8e8996ce1fddbbc" id="infopanel-for-decbbd3ee5a73b54e8e8996ce1fddbbc">
    <span id="infopaneltitle-for-decbbd3ee5a73b54e8e8996ce1fddbbc" style="display:none">Info about the 'tuple' external reference.</span><a href="https://infra.spec.whatwg.org/#tuple">https://infra.spec.whatwg.org/#tuple</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-tuple">4. Algorithms</a> <a href="#ref-for-tuple①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-aa2c8002bc21ce6db8c66313c0f9d701" class="dfn-panel" data-for="aa2c8002bc21ce6db8c66313c0f9d701" id="infopanel-for-aa2c8002bc21ce6db8c66313c0f9d701" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-aa2c8002bc21ce6db8c66313c0f9d701" class="dfn-panel" data-for="aa2c8002bc21ce6db8c66313c0f9d701" id="infopanel-for-aa2c8002bc21ce6db8c66313c0f9d701">
    <span id="infopaneltitle-for-aa2c8002bc21ce6db8c66313c0f9d701" style="display:none">Info about the 'integer' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#section-3.3.1">https://tools.ietf.org/html/rfc8941#section-3.3.1</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-section-3.3.1">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-74d52bb72ef9fb1bb5520406f010079c" class="dfn-panel" data-for="74d52bb72ef9fb1bb5520406f010079c" id="infopanel-for-74d52bb72ef9fb1bb5520406f010079c" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-74d52bb72ef9fb1bb5520406f010079c" class="dfn-panel" data-for="74d52bb72ef9fb1bb5520406f010079c" id="infopanel-for-74d52bb72ef9fb1bb5520406f010079c">
    <span id="infopaneltitle-for-74d52bb72ef9fb1bb5520406f010079c" style="display:none">Info about the 'string' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#section-3.3.3">https://tools.ietf.org/html/rfc8941#section-3.3.3</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-section-3.3.3">9.1. The 'Sec-Private-State-Token' Header Field</a>
     <li><a href="#ref-for-section-3.3.3①">9.3. The 'Sec-Private-State-Token-Version' Header Field</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-edc3e3324b8239e1191d55af2617bd31" class="dfn-panel" data-for="edc3e3324b8239e1191d55af2617bd31" id="infopanel-for-edc3e3324b8239e1191d55af2617bd31" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-edc3e3324b8239e1191d55af2617bd31" class="dfn-panel" data-for="edc3e3324b8239e1191d55af2617bd31" id="infopanel-for-edc3e3324b8239e1191d55af2617bd31">
    <span id="infopaneltitle-for-edc3e3324b8239e1191d55af2617bd31" style="display:none">Info about the 'structured header' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#">https://tools.ietf.org/html/rfc8941#</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.1. The 'Sec-Private-State-Token' Header Field</a>
@@ -1680,21 +1681,21 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.3. The 'Sec-Private-State-Token-Version' Header Field</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-eb0e1698348a5ae30cd3aa882b6dff01" class="dfn-panel" data-for="eb0e1698348a5ae30cd3aa882b6dff01" id="infopanel-for-eb0e1698348a5ae30cd3aa882b6dff01" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-eb0e1698348a5ae30cd3aa882b6dff01" class="dfn-panel" data-for="eb0e1698348a5ae30cd3aa882b6dff01" id="infopanel-for-eb0e1698348a5ae30cd3aa882b6dff01">
    <span id="infopaneltitle-for-eb0e1698348a5ae30cd3aa882b6dff01" style="display:none">Info about the 'origin' external reference.</span><a href="https://url.spec.whatwg.org/#concept-url-origin">https://url.spec.whatwg.org/#concept-url-origin</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-url-origin">6.1. Browser Steps For Creating Issue Request</a>
     <li><a href="#ref-for-concept-url-origin①">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-07df417653faafb38ece7480f2c15a3e" class="dfn-panel" data-for="07df417653faafb38ece7480f2c15a3e" id="infopanel-for-07df417653faafb38ece7480f2c15a3e" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-07df417653faafb38ece7480f2c15a3e" class="dfn-panel" data-for="07df417653faafb38ece7480f2c15a3e" id="infopanel-for-07df417653faafb38ece7480f2c15a3e">
    <span id="infopaneltitle-for-07df417653faafb38ece7480f2c15a3e" style="display:none">Info about the 'url parser' external reference.</span><a href="https://url.spec.whatwg.org/#concept-url-parser">https://url.spec.whatwg.org/#concept-url-parser</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-url-parser">8.1. Token Query</a>
     <li><a href="#ref-for-concept-url-parser①">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-0ab204fb9cc9a746edaff83c0db0740a" class="dfn-panel" data-for="0ab204fb9cc9a746edaff83c0db0740a" id="infopanel-for-0ab204fb9cc9a746edaff83c0db0740a" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-0ab204fb9cc9a746edaff83c0db0740a" class="dfn-panel" data-for="0ab204fb9cc9a746edaff83c0db0740a" id="infopanel-for-0ab204fb9cc9a746edaff83c0db0740a">
    <span id="infopaneltitle-for-0ab204fb9cc9a746edaff83c0db0740a" style="display:none">Info about the 'DOMException' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-DOMException">https://webidl.spec.whatwg.org/#idl-DOMException</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-DOMException">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-idl-DOMException①">(2)</a>
@@ -1702,13 +1703,13 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-idl-DOMException⑦">8.2. Redemption Record Query</a> <a href="#ref-for-idl-DOMException⑧">(2)</a> <a href="#ref-for-idl-DOMException⑨">(3)</a> <a href="#ref-for-idl-DOMException①⓪">(4)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-932ea4ef25c6e7fae06ef561c6e9532f" class="dfn-panel" data-for="932ea4ef25c6e7fae06ef561c6e9532f" id="infopanel-for-932ea4ef25c6e7fae06ef561c6e9532f" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-932ea4ef25c6e7fae06ef561c6e9532f" class="dfn-panel" data-for="932ea4ef25c6e7fae06ef561c6e9532f" id="infopanel-for-932ea4ef25c6e7fae06ef561c6e9532f">
    <span id="infopaneltitle-for-932ea4ef25c6e7fae06ef561c6e9532f" style="display:none">Info about the 'DataError' external reference.</span><a href="https://webidl.spec.whatwg.org/#dataerror">https://webidl.spec.whatwg.org/#dataerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dataerror">6.3. Browser Steps For Issue Response</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" class="dfn-panel" data-for="e2a06375a2fb70c61a8b4cd0abe9d4f1" id="infopanel-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" class="dfn-panel" data-for="e2a06375a2fb70c61a8b4cd0abe9d4f1" id="infopanel-for-e2a06375a2fb70c61a8b4cd0abe9d4f1">
    <span id="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" style="display:none">Info about the 'InvalidStateError' external reference.</span><a href="https://webidl.spec.whatwg.org/#invalidstateerror">https://webidl.spec.whatwg.org/#invalidstateerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-invalidstateerror">6.3. Browser Steps For Issue Response</a>
@@ -1716,27 +1717,27 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-invalidstateerror②">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-aa43258e2b51dc6ebe6268a36e6fd733" class="dfn-panel" data-for="aa43258e2b51dc6ebe6268a36e6fd733" id="infopanel-for-aa43258e2b51dc6ebe6268a36e6fd733" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-aa43258e2b51dc6ebe6268a36e6fd733" class="dfn-panel" data-for="aa43258e2b51dc6ebe6268a36e6fd733" id="infopanel-for-aa43258e2b51dc6ebe6268a36e6fd733">
    <span id="infopaneltitle-for-aa43258e2b51dc6ebe6268a36e6fd733" style="display:none">Info about the 'NotAllowedError' external reference.</span><a href="https://webidl.spec.whatwg.org/#notallowederror">https://webidl.spec.whatwg.org/#notallowederror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-notallowederror">8.1. Token Query</a> <a href="#ref-for-notallowederror①">(2)</a>
     <li><a href="#ref-for-notallowederror②">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" class="dfn-panel" data-for="93669c631ec1ef8e696b4c083bdbe12c" id="infopanel-for-93669c631ec1ef8e696b4c083bdbe12c" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" class="dfn-panel" data-for="93669c631ec1ef8e696b4c083bdbe12c" id="infopanel-for-93669c631ec1ef8e696b4c083bdbe12c">
    <span id="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" style="display:none">Info about the 'Promise' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-promise">https://webidl.spec.whatwg.org/#idl-promise</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-promise">7.2. Changes to Document</a> <a href="#ref-for-idl-promise①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-3f9c3eac015894a734faa8068fd8c2a1" class="dfn-panel" data-for="3f9c3eac015894a734faa8068fd8c2a1" id="infopanel-for-3f9c3eac015894a734faa8068fd8c2a1" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-3f9c3eac015894a734faa8068fd8c2a1" class="dfn-panel" data-for="3f9c3eac015894a734faa8068fd8c2a1" id="infopanel-for-3f9c3eac015894a734faa8068fd8c2a1">
    <span id="infopaneltitle-for-3f9c3eac015894a734faa8068fd8c2a1" style="display:none">Info about the 'TypeError' external reference.</span><a href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror">https://webidl.spec.whatwg.org/#exceptiondef-typeerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-exceptiondef-typeerror">8.1. Token Query</a> <a href="#ref-for-exceptiondef-typeerror①">(2)</a>
     <li><a href="#ref-for-exceptiondef-typeerror②">8.2. Redemption Record Query</a> <a href="#ref-for-exceptiondef-typeerror③">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-e270bcd7cdb4abe27bc3bb16a1975937" class="dfn-panel" data-for="e270bcd7cdb4abe27bc3bb16a1975937" id="infopanel-for-e270bcd7cdb4abe27bc3bb16a1975937" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-e270bcd7cdb4abe27bc3bb16a1975937" class="dfn-panel" data-for="e270bcd7cdb4abe27bc3bb16a1975937" id="infopanel-for-e270bcd7cdb4abe27bc3bb16a1975937">
    <span id="infopaneltitle-for-e270bcd7cdb4abe27bc3bb16a1975937" style="display:none">Info about the 'USVString' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-USVString">https://webidl.spec.whatwg.org/#idl-USVString</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-USVString">5.1. Definitions</a>
@@ -1745,7 +1746,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-idl-USVString⑦">8.2. Redemption Record Query</a> <a href="#ref-for-idl-USVString⑧">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" class="dfn-panel" data-for="bbe33fc7ac016834e4aaddbfd1b084a1" id="infopanel-for-bbe33fc7ac016834e4aaddbfd1b084a1" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" class="dfn-panel" data-for="bbe33fc7ac016834e4aaddbfd1b084a1" id="infopanel-for-bbe33fc7ac016834e4aaddbfd1b084a1">
    <span id="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" style="display:none">Info about the 'a new promise' external reference.</span><a href="https://webidl.spec.whatwg.org/#a-new-promise">https://webidl.spec.whatwg.org/#a-new-promise</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-a-new-promise">6.3. Browser Steps For Issue Response</a>
@@ -1753,13 +1754,13 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-a-new-promise②">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-f8062b07e25ed0281f5cbfb9a54070b4" class="dfn-panel" data-for="f8062b07e25ed0281f5cbfb9a54070b4" id="infopanel-for-f8062b07e25ed0281f5cbfb9a54070b4" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-f8062b07e25ed0281f5cbfb9a54070b4" class="dfn-panel" data-for="f8062b07e25ed0281f5cbfb9a54070b4" id="infopanel-for-f8062b07e25ed0281f5cbfb9a54070b4">
    <span id="infopaneltitle-for-f8062b07e25ed0281f5cbfb9a54070b4" style="display:none">Info about the 'boolean' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-boolean">https://webidl.spec.whatwg.org/#idl-boolean</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-boolean">7.2. Changes to Document</a> <a href="#ref-for-idl-boolean①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" class="dfn-panel" data-for="f7204c0306e7ffcb24c31adf6e629e1d" id="infopanel-for-f7204c0306e7ffcb24c31adf6e629e1d" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" class="dfn-panel" data-for="f7204c0306e7ffcb24c31adf6e629e1d" id="infopanel-for-f7204c0306e7ffcb24c31adf6e629e1d">
    <span id="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" style="display:none">Info about the 'reject' external reference.</span><a href="https://webidl.spec.whatwg.org/#reject">https://webidl.spec.whatwg.org/#reject</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-reject">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-reject①">(2)</a>
@@ -1767,7 +1768,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-reject⑦">8.2. Redemption Record Query</a> <a href="#ref-for-reject⑧">(2)</a> <a href="#ref-for-reject⑨">(3)</a> <a href="#ref-for-reject①⓪">(4)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-f4f973f92274819781816b033aea1f11" class="dfn-panel" data-for="f4f973f92274819781816b033aea1f11" id="infopanel-for-f4f973f92274819781816b033aea1f11" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-f4f973f92274819781816b033aea1f11" class="dfn-panel" data-for="f4f973f92274819781816b033aea1f11" id="infopanel-for-f4f973f92274819781816b033aea1f11">
    <span id="infopaneltitle-for-f4f973f92274819781816b033aea1f11" style="display:none">Info about the 'resolve' external reference.</span><a href="https://webidl.spec.whatwg.org/#resolve">https://webidl.spec.whatwg.org/#resolve</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-resolve">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-resolve①">(2)</a>
@@ -1775,19 +1776,19 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-resolve③">8.2. Redemption Record Query</a> <a href="#ref-for-resolve④">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" class="dfn-panel" data-for="38ab7db52e46bed36993204c29f67202" id="infopanel-for-38ab7db52e46bed36993204c29f67202" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" class="dfn-panel" data-for="38ab7db52e46bed36993204c29f67202" id="infopanel-for-38ab7db52e46bed36993204c29f67202">
    <span id="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" style="display:none">Info about the 'sequence' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-sequence">https://webidl.spec.whatwg.org/#idl-sequence</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-sequence">5.1. Definitions</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" class="dfn-panel" data-for="be0933df03cd63338f98de217c4158c7" id="infopanel-for-be0933df03cd63338f98de217c4158c7" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" class="dfn-panel" data-for="be0933df03cd63338f98de217c4158c7" id="infopanel-for-be0933df03cd63338f98de217c4158c7">
    <span id="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" style="display:none">Info about the 'this' external reference.</span><a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-this">5.2. Modifications to request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" class="dfn-panel" data-for="cee863f1f2ec91066cfb7f5d309d59dc" id="infopanel-for-cee863f1f2ec91066cfb7f5d309d59dc" role="menu">
+  <aside aria-labelledby="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" class="dfn-panel" data-for="cee863f1f2ec91066cfb7f5d309d59dc" id="infopanel-for-cee863f1f2ec91066cfb7f5d309d59dc">
    <span id="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" style="display:none">Info about the 'undefined' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-undefined">6.3. Browser Steps For Issue Response</a> <a href="#ref-for-idl-undefined①">(2)</a>
@@ -1948,26 +1949,26 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
    <div class="issue"> Need to specify how <code>operation</code> and <code>issuers</code> are used. <a href="https://github.com/WICG/trust-token-api/issues/151">[Issue #151]</a> <a class="issue-return" href="#issue-1b149e55" title="Jump to section">↵</a></div>
-   <div class="issue"> How do we get the issuer public keys here? <a class="issue-return" href="#issue-c631389b" title="Jump to section">↵</a></div>
-   <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
-   <div class="issue"> Define "cryptographic procedures to obtain a list of unmasked tokens" <a class="issue-return" href="#issue-63880884" title="Jump to section">↵</a></div>
+   <div class="issue"> How do we get the issuer public keys here? <a href="https://github.com/WICG/trust-token-api/issues/187">[Issue #187]</a> <a class="issue-return" href="#issue-c631389b" title="Jump to section">↵</a></div>
+   <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
+   <div class="issue"> Define "cryptographic procedures to obtain a list of unmasked tokens" <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a> <a class="issue-return" href="#issue-63880884" title="Jump to section">↵</a></div>
    <div class="issue"> Define this in terms of fetch <a class="issue-return" href="#issue-bc47898b" title="Jump to section">↵</a></div>
    <div class="issue"> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-2131c336" title="Jump to section">↵</a></div>
-   <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a class="issue-return" href="#issue-f6043e49①" title="Jump to section">↵</a></div>
+   <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49①" title="Jump to section">↵</a></div>
    <div class="issue"> This needs to be specified more clearly <a class="issue-return" href="#issue-907127dc" title="Jump to section">↵</a></div>
    <div class="issue"> Add redemption response handling, including calling [= record redemption timestamp =]. <a href="https://github.com/WICG/trust-token-api/issues/165">[Issue #165]</a> <a class="issue-return" href="#issue-045e65c0" title="Jump to section">↵</a></div>
    <div class="issue"> Define and link issuance, redemption, masked (formerly blinded), unmasked,
 signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to section">↵</a></div>
    <div class="issue"> Link stuff here too. <a class="issue-return" href="#issue-0f07ef70" title="Jump to section">↵</a></div>
-   <div class="issue"> Define what "major version" actually means. <a class="issue-return" href="#issue-411a11f5" title="Jump to section">↵</a></div>
+   <div class="issue"> Define what "major version" actually means. <a href="https://github.com/WICG/trust-token-api/issues/188">[Issue #188]</a> <a class="issue-return" href="#issue-411a11f5" title="Jump to section">↵</a></div>
   </div>
-  <aside aria-labelledby="infopaneltitle-for-issuerassociations" class="dfn-panel" data-for="issuerassociations" id="infopanel-for-issuerassociations" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-issuerassociations" class="dfn-panel" data-for="issuerassociations" id="infopanel-for-issuerassociations">
    <span id="infopaneltitle-for-issuerassociations" style="display:none">Info about the 'issuerAssociations' definition.</span><b><a href="#issuerassociations">#issuerassociations</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-issuerassociations">4. Algorithms</a> <a href="#ref-for-issuerassociations①">(2)</a> <a href="#ref-for-issuerassociations②">(3)</a> <a href="#ref-for-issuerassociations③">(4)</a> <a href="#ref-for-issuerassociations④">(5)</a> <a href="#ref-for-issuerassociations⑤">(6)</a> <a href="#ref-for-issuerassociations⑥">(7)</a> <a href="#ref-for-issuerassociations⑦">(8)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" class="dfn-panel" data-for="determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" id="infopanel-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" class="dfn-panel" data-for="determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" id="infopanel-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit">
    <span id="infopaneltitle-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" style="display:none">Info about the 'determine whether associating an issuer would exceed the top-level limit' definition.</span><b><a href="#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit">#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit">6.1. Browser Steps For Creating Issue Request</a>
@@ -1975,7 +1976,7 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit②">8.1. Token Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-associate-the-issuer" class="dfn-panel" data-for="associate-the-issuer" id="infopanel-for-associate-the-issuer" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-associate-the-issuer" class="dfn-panel" data-for="associate-the-issuer" id="infopanel-for-associate-the-issuer">
    <span id="infopaneltitle-for-associate-the-issuer" style="display:none">Info about the 'associate the issuer' definition.</span><b><a href="#associate-the-issuer">#associate-the-issuer</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-associate-the-issuer">6.1. Browser Steps For Creating Issue Request</a>
@@ -1983,25 +1984,25 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-associate-the-issuer②">8.1. Token Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-is-associated-with" class="dfn-panel" data-for="is-associated-with" id="infopanel-for-is-associated-with" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-is-associated-with" class="dfn-panel" data-for="is-associated-with" id="infopanel-for-is-associated-with">
    <span id="infopaneltitle-for-is-associated-with" style="display:none">Info about the 'is associated with' definition.</span><b><a href="#is-associated-with">#is-associated-with</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-is-associated-with">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-redemptiontimes" class="dfn-panel" data-for="redemptiontimes" id="infopanel-for-redemptiontimes" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-redemptiontimes" class="dfn-panel" data-for="redemptiontimes" id="infopanel-for-redemptiontimes">
    <span id="infopaneltitle-for-redemptiontimes" style="display:none">Info about the 'redemptionTimes' definition.</span><b><a href="#redemptiontimes">#redemptiontimes</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-redemptiontimes">4. Algorithms</a> <a href="#ref-for-redemptiontimes①">(2)</a> <a href="#ref-for-redemptiontimes②">(3)</a> <a href="#ref-for-redemptiontimes③">(4)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-look-up-penultimate-redemption" class="dfn-panel" data-for="look-up-penultimate-redemption" id="infopanel-for-look-up-penultimate-redemption" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-look-up-penultimate-redemption" class="dfn-panel" data-for="look-up-penultimate-redemption" id="infopanel-for-look-up-penultimate-redemption">
    <span id="infopaneltitle-for-look-up-penultimate-redemption" style="display:none">Info about the 'look up penultimate redemption' definition.</span><b><a href="#look-up-penultimate-redemption">#look-up-penultimate-redemption</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-look-up-penultimate-redemption">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-look-up-the-key-commitments" class="dfn-panel" data-for="look-up-the-key-commitments" id="infopanel-for-look-up-the-key-commitments" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-look-up-the-key-commitments" class="dfn-panel" data-for="look-up-the-key-commitments" id="infopanel-for-look-up-the-key-commitments">
    <span id="infopaneltitle-for-look-up-the-key-commitments" style="display:none">Info about the 'look up the key commitments' definition.</span><b><a href="#look-up-the-key-commitments">#look-up-the-key-commitments</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-look-up-the-key-commitments">6.1. Browser Steps For Creating Issue Request</a>
@@ -2010,13 +2011,13 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-look-up-the-key-commitments③">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-retrieve-a-token" class="dfn-panel" data-for="retrieve-a-token" id="infopanel-for-retrieve-a-token" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-retrieve-a-token" class="dfn-panel" data-for="retrieve-a-token" id="infopanel-for-retrieve-a-token">
    <span id="infopaneltitle-for-retrieve-a-token" style="display:none">Info about the 'retrieve a token' definition.</span><b><a href="#retrieve-a-token">#retrieve-a-token</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-retrieve-a-token">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-discard-tokens" class="dfn-panel" data-for="discard-tokens" id="infopanel-for-discard-tokens" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-discard-tokens" class="dfn-panel" data-for="discard-tokens" id="infopanel-for-discard-tokens">
    <span id="infopaneltitle-for-discard-tokens" style="display:none">Info about the 'discard tokens' definition.</span><b><a href="#discard-tokens">#discard-tokens</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-discard-tokens">6.1. Browser Steps For Creating Issue Request</a>
@@ -2025,86 +2026,86 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-discard-tokens③">8.2. Redemption Record Query</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-number-of-tokens" class="dfn-panel" data-for="number-of-tokens" id="infopanel-for-number-of-tokens" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-number-of-tokens" class="dfn-panel" data-for="number-of-tokens" id="infopanel-for-number-of-tokens">
    <span id="infopaneltitle-for-number-of-tokens" style="display:none">Info about the 'number of tokens' definition.</span><b><a href="#number-of-tokens">#number-of-tokens</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-number-of-tokens">6.1. Browser Steps For Creating Issue Request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-max-batch-size" class="dfn-panel" data-for="max-batch-size" id="infopanel-for-max-batch-size" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-max-batch-size" class="dfn-panel" data-for="max-batch-size" id="infopanel-for-max-batch-size">
    <span id="infopaneltitle-for-max-batch-size" style="display:none">Info about the 'max batch size' definition.</span><b><a href="#max-batch-size">#max-batch-size</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-max-batch-size">6.1. Browser Steps For Creating Issue Request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-generate-masked-tokens" class="dfn-panel" data-for="generate-masked-tokens" id="infopanel-for-generate-masked-tokens" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-generate-masked-tokens" class="dfn-panel" data-for="generate-masked-tokens" id="infopanel-for-generate-masked-tokens">
    <span id="infopaneltitle-for-generate-masked-tokens" style="display:none">Info about the 'generate masked tokens' definition.</span><b><a href="#generate-masked-tokens">#generate-masked-tokens</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-generate-masked-tokens">6.1. Browser Steps For Creating Issue Request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-enumdef-refreshpolicy" class="dfn-panel" data-for="enumdef-refreshpolicy" id="infopanel-for-enumdef-refreshpolicy" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-enumdef-refreshpolicy" class="dfn-panel" data-for="enumdef-refreshpolicy" id="infopanel-for-enumdef-refreshpolicy">
    <span id="infopaneltitle-for-enumdef-refreshpolicy" style="display:none">Info about the 'RefreshPolicy' definition.</span><b><a href="#enumdef-refreshpolicy">#enumdef-refreshpolicy</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-enumdef-refreshpolicy">5.1. Definitions</a> <a href="#ref-for-enumdef-refreshpolicy①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-enumdef-tokentype" class="dfn-panel" data-for="enumdef-tokentype" id="infopanel-for-enumdef-tokentype" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-enumdef-tokentype" class="dfn-panel" data-for="enumdef-tokentype" id="infopanel-for-enumdef-tokentype">
    <span id="infopaneltitle-for-enumdef-tokentype" style="display:none">Info about the 'TokenType' definition.</span><b><a href="#enumdef-tokentype">#enumdef-tokentype</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-enumdef-tokentype">5.1. Definitions</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-enumdef-operationtype" class="dfn-panel" data-for="enumdef-operationtype" id="infopanel-for-enumdef-operationtype" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-enumdef-operationtype" class="dfn-panel" data-for="enumdef-operationtype" id="infopanel-for-enumdef-operationtype">
    <span id="infopaneltitle-for-enumdef-operationtype" style="display:none">Info about the 'OperationType' definition.</span><b><a href="#enumdef-operationtype">#enumdef-operationtype</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-enumdef-operationtype">5.1. Definitions</a> <a href="#ref-for-enumdef-operationtype①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-dictdef-privatestatetoken" class="dfn-panel" data-for="dictdef-privatestatetoken" id="infopanel-for-dictdef-privatestatetoken" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-dictdef-privatestatetoken" class="dfn-panel" data-for="dictdef-privatestatetoken" id="infopanel-for-dictdef-privatestatetoken">
    <span id="infopaneltitle-for-dictdef-privatestatetoken" style="display:none">Info about the 'PrivateStateToken' definition.</span><b><a href="#dictdef-privatestatetoken">#dictdef-privatestatetoken</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-privatestatetoken">5.1. Definitions</a> <a href="#ref-for-dictdef-privatestatetoken①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-dom-privatestatetoken-refreshpolicy" class="dfn-panel" data-for="dom-privatestatetoken-refreshpolicy" id="infopanel-for-dom-privatestatetoken-refreshpolicy" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-dom-privatestatetoken-refreshpolicy" class="dfn-panel" data-for="dom-privatestatetoken-refreshpolicy" id="infopanel-for-dom-privatestatetoken-refreshpolicy">
    <span id="infopaneltitle-for-dom-privatestatetoken-refreshpolicy" style="display:none">Info about the 'refreshPolicy' definition.</span><b><a href="#dom-privatestatetoken-refreshpolicy">#dom-privatestatetoken-refreshpolicy</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-privatestatetoken-refreshpolicy">5.2. Modifications to request</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-dom-requestinit-privatestatetoken" class="dfn-panel" data-for="dom-requestinit-privatestatetoken" id="infopanel-for-dom-requestinit-privatestatetoken" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-dom-requestinit-privatestatetoken" class="dfn-panel" data-for="dom-requestinit-privatestatetoken" id="infopanel-for-dom-requestinit-privatestatetoken">
    <span id="infopaneltitle-for-dom-requestinit-privatestatetoken" style="display:none">Info about the 'privateStateToken' definition.</span><b><a href="#dom-requestinit-privatestatetoken">#dom-requestinit-privatestatetoken</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-requestinit-privatestatetoken">5.2. Modifications to request</a> <a href="#ref-for-dom-requestinit-privatestatetoken①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-request-token-refresh-policy" class="dfn-panel" data-for="request-token-refresh-policy" id="infopanel-for-request-token-refresh-policy" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-request-token-refresh-policy" class="dfn-panel" data-for="request-token-refresh-policy" id="infopanel-for-request-token-refresh-policy">
    <span id="infopaneltitle-for-request-token-refresh-policy" style="display:none">Info about the 'token refresh policy' definition.</span><b><a href="#request-token-refresh-policy">#request-token-refresh-policy</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-request-token-refresh-policy">5.2. Modifications to request</a>
     <li><a href="#ref-for-request-token-refresh-policy①">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-append-private-state-token-issue-request-headers" class="dfn-panel" data-for="append-private-state-token-issue-request-headers" id="infopanel-for-append-private-state-token-issue-request-headers" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-append-private-state-token-issue-request-headers" class="dfn-panel" data-for="append-private-state-token-issue-request-headers" id="infopanel-for-append-private-state-token-issue-request-headers">
    <span id="infopaneltitle-for-append-private-state-token-issue-request-headers" style="display:none">Info about the 'append private state token issue request headers' definition.</span><b><a href="#append-private-state-token-issue-request-headers">#append-private-state-token-issue-request-headers</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-append-private-state-token-issue-request-headers">5.3. Modifications to http-network-or-cache fetch</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-set-redemption-headers" class="dfn-panel" data-for="set-redemption-headers" id="infopanel-for-set-redemption-headers" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-set-redemption-headers" class="dfn-panel" data-for="set-redemption-headers" id="infopanel-for-set-redemption-headers">
    <span id="infopaneltitle-for-set-redemption-headers" style="display:none">Info about the 'set redemption headers' definition.</span><b><a href="#set-redemption-headers">#set-redemption-headers</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-set-redemption-headers">7. Redeeming Tokens</a> <a href="#ref-for-set-redemption-headers①">(2)</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-append-private-state-token-redemption-request-headers" class="dfn-panel" data-for="append-private-state-token-redemption-request-headers" id="infopanel-for-append-private-state-token-redemption-request-headers" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-append-private-state-token-redemption-request-headers" class="dfn-panel" data-for="append-private-state-token-redemption-request-headers" id="infopanel-for-append-private-state-token-redemption-request-headers">
    <span id="infopaneltitle-for-append-private-state-token-redemption-request-headers" style="display:none">Info about the 'append private state token redemption request headers' definition.</span><b><a href="#append-private-state-token-redemption-request-headers">#append-private-state-token-redemption-request-headers</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-append-private-state-token-redemption-request-headers">5.3. Modifications to http-network-or-cache fetch</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-redemption-record" class="dfn-panel" data-for="redemption-record" id="infopanel-for-redemption-record" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-redemption-record" class="dfn-panel" data-for="redemption-record" id="infopanel-for-redemption-record">
    <span id="infopaneltitle-for-redemption-record" style="display:none">Info about the 'Redemption Record' definition.</span><b><a href="#redemption-record">#redemption-record</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-redemption-record">5.1. Definitions</a>
@@ -2115,25 +2116,25 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-redemption-record①③">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-get-an-unexpired-redemption-record" class="dfn-panel" data-for="get-an-unexpired-redemption-record" id="infopanel-for-get-an-unexpired-redemption-record" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-get-an-unexpired-redemption-record" class="dfn-panel" data-for="get-an-unexpired-redemption-record" id="infopanel-for-get-an-unexpired-redemption-record">
    <span id="infopaneltitle-for-get-an-unexpired-redemption-record" style="display:none">Info about the 'get an unexpired Redemption Record' definition.</span><b><a href="#get-an-unexpired-redemption-record">#get-an-unexpired-redemption-record</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-get-an-unexpired-redemption-record">7. Redeeming Tokens</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-dom-document-hasprivatetokens" class="dfn-panel" data-for="dom-document-hasprivatetokens" id="infopanel-for-dom-document-hasprivatetokens" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-dom-document-hasprivatetokens" class="dfn-panel" data-for="dom-document-hasprivatetokens" id="infopanel-for-dom-document-hasprivatetokens">
    <span id="infopaneltitle-for-dom-document-hasprivatetokens" style="display:none">Info about the 'hasPrivateTokens(issuer, type)' definition.</span><b><a href="#dom-document-hasprivatetokens">#dom-document-hasprivatetokens</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-document-hasprivatetokens">7.2. Changes to Document</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-dom-document-hasredemptionrecord" class="dfn-panel" data-for="dom-document-hasredemptionrecord" id="infopanel-for-dom-document-hasredemptionrecord" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-dom-document-hasredemptionrecord" class="dfn-panel" data-for="dom-document-hasredemptionrecord" id="infopanel-for-dom-document-hasredemptionrecord">
    <span id="infopaneltitle-for-dom-document-hasredemptionrecord" style="display:none">Info about the 'hasRedemptionRecord(issuer, type)' definition.</span><b><a href="#dom-document-hasredemptionrecord">#dom-document-hasredemptionrecord</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-document-hasredemptionrecord">7.2. Changes to Document</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token" class="dfn-panel" data-for="http-headerdef-sec-private-state-token" id="infopanel-for-http-headerdef-sec-private-state-token" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token" class="dfn-panel" data-for="http-headerdef-sec-private-state-token" id="infopanel-for-http-headerdef-sec-private-state-token">
    <span id="infopaneltitle-for-http-headerdef-sec-private-state-token" style="display:none">Info about the 'Sec-Private-State-Token' definition.</span><b><a href="#http-headerdef-sec-private-state-token">#http-headerdef-sec-private-state-token</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-http-headerdef-sec-private-state-token">6.1. Browser Steps For Creating Issue Request</a>
@@ -2146,7 +2147,7 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-http-headerdef-sec-private-state-token①⓪">12. IANA Considerations</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-lifetime" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-lifetime" id="infopanel-for-http-headerdef-sec-private-state-token-lifetime" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-lifetime" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-lifetime" id="infopanel-for-http-headerdef-sec-private-state-token-lifetime">
    <span id="infopaneltitle-for-http-headerdef-sec-private-state-token-lifetime" style="display:none">Info about the 'Sec-Private-State-Token-Lifetime' definition.</span><b><a href="#http-headerdef-sec-private-state-token-lifetime">#http-headerdef-sec-private-state-token-lifetime</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-http-headerdef-sec-private-state-token-lifetime">7. Redeeming Tokens</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime①">(2)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime②">(3)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime③">(4)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime④">(5)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑤">(6)</a> <a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑥">(7)</a>
@@ -2154,7 +2155,7 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
     <li><a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑨">12. IANA Considerations</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-version" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-version" id="infopanel-for-http-headerdef-sec-private-state-token-version" role="dialog">
+  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-version" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-version" id="infopanel-for-http-headerdef-sec-private-state-token-version">
    <span id="infopaneltitle-for-http-headerdef-sec-private-state-token-version" style="display:none">Info about the 'Sec-Private-State-Token-Version' definition.</span><b><a href="#http-headerdef-sec-private-state-token-version">#http-headerdef-sec-private-state-token-version</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-http-headerdef-sec-private-state-token-version">6.1. Browser Steps For Creating Issue Request</a>
@@ -2237,7 +2238,6 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
             panelWrapper.style.height = "0px";
             dfn.insertAdjacentElement("afterend", panelWrapper);
             dfn.setAttribute('role', 'button');
-            dfn.setAttribute('aria-haspopup', 'menu');
             dfn.setAttribute('aria-expanded', 'false')
             dfn.tabIndex = 0;
             dfn.classList.add('has-dfn-panel');
