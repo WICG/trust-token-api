@@ -318,7 +318,7 @@ The OperationType refers to which operation the browser is attempting to complet
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
 </pre>
 
-The PrivateStateToken contains the information required to make a request.
+The {{PrivateStateToken}} contains the information required to make a fetch request.
 
 <pre class=idl>
 dictionary PrivateStateToken {
