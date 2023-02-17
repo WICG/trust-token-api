@@ -245,22 +245,25 @@ fetched for an issuer, previous commitments are discarded.
 Algorithms {#algorithms}
 ====================================
 
+An user agent has <dfn>issuerAssociations</dfn>, a [=map=] where the keys are [=/origin=] |topLevel|, and the values are [=list=] of [=origins=].
+
 To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
-1. Let |limit| be 2.
-2. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], return false.
+1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return false.
+1. If the [=issuerAssociations=][|topLevel|] [=list/size=] is less than 2, return false.
+1. Return true.
 
 To <dfn>associate the issuer</dfn> |issuer| (an [=/origin=]) with the [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
-
-To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
-
-1. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], [=map/set=] [=issuerAssociations=][|topLevel|] to an empty [=list=].
+1. [=list/Append=] |issuer| to [=issuerAssociations=][|topLevel|].
 
 To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a given [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], return false.
+1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return true.
+1. Return false.
 
 An user agent has <dfn>redemptionTimes</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|lastRedemption|, |penultimateRedemption|).
 
@@ -277,6 +280,9 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
+To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
 
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
