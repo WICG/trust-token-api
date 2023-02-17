@@ -384,10 +384,10 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. Let |tokens| be the result of [=generate blinded tokens|generating blinded tokens=] with |numTokens|.
  1. Configure the HTTP request.
                a. Set a load flag to bypass the HTTP cache.
-               b. Add `Sec-Private-State-Token` request header containing a
+          b. Add <a http-header>Sec-Private-State-Token</a> request header containing a
                       base64-encoded version of the bytestring of tokens
                       generated in Step 11.
-               c. Add `Sec-Private-State-Token-Version` request header that specifies
+               c. Add <a http-header>Sec-Private-State-Token-Version</a> request header that specifies
                       the version of the cryptographic protocol used.
 
      Issue: This step should append structured headers using [=header list/set a structured field value=]
@@ -412,12 +412,12 @@ passed in the URL `public` parameter. PMB can encode a value from set {0,1,2}
 in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the blinded tokens obtained in the
-`Sec-Private-State-Token` request header value. Issuer uses the cryptographic protocol
-specified in the request `Sec-Private-State-Token-Version` header. Encoding the values
+<a http-header>Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
+specified in the request <a http-header>Sec-Private-State-Token-Version</a> header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
-step. Issuer returns the signed tokens in the `Sec-Private-State-Token` response header
+step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
 value encoded as a base64 byte string. The number of tokens issued is returned
-in `Sec-Private-State-Token-Count` header. Value of this header is the string message of
+in <a http-header>Sec-Private-State-Token-Count</a> header. Value of this header is the string message of
 
 ```
 Issuing <number of tokens> tokens.
@@ -441,10 +441,10 @@ Browser Steps For Issue Response {#browser-issue-response}
 
 To process a response to an issue request, browser carries out the following steps.
 
- 1. If the response has no `Sec-Private-State-Token` header, return an error.
- 2. If the response has an empty `Sec-Private-State-Token` header, return; this is a
+ 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, return an error.
+ 2. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, return; this is a
        `Success` response bearing 0 tokens.
- 3. Strip the `Sec-Private-State-Token` header from the response and carry out the
+ 3. Strip the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the
     cryptographic procedures to obtain a list of unblinded tokens.
     a. If the cryptographic procedure succeeds, associate the tokens with the
           issuing key’s label and store the tokens.
@@ -484,9 +484,9 @@ token.
 -->
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
- 1. Set redemption procedure result in `Sec-Private-State-Token` request header.
- 1. Set `Sec-Private-State-Token-Version` header value to the cryptographic protocol used.
- 1. Optionally, set `Sec-Private-State-Token-Lifetime` header.
+ 1. Set redemption procedure result in <a http-header>Sec-Private-State-Token</a> request header.
+ 1. Set <a http-header>Sec-Private-State-Token-Version</a> header value to the cryptographic protocol used.
+ 1. Optionally, set <a http-header>Sec-Private-State-Token-Lifetime</a> header.
  1. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
 
 Issue: This algorithm should append structured headers using [=header list/set a structured field value=]
@@ -521,13 +521,13 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
 
  1. [=Set redemption headers=] with |request| and |record|.
 
-`Sec-Private-State-Token-Lifetime` response header indicates how long (in seconds) the
-RR should be cached for. When `Sec-Private-State-Token-Lifetime` response header value
+<a http-header>Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
+    RR should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
 is invalid (too large, a negative number or non-numeric), UA should ignore the
-`Sec-Private-State-Token-Lifetime` header. When `Sec-Private-State-Token-Lifetime` header value
+<a http-header>Sec-Private-State-Token-Lifetime</a> header. When <a http-header>Sec-Private-State-Token-Lifetime</a> header value
 is zero, UA should treat the record as expired. In case of multiple
-`Sec-Private-State-Token-Lifetime` headers, UA uses the last one. If
-`Sec-Private-State-Token-Lifetime` header is omitted, the lifetime of the RR will be
+<a http-header>Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If
+<a http-header>Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the RR will be
 tied to the lifetime of the Private State Token verification key that confirmed the
 redeemed token's issuance. The RR is HTTP-only and JavaScript is only able to
 access/send the RR via Private State Token Fetch APIs. The RR is treated as an
@@ -539,13 +539,13 @@ Redemption Records {#redemption-records}
 ----------------------------------------
 
 To reduce communication overhead, the browser might cache blobs returned in
-`Sec-Private-State-Token` header value in redemption responses. These blobs are
+<a http-header>Sec-Private-State-Token</a> header value in redemption responses. These blobs are
 referred as *Redemption Records*. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
-validity. Issuer might choose to include optional `Sec-Private-State-Token-Lifetime`
+validity. Issuer might choose to include optional <a http-header>Sec-Private-State-Token-Lifetime</a>
 header in the redemption response. The value of this header indicates the
 expiration time for the redemption record provided. This expiration is
-specified as number of seconds in the `Sec-Private-State-Token-Lifetime` HTTP response
+specified as number of seconds in the <a http-header>Sec-Private-State-Token-Lifetime</a> HTTP response
 header value.
 
 A <dfn>Redemption Record</dfn> is a [=struct=] with the following items:
@@ -796,9 +796,9 @@ Issuers can sign fewer tokens at a time to mitigate the risk.
 IANA Considerations {#iana-considerations}
 ==========================================
 
-This document intends to define the `Sec-Private-State-Token`,
-`Sec-Private-State-Token-Count`, `Sec-Private-State-Token-Lifetime`,
-`Sec-Private-State-Token-Version`, HTTP request header fields, and register
+This document intends to define the <a http-header>Sec-Private-State-Token</a>,
+<a http-header>Sec-Private-State-Token-Count</a>, <a http-header>Sec-Private-State-Token-Lifetime</a>,
+<a http-header>Sec-Private-State-Token-Version</a>, HTTP request header fields, and register
 them in the permenant message header field registry ([[RFC9110]]).
 
 'Sec-Private-State-Token' Header Field {#iana-sec-private-state-token}
