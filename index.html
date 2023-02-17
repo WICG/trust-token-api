@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="4bd347cd186cb5769a59b735e3fc7c634e66d2f7" name="document-revision">
+  <meta content="ef5c2301bda2df37b9ce61b822671e5c9db044d2" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -661,9 +661,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <a href="#pst-http-header-fields"><span class="secno">9</span> <span class="content">Private State Token HTTP Header Fields</span></a>
      <ol class="toc">
       <li><a href="#sec-private-state-token"><span class="secno">9.1</span> <span class="content">The 'Sec-Private-State-Token' Header Field</span></a>
-      <li><a href="#sec-private-state-token-count"><span class="secno">9.2</span> <span class="content">The 'Sec-Private-State-Token-Count' Header Field</span></a>
-      <li><a href="#sec-private-state-token-lifetime"><span class="secno">9.3</span> <span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span></a>
-      <li><a href="#sec-private-state-token-version"><span class="secno">9.4</span> <span class="content">The 'Sec-Private-State-Token-Version' Header Field</span></a>
+      <li><a href="#sec-private-state-token-lifetime"><span class="secno">9.2</span> <span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span></a>
+      <li><a href="#sec-private-state-token-version"><span class="secno">9.3</span> <span class="content">The 'Sec-Private-State-Token-Version' Header Field</span></a>
      </ol>
     <li>
      <a href="#privacy"><span class="secno">10</span> <span class="content">Privacy Considerations</span></a>
@@ -691,9 +690,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <a href="#iana-considerations"><span class="secno">12</span> <span class="content">IANA Considerations</span></a>
      <ol class="toc">
       <li><a href="#iana-sec-private-state-token"><span class="secno">12.1</span> <span class="content">'Sec-Private-State-Token' Header Field</span></a>
-      <li><a href="#iana-sec-private-state-token-count"><span class="secno">12.2</span> <span class="content">'Sec-Private-State-Token-Count' Header Field</span></a>
-      <li><a href="#iana-sec-private-state-token-lifetime"><span class="secno">12.3</span> <span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span></a>
-      <li><a href="#iana-sec-private-state-token-version"><span class="secno">12.4</span> <span class="content">'Sec-Private-State-Token-Version' Header Field</span></a>
+      <li><a href="#iana-sec-private-state-token-lifetime"><span class="secno">12.2</span> <span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span></a>
+      <li><a href="#iana-sec-private-state-token-version"><span class="secno">12.3</span> <span class="content">'Sec-Private-State-Token-Version' Header Field</span></a>
      </ol>
     <li><a href="#acknowledgments"><span class="secno"></span> <span class="content">Acknowledgments</span></a>
     <li>
@@ -998,16 +996,11 @@ in <code>public</code> and a value from set {0,1} in <code>private</code> parame
 specified in the request <code>Sec-Private-State-Token-Version</code> header. Encoding the values
 passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
 step. Issuer returns the signed tokens in the <code>Sec-Private-State-Token</code> response header
-value encoded as a base64 byte string. The number of tokens issued is returned
-in <code>Sec-Private-State-Token-Count</code> header. Value of this header is the string message of</p>
-<pre>Issuing &lt;number of tokens> tokens.
-</pre>
-   <p>with the right nonnegative integer value that specifies the tokens issued.</p>
-   <div class="example" id="example-a308f91c">
-    <a class="self-link" href="#example-a308f91c"></a> Following snippet displays a typical response demonstrating the Private State Token
-related headers. 
+value encoded as a base64 byte string.</p>
+   <div class="example" id="example-fd1d464a">
+    <a class="self-link" href="#example-fd1d464a"></a> The following snippet displays a typical response demonstrating the Private State Token
+header. 
 <pre>Sec-Private-State-Token: &lt;token encoded as base64 string>
-Sec-PST-Count: Issuing 3 tokens.
 </pre>
    </div>
    <h3 class="heading settled" data-level="6.3" id="browser-issue-response"><span class="secno">6.3. </span><span class="content">Browser Steps For Issue Response</span><a class="self-link" href="#browser-issue-response"></a></h3>
@@ -1226,27 +1219,19 @@ just-created signed redemption record.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token</c-> <c- o>=</c-> <c- nc>sf-string</c->
 </pre>
-   <h3 class="heading settled" data-level="9.2" id="sec-private-state-token-count"><span class="secno">9.2. </span><span class="content">The 'Sec-Private-State-Token-Count' Header Field</span><a class="self-link" href="#sec-private-state-token-count"></a></h3>
-   <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-count"><code>Sec-Private-State-Token-Count</code><a class="self-link" href="#http-headerdef-sec-private-state-token-count"></a></dfn> header field gives
-the number of tokens issued in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①"><code>Sec-Private-State-Token</code></a> response header.</p>
-   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
-   <p>The header’s ABNF is:</p>
-<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Count</c-> <c- o>=</c-> <c- l>%s"Issuing "</c-> <c- nc>sf-integer</c-> <c- l>%s" tokens."</c->
-</pre>
-   <p class="issue" id="issue-7ece1607"><a class="self-link" href="#issue-7ece1607"></a> Do we really want to end the header with a period "."?</p>
-   <h3 class="heading settled" data-level="9.3" id="sec-private-state-token-lifetime"><span class="secno">9.3. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
+   <h3 class="heading settled" data-level="9.2" id="sec-private-state-token-lifetime"><span class="secno">9.2. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
    <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code><a class="self-link" href="#http-headerdef-sec-private-state-token-lifetime"></a></dfn> response header
 field gives the expiration for the redemption record 
-given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
-   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31②">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1①">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
+given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
+   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
 </pre>
-   <h3 class="heading settled" data-level="9.4" id="sec-private-state-token-version"><span class="secno">9.4. </span><span class="content">The 'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-version"></a></h3>
+   <h3 class="heading settled" data-level="9.3" id="sec-private-state-token-version"><span class="secno">9.3. </span><span class="content">The 'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-version"></a></h3>
    <p>The <dfn data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code><a class="self-link" href="#http-headerdef-sec-private-state-token-version"></a></dfn> header field gives
 the "major version" of Private State Token protocol.</p>
    <p class="issue" id="issue-411a11f5"><a class="self-link" href="#issue-411a11f5"></a> Define what "major version" actually means.</p>
-   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31③">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3①">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
+   <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31②">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3①">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Version</c-> <c- o>=</c-> <c- nc>sf-string</c->
 </pre>
@@ -1306,32 +1291,27 @@ is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user’s tokens, the tokens will run out over time.
 Issuers can sign fewer tokens at a time to mitigate the risk.</p>
    <h2 class="heading settled" data-level="12" id="iana-considerations"><span class="secno">12. </span><span class="content">IANA Considerations</span><a class="self-link" href="#iana-considerations"></a></h2>
-   <p>This document intends to define the <code>Sec-Private-State-Token</code>, <code>Sec-Private-State-Token-Count</code>, <code>Sec-Private-State-Token-Lifetime</code>, <code>Sec-Private-State-Token-Version</code>, HTTP request header fields, and register
-them in the permenant message header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="HTTP Semantics">[RFC9110]</a>).</p>
+   <p>This document intends to define the <code>Sec-Private-State-Token</code>, <code>Sec-Private-State-Token-Lifetime</code>, <code>Sec-Private-State-Token-Version</code>,
+HTTP request header fields, and register them in the permanent message
+header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="HTTP Semantics">[RFC9110]</a>).</p>
    <h3 class="heading settled" data-level="12.1" id="iana-sec-private-state-token"><span class="secno">12.1. </span><span class="content">'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#iana-sec-private-state-token"></a></h3>
    <p>Header field name: Sec-Private-State-Token</p>
    <p>Applicable protocol: http</p>
    <p>Status: standard</p>
    <p>Author/Change controller: IETF</p>
    <p>Specification document: this specification (<a href="#sec-private-state-token">§ 9.1 The 'Sec-Private-State-Token' Header Field</a>)</p>
-   <h3 class="heading settled" data-level="12.2" id="iana-sec-private-state-token-count"><span class="secno">12.2. </span><span class="content">'Sec-Private-State-Token-Count' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-count"></a></h3>
-   <p>Header field name: Sec-Private-State-Token-Count</p>
-   <p>Applicable protocol: http</p>
-   <p>Status: standard</p>
-   <p>Author/Change controller: IETF</p>
-   <p>Specification document: this specification (<a href="#sec-private-state-token-count">§ 9.2 The 'Sec-Private-State-Token-Count' Header Field</a>)</p>
-   <h3 class="heading settled" data-level="12.3" id="iana-sec-private-state-token-lifetime"><span class="secno">12.3. </span><span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-lifetime"></a></h3>
+   <h3 class="heading settled" data-level="12.2" id="iana-sec-private-state-token-lifetime"><span class="secno">12.2. </span><span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-lifetime"></a></h3>
    <p>Header field name: Sec-Private-State-Token-Lifetime</p>
    <p>Applicable protocol: http</p>
    <p>Status: standard</p>
    <p>Author/Change controller: IETF</p>
-   <p>Specification document: this specification (<a href="#sec-private-state-token-lifetime">§ 9.3 The 'Sec-Private-State-Token-Lifetime' Header Field</a>)</p>
-   <h3 class="heading settled" data-level="12.4" id="iana-sec-private-state-token-version"><span class="secno">12.4. </span><span class="content">'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-version"></a></h3>
+   <p>Specification document: this specification (<a href="#sec-private-state-token-lifetime">§ 9.2 The 'Sec-Private-State-Token-Lifetime' Header Field</a>)</p>
+   <h3 class="heading settled" data-level="12.3" id="iana-sec-private-state-token-version"><span class="secno">12.3. </span><span class="content">'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-version"></a></h3>
    <p>Header field name: Sec-Private-State-Token-Version</p>
    <p>Applicable protocol: http</p>
    <p>Status: standard</p>
    <p>Author/Change controller: IETF</p>
-   <p>Specification document: this specification (<a href="#sec-private-state-token-version">§ 9.4 The 'Sec-Private-State-Token-Version' Header Field</a>)</p>
+   <p>Specification document: this specification (<a href="#sec-private-state-token-version">§ 9.3 The 'Sec-Private-State-Token-Version' Header Field</a>)</p>
    <h2 class="no-num heading settled" id="acknowledgments"><span class="content">Acknowledgments</span><a class="self-link" href="#acknowledgments"></a></h2>
    <p>Thanks to Charlie Harrison, David Van Cleve, Johann Hofmann, Kaustubha Govind,
 Mike Taylor, and Chris Fredrickson for their contributions. Thanks to Chris
@@ -1411,9 +1391,8 @@ Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#dom-privatestatetoken-refreshpolicy">refreshPolicy</a><span>, in § 5.1</span>
    <li><a href="#retrieve-a-token">retrieve a token</a><span>, in § 4</span>
    <li><a href="#http-headerdef-sec-private-state-token">Sec-Private-State-Token</a><span>, in § 9.1</span>
-   <li><a href="#http-headerdef-sec-private-state-token-count">Sec-Private-State-Token-Count</a><span>, in § 9.2</span>
-   <li><a href="#http-headerdef-sec-private-state-token-lifetime">Sec-Private-State-Token-Lifetime</a><span>, in § 9.3</span>
-   <li><a href="#http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a><span>, in § 9.4</span>
+   <li><a href="#http-headerdef-sec-private-state-token-lifetime">Sec-Private-State-Token-Lifetime</a><span>, in § 9.2</span>
+   <li><a href="#http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a><span>, in § 9.3</span>
    <li><a href="#dom-operationtype-send-redemption-record">"send-redemption-record"</a><span>, in § 5.1</span>
    <li><a href="#set-redemption-headers">set redemption headers</a><span>, in § 7</span>
    <li><a href="#enumdef-signrequestdata">SignRequestData</a><span>, in § 5.1</span>
@@ -1574,24 +1553,22 @@ Wilson for reviewing and mentoring this spec.</p>
   <aside aria-labelledby="infopaneltitle-for-aa2c8002bc21ce6db8c66313c0f9d701" class="dfn-panel" data-for="aa2c8002bc21ce6db8c66313c0f9d701" id="infopanel-for-aa2c8002bc21ce6db8c66313c0f9d701" role="menu">
    <span id="infopaneltitle-for-aa2c8002bc21ce6db8c66313c0f9d701" style="display:none">Info about the 'integer' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#section-3.3.1">https://tools.ietf.org/html/rfc8941#section-3.3.1</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-section-3.3.1">9.2. The 'Sec-Private-State-Token-Count' Header Field</a>
-    <li><a href="#ref-for-section-3.3.1①">9.3. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-section-3.3.1">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-74d52bb72ef9fb1bb5520406f010079c" class="dfn-panel" data-for="74d52bb72ef9fb1bb5520406f010079c" id="infopanel-for-74d52bb72ef9fb1bb5520406f010079c" role="menu">
    <span id="infopaneltitle-for-74d52bb72ef9fb1bb5520406f010079c" style="display:none">Info about the 'string' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#section-3.3.3">https://tools.ietf.org/html/rfc8941#section-3.3.3</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-section-3.3.3">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-section-3.3.3①">9.4. The 'Sec-Private-State-Token-Version' Header Field</a>
+    <li><a href="#ref-for-section-3.3.3①">9.3. The 'Sec-Private-State-Token-Version' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-edc3e3324b8239e1191d55af2617bd31" class="dfn-panel" data-for="edc3e3324b8239e1191d55af2617bd31" id="infopanel-for-edc3e3324b8239e1191d55af2617bd31" role="menu">
    <span id="infopaneltitle-for-edc3e3324b8239e1191d55af2617bd31" style="display:none">Info about the 'structured header' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#">https://tools.ietf.org/html/rfc8941#</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.2. The 'Sec-Private-State-Token-Count' Header Field</a>
-    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.3. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
-    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.4. The 'Sec-Private-State-Token-Version' Header Field</a>
+    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.3. The 'Sec-Private-State-Token-Version' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-eb0e1698348a5ae30cd3aa882b6dff01" class="dfn-panel" data-for="eb0e1698348a5ae30cd3aa882b6dff01" id="infopanel-for-eb0e1698348a5ae30cd3aa882b6dff01" role="menu">
@@ -1847,7 +1824,6 @@ Wilson for reviewing and mentoring this spec.</p>
    <div class="issue"> Define and link issuance, redemption, masked (formerly blinded), unmasked,
 signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to section">↵</a></div>
    <div class="issue"> Link stuff here too. <a class="issue-return" href="#issue-0f07ef70" title="Jump to section">↵</a></div>
-   <div class="issue"> Do we really want to end the header with a period "."? <a class="issue-return" href="#issue-7ece1607" title="Jump to section">↵</a></div>
    <div class="issue"> Define what "major version" actually means. <a class="issue-return" href="#issue-411a11f5" title="Jump to section">↵</a></div>
   </div>
   <aside aria-labelledby="infopaneltitle-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" class="dfn-panel" data-for="determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" id="infopanel-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit" role="dialog">
@@ -1998,8 +1974,7 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
    <span id="infopaneltitle-for-http-headerdef-sec-private-state-token" style="display:none">Info about the 'Sec-Private-State-Token' definition.</span><b><a href="#http-headerdef-sec-private-state-token">#http-headerdef-sec-private-state-token</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-http-headerdef-sec-private-state-token">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token①">9.2. The 'Sec-Private-State-Token-Count' Header Field</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token②">9.3. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token①">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
