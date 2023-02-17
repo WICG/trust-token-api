@@ -462,20 +462,29 @@ The details for servers implementing this protocol can be found in [[!ISSUER-PRO
 Browser Steps For Issue Response {#browser-issue-response}
 ----------------------------------------------------------
 
-To process a response to an issue request, browser carries out the following steps.
+To <dfn>handle an issue request</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
 
- 1. Let |p| be [=a new promise=].
- 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
- 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, [=/resolve=] |p| with {{undefined}} and return |p|. (This is a `Success` response bearing 0 tokens.)
- 1. Remove the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the cryptographic procedures to obtain a list of unmasked tokens.
- 
- Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
-    1. If the cryptographic procedure succeeds, associate the tokens with the issuing key's label and store the tokens. [=/Resolve=] |p| with {{undefined}} and return |p|.
-    1. Else, [=/reject=] |p| with a "{{DataError}}" {{DOMException}} and return |p|.
+1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
+1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. If |header| is null, return a [=network error=].
+1. If |header| is empty, return null.
+1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens.
+1. If |unmasked tokens| is an error, return a [=network error=].
+1. Associate |unmasked tokens| with the issuing key's label and store the tokens.
+1. Return null.
 
-Issue: Define this in terms of fetch
+Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
+
+<h3 id="modification-to-http-fetch-steps-header">Modification to HTTP fetch steps</h3>
+The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "If |actualResponse|'s status is a redirect status, ..."):
+
+1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
+1. If |issue response result| is a [=network error=], return |issue response result|.
+
+<span class=XXX>TODO: make the modification directly to the fetch spec.</span>
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
