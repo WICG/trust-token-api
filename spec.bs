@@ -83,7 +83,7 @@ Goals {#goals}
 
 The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
-privacy pass protocol [[PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
+privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
 documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
 State Tokens can be considered as a web platform implementation of Privacy
 Pass.
@@ -110,8 +110,8 @@ transfer of authentication information.
 
 Authentication of the clients and token signing are both carried by the same
 entity referred to as the **issuer**. This is the joint attester and issuer
-architecture described in [[PRIVACY-PASS-ARCHITECTURE]],
-[[PRIVACY-PASS-AUTH-SCHEME]].
+architecture described in [[!PRIVACY-PASS-ARCHITECTURE]],
+[[!PRIVACY-PASS-AUTH-SCHEME]].
 
 Browsers store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
@@ -122,35 +122,35 @@ choice. Tokens can be redeemed from a different origin than the fetching one.
 
 Private State Tokens API performs cross site anonymous authentication without
 using linkable state carrying cookies [[RFC6265]]. Cookies do provide cross
-site authentication, however, fail to provide anonymity.
+site authentication, however, they fail to provide anonymity.
 
-Cookies store large amount of information. [[RFC6265]] requires at least 4096
+Cookies store large amounts of information. [[RFC6265]] requires at least 4096
 bytes per cookie and 50 cookies per domain. This means an origin has
 50 x 4096 x 2^8 unique identifiers at its disposal. When backed with back end
 databases, a server can store arbitrary data for that many unique
 users/sessions.
 
-Compared to a cookie, amount of data stored in a Private State Token is very
+Compared to a cookie, the amount of data stored in a Private State Token is very
 limited. A token stores a value from a set of six values (think of a value of
 an enum type of six possible values). Hence a token stores data between 2 and 3
 bits (4 < 6 < 8). This is very small compared to 4096 bytes a cookie can store.
 
 Moreover, Private State Tokens API use cryptographic protocols that prevents
-origins to track which tokens they issue to which user. When presented with
-their tokens, issuers can verify they issued them, however, can not link the
-tokens to the contex they are issued. Cookies do not have this property.
+origins from tracking which tokens they issue to which user. When presented with
+their tokens, issuers can verify they issued them but cannot link the
+tokens to the context of their issuance. Cookies do not have this property.
 
 Unlike cookies, storing multiple tokens from an issuer does not deteriorate
-privacy of the user due to unlinkability property of the tokens. Private
+privacy of the user due to the unlinkability of the tokens. The Private
 State Token API allows at most 2 different issuers in a top level origin. This
 is to limit the information stored for a user when the issuers are
 collaborating.
 
-Private State Token operations rely on [[FETCH]]. A fetch request corresponding to a
+Private State Token operations rely on [[!FETCH]]. A fetch request corresponding to a
 specific Private State Token operation can be created and used as a parameter to the
 fetch function.
 
-Note: This specification uses the terms "masked" and "unmasked" where [[PMB]]
+Note: This specification uses the terms "masked" and "unmasked" where [[!PMB]]
 uses "blinded" and "unblinded", respectively.
 
 <!--
@@ -173,11 +173,11 @@ An issuer needs to maintain a set of keys and implement the **Issue** and
 required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
-through secure HTTP [[RFC8446]] endpoints. Browsers should fetch the key
+through secure HTTP [[!RFC8446]] endpoints. Browsers should fetch the key
 commitments periodically.
 
 Requests to key commitment endpoints should result in a JSON response
-[[RFC8259]] of the following format.
+[[!RFC8259]] of the following format.
 
 ```javascript
 {
@@ -202,15 +202,15 @@ Requests to key commitment endpoints should result in a JSON response
     `"PrivateStateTokenV3PMB"` or `"PrivateStateTokenV3VOPRF"`. Both protocols have similar
     properties in terms of privacy implications.
 
-    * Protocol version `“PrivateStateTokenV3PMB”` implements [[PMB]] cryptographic
+    * Protocol version `“PrivateStateTokenV3PMB”` implements [[!PMB]] cryptographic
                protocol. In this protocol, each token contains a private
                metadata bit.
 
-    * Protocol version `“PrivateStateTokenV2VOPRF”` implements [[VOPRF]] cryptographic
-               protocol. Contrary to PMB, tokens do not contain private
+    * Protocol version `“PrivateStateTokenV2VOPRF”` implements [[!VOPRF]] cryptographic
+               protocol. Contrary to [[!PMB]], tokens do not contain private
                metadata bits. However, issuers can use twice as many
                concurrently valid token signing keys (six compared to three of
-               PMB).
+               [[!PMB]]).
 
 * `"id"` field provides the identifier of the key commitment. It is a string
          representation of a non-negative integer that is within the range of
@@ -229,7 +229,7 @@ Requests to key commitment endpoints should result in a JSON response
                is within the range of an unsigned 32 bit integer type.
 
          * Each key has a `"Y"` field which is a string representation of a
-                big-endian base64 encoding [[RFC4648]] of the byte string of
+                big-endian base64 encoding [[!RFC4648]] of the byte string of
                 the key.
 
          * `"expiry"` field specifies how long the underlying key is valid. It
@@ -237,7 +237,7 @@ Requests to key commitment endpoints should result in a JSON response
                       is within the range of an unsigned 64 bit integer type.
                       Underlying key expires if this amount many or more
                       microseconds are elapsed since the POSIX epoch
-                      [[RFC8536]].
+                      [[!RFC8536]].
 
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
@@ -245,22 +245,25 @@ fetched for an issuer, previous commitments are discarded.
 Algorithms {#algorithms}
 ====================================
 
+An user agent has <dfn>issuerAssociations</dfn>, which is a [=map=] where the keys are [=/origin=] |topLevel|, and the values are a [=list=] of [=origins=].
+
 To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
-1. Let |limit| be 2.
-2. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], return false.
+1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return false.
+1. If the [=issuerAssociations=][|topLevel|] [=list/size=] is less than 2, return false.
+1. Return true.
 
 To <dfn>associate the issuer</dfn> |issuer| (an [=/origin=]) with the [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
-
-To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
-
-1. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], [=map/set=] [=issuerAssociations=][|topLevel|] to an empty [=list=].
+1. [=list/Append=] |issuer| to [=issuerAssociations=][|topLevel|].
 
 To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a given [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], return false.
+1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return true.
+1. Return false.
 
 An user agent has <dfn>redemptionTimes</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|lastRedemption|, |penultimateRedemption|).
 
@@ -277,6 +280,9 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
+To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
 
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
@@ -304,21 +310,28 @@ Integration with Fetch {#fetch-integration}
 Definitions {#definitions}
 ---------------------------------------------------------------
 
+The {{RefreshPolicy}} is attached to a redemption request, determining whether or not the
+redemption should result in a previously returned, unexpired [=redemption record=] or a
+new one.
+
 <pre class=idl>
 enum RefreshPolicy { "none", "refresh" };
 </pre>
+
+The {{TokenType}} is currently set to "private-state-token", as this is the only token
+type that the specification supports at this time.
 
 <pre class=idl>
 enum TokenType { "private-state-token" };
 </pre>
 
+The {{OperationType}} refers to which operation the user agent is attempting to complete.
+
 <pre class=idl>
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
 </pre>
 
-<pre class=idl>
-enum SignRequestData { "omit", "include", "headers-only" };
-</pre>
+The {{PrivateStateToken}} contains the information required to make a fetch request.
 
 <pre class=idl>
 dictionary PrivateStateToken {
@@ -401,14 +414,13 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
  1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
- 1. Configure the HTTP request.
-     1. Set a load flag to bypass the HTTP cache.
-     1. Add <a http-header>Sec-Private-State-Token</a> request header containing a
-                      base64-encoded version of |tokens|.
-     1. Add <a http-header>Sec-Private-State-Token-Version</a> request header that specifies
-                      the version of the cryptographic protocol used.
-
-     Issue: This step should append structured headers using [=header list/set a structured field value=]
+ 1. Set a load flag to bypass the HTTP cache.
+ 1. Let |base64-encoded-tokens| be the base64-encoded version of |tokens|.
+ 1. Let |version| be the version of the cryptographic protocol used.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
+                in |request|'s header list.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+                in |request|'s header list.
 
 <div class=example>
 Private State Token HTTP request headers created for a typical fetch is as follows.
@@ -426,7 +438,7 @@ Issuer Signing Tokens {#issuer-signing-tokens}
 This section explains the signing of tokens that happens in the issuer
 servers. Information to be encoded in the tokens are passed in the URL `public`
 and `private` parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
-passed in the URL `public` parameter. PMB can encode a value from set {0,1,2}
+passed in the URL `public` parameter. [[!PMB]] can encode a value from set {0,1,2}
 in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the masked tokens obtained in the
@@ -452,14 +464,14 @@ Browser Steps For Issue Response {#browser-issue-response}
 
 To process a response to an issue request, browser carries out the following steps.
 
- 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, return an error.
- 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, return; this is a
-       `Success` response bearing 0 tokens.
- 1. Strip the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the
-    cryptographic procedures to obtain a list of unmasked tokens.
-    1. If the cryptographic procedure succeeds, associate the tokens with the
-          issuing key’s label and store the tokens.
-    1. Else, return an error.
+ 1. Let |p| be [=a new promise=].
+ 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+ 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, [=/resolve=] |p| with {{undefined}} and return |p|. (This is a `Success` response bearing 0 tokens.)
+ 1. Remove the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the cryptographic procedures to obtain a list of unmasked tokens.
+ 
+ Issue: Define "cryptographic procedures to obtain a list of unmasked tokens"
+    1. If the cryptographic procedure succeeds, associate the tokens with the issuing key's label and store the tokens. [=/Resolve=] |p| with {{undefined}} and return |p|.
+    1. Else, [=/reject=] |p| with a "{{DataError}}" {{DOMException}} and return |p|.
 
 Issue: Define this in terms of fetch
 
@@ -497,9 +509,15 @@ token.
 -->
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
- 1. Set redemption procedure result in <a http-header>Sec-Private-State-Token</a> request header.
- 1. Set <a http-header>Sec-Private-State-Token-Version</a> header value to the cryptographic protocol used.
- 1. Optionally, set <a http-header>Sec-Private-State-Token-Lifetime</a> header.
+ 1. Let |redemption-result| be the redemption procedure result.
+ 1. Let |version| be the version of the cryptographic protocol used.
+ 1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemption-result|)
+                in |request|'s header list.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+                in |request|'s header list.
+ 1. Optionally, [=header list/set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Lifetime`</a>, |token-lifetime|)
+                in |request|'s header list.
  1. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
 
 Issue: This algorithm should append structured headers using [=header list/set a structured field value=]
@@ -706,7 +724,7 @@ Privacy Considerations {#privacy}
 Unlinkability {#unlinkability}
 ------------------------------
 
-Cryptographic protocols [[VOPRF]] and [[PMB]] provide masked signatures. At
+Cryptographic protocols [[!VOPRF]] and [[!PMB]] provide masked signatures. At
 redemption time, issuers can recognize their signature on the provided token,
 however they can not determine at what time or in which context they signed the token.
 This prevents issuers from correlating their issuances on an origin with
@@ -717,13 +735,22 @@ about the origins users visit.
 Limiting Encoded Information {#limit-encoded-info}
 --------------------------------------------------
 
-User agents should enforce limits on the number of unique keys an issuer can have at any point in time, to preserve client privacy.  Without limits, an issuer could de-anonymize clients by simply using a unique
-key for each client. For [[!VOPRF]], the
+User agents should enforce limits on the number of unique keys an issuer can have 
+at any point in time, to preserve client privacy.  Without limits, an issuer could 
+de-anonymize clients by simply using a unique key for each client. For [[!VOPRF]], the
 number of keys is limited to six, and for [[!PMB]], the number is limited to
 three keys. 
     
-Issuers can utilize different keys to represent different "labels", which correspond to an arbritrary client state, such as client trust level or some other useful anti-fraud signal. Issuers are responsible for understanding this designation and sharing the key "labels" with token redeemers so they know how to interpret the significance of each token. This helps reduce reverse engineering from malicious actors and preserves client privacy over human-readable labels. When using [[!VOPRF]], the issuer's 6 keys can effectively represent six labels. Similarly, when using [[!PMB]], even though there are only up to three keys, the issuer can still utilize six labels by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels). Both
-[[!VOPRF]] and [[!PMB]] encode the same amount of information in a token, however the
+Issuers can utilize different keys to represent different "labels", which correspond
+to an arbritrary client state, such as client trust level or some other useful 
+anti-fraud signal. Issuers are responsible for understanding this designation and 
+sharing the key "labels" with token redeemers so they know how to interpret the 
+significance of each token. This helps reduce reverse engineering from malicious 
+actors and preserves client privacy over human-readable labels. When using [[!VOPRF]], 
+the issuer's 6 keys can effectively represent six labels. Similarly, when using [[!PMB]], 
+even though there are only up to three keys, the issuer can still utilize six labels 
+by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels). 
+Both [[!VOPRF]] and [[!PMB]] encode the same amount of information in a token, however the
 difference is [[!PMB]] utilizing a private bit.
 
 ### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
@@ -787,7 +814,7 @@ IANA Considerations {#iana-considerations}
 This document intends to define the <a http-header>Sec-Private-State-Token</a>,
 <a http-header>Sec-Private-State-Token-Lifetime</a>, <a http-header>Sec-Private-State-Token-Version</a>,
 HTTP request header fields, and register them in the permanent message
-header field registry ([[RFC9110]]).
+header field registry ([[!RFC9110]]).
 
 'Sec-Private-State-Token' Header Field {#iana-sec-private-state-token}
 ------------------------
