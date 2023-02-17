@@ -245,22 +245,25 @@ fetched for an issuer, previous commitments are discarded.
 Algorithms {#algorithms}
 ====================================
 
+An user agent has <dfn>issuerAssociations</dfn>, which is a [=map=] where the keys are [=/origin=] |topLevel|, and the values are a [=list=] of [=origins=].
+
 To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
-1. Let |limit| be 2.
-2. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], return false.
+1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return false.
+1. If the [=issuerAssociations=][|topLevel|] [=list/size=] is less than 2, return false.
+1. Return true.
 
 To <dfn>associate the issuer</dfn> |issuer| (an [=/origin=]) with the [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
-
-To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
-
-1. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], [=map/set=] [=issuerAssociations=][|topLevel|] to an empty [=list=].
+1. [=list/Append=] |issuer| to [=issuerAssociations=][|topLevel|].
 
 To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a given [=/origin=] |topLevel|, run the following steps:
 
-1. TODO
+1. If [=issuerAssociations=][|topLevel|] does not [=map/exist=], return false.
+1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return true.
+1. Return false.
 
 An user agent has <dfn>redemptionTimes</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|lastRedemption|, |penultimateRedemption|).
 
@@ -277,6 +280,9 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
+To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+
+1. TODO
 
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
@@ -304,21 +310,28 @@ Integration with Fetch {#fetch-integration}
 Definitions {#definitions}
 ---------------------------------------------------------------
 
+The {{RefreshPolicy}} is attached to a redemption request, determining whether or not the
+redemption should result in a previously returned, unexpired [=redemption record=] or a
+new one.
+
 <pre class=idl>
 enum RefreshPolicy { "none", "refresh" };
 </pre>
+
+The {{TokenType}} is currently set to "private-state-token", as this is the only token
+type that the specification supports at this time.
 
 <pre class=idl>
 enum TokenType { "private-state-token" };
 </pre>
 
+The {{OperationType}} refers to which operation the user agent is attempting to complete.
+
 <pre class=idl>
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
 </pre>
 
-<pre class=idl>
-enum SignRequestData { "omit", "include", "headers-only" };
-</pre>
+The {{PrivateStateToken}} contains the information required to make a fetch request.
 
 <pre class=idl>
 dictionary PrivateStateToken {
@@ -452,14 +465,14 @@ Browser Steps For Issue Response {#browser-issue-response}
 
 To process a response to an issue request, browser carries out the following steps.
 
- 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, return an error.
- 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, return; this is a
-       `Success` response bearing 0 tokens.
- 1. Strip the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the
-    cryptographic procedures to obtain a list of unmasked tokens.
-    1. If the cryptographic procedure succeeds, associate the tokens with the
-          issuing key’s label and store the tokens.
-    1. Else, return an error.
+ 1. Let |p| be [=a new promise=].
+ 1. If the response has no <a http-header>Sec-Private-State-Token</a> header, [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+ 1. If the response has an empty <a http-header>Sec-Private-State-Token</a> header, [=/resolve=] |p| with {{undefined}} and return |p|. (This is a `Success` response bearing 0 tokens.)
+ 1. Remove the <a http-header>Sec-Private-State-Token</a> header from the response and carry out the cryptographic procedures to obtain a list of unmasked tokens.
+ 
+ Issue: Define "cryptographic procedures to obtain a list of unmasked tokens"
+    1. If the cryptographic procedure succeeds, associate the tokens with the issuing key's label and store the tokens. [=/Resolve=] |p| with {{undefined}} and return |p|.
+    1. Else, [=/reject=] |p| with a "{{DataError}}" {{DOMException}} and return |p|.
 
 Issue: Define this in terms of fetch
 
