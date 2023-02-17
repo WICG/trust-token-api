@@ -896,7 +896,7 @@ struct {
 } PrivateStateTokenPublicKey;
 ```
 
-We use serialization schemes and hashes from draft 07 of the hash-to-curve specification, [[HTC]].
+We use serialization schemes and hashes from draft 07 of the hash-to-curve specification, [[!HTC]].
 
 `Ht(t)` is defined as P384_XMD:SHA-512_SSWU_RO_ with a big-endian bytestring input of `t` and a dst of "PMBTokens Experiment V2 HashT".
 
@@ -909,7 +909,7 @@ struct {
 } T;
 ```
 
-The [[HTC]] document does not define hash to scalars, so `Hc(x)` is defined to be the output of the hash_to_field function with the following parameters:
+The [[!HTC]] document does not define hash to scalars, so `Hc(x)` is defined to be the output of the hash_to_field function with the following parameters:
 
 * `DST` is "PMBTokens Experiment V2 HashC"
 * `F`, `p`, and `m` are defined according to the finite field `GF(r)`, where `r` is the order of P-384. Note this is a different modulus from `hash_to_field` as used in P384_XMD:SHA-512_SSWU_RO.
@@ -1105,7 +1105,7 @@ DLEQOR.P((X, T, S, W), (xb, yb)):
 Redemption
 ------------------------
 
-The `Redeem` function below corresponds to the **AT.VerValid** and **AT.ReadBit** stages of the [[PMB]] protocol.
+The `Redeem` function below corresponds to the **AT.VerValid** and **AT.ReadBit** stages of the [[!PMB]] protocol.
 
 Inputs:
 
