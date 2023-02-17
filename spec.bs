@@ -56,12 +56,6 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
         "publisher": "IETF",
         "title": "Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups"
     },
-    "HTC": {
-        "authors": ["A. Faz-Hernandez", "S. Scott", "N. Sullivan", "R.S. Wahby", "C.A. Wood"],
-        "href": "https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-07",
-        "publisher": "IETF",
-        "title": "Hashing to Elliptic Curves"
-    },
     "ISSUER-PROTOCOL": {
         "authors": ["S. Valdez", "A. Bulut", "S. Schlesinger"],
         "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
