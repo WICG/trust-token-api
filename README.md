@@ -59,7 +59,7 @@ When an origin is in a context where they trust the user, they can issue the bro
 
 ### Private State Token Issuance
 
-When an ```issuer.example``` context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the privateToken parameter:
+When an `issuer.example` context wants to provide tokens to a user (i.e. when the user is trusted), they can use a new Fetch API with the privateToken parameter:
 
 
 ```
