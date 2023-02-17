@@ -398,7 +398,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
 
     Issue: This probably needs to be its own algorithm, how is "most recent" defined here?
 
- 1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens, whichever is smaller.
+ 1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
  1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
  1. Configure the HTTP request.
@@ -514,7 +514,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |request|'s [=request/token refresh policy=] is `"none"`:
      1. Let |record| be the result of [=get an unexpired redemption record|getting an unexpired redemption record=].
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
- 1. Let |penultimate_redemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|, if the value is less than an [=implementation-defined=] timeperiod, return error.
+ 1. Let |penultimate_redemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|, if the value is less than an [=implementation-defined=] time period (which is recommended to be 48 hours), return error.
 
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer| and |topLevel|.
  1. If |commitments| is [=list/empty=], return.
