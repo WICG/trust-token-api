@@ -723,7 +723,7 @@ number of keys is limited to six, and for [[!PMB]], the number is limited to
 three keys. 
     
 Issuers can utilize different keys to represent different "labels", which correspond to an arbritrary client state, such as client trust level or some other useful anti-fraud signal. Issuers are responsible for understanding this designation and sharing the key "labels" with token redeemers so they know how to interpret the significance of each token. This helps reduce reverse engineering from malicious actors and preserves client privacy over human-readable labels. When using [[!VOPRF]], the issuer's 6 keys can effectively represent six labels. Similarly, when using [[!PMB]], even though there are only up to three keys, the issuer can still utilize six labels by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels). Both
-[[VOPRF]] and [[PMB]] encode the same amount of information in a token, however the
+[[!VOPRF]] and [[!PMB]] encode the same amount of information in a token, however the
 difference is [[PMB]] utilizing a private bit.
 
 ### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
