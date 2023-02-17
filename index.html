@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="d1ddb7e1108e8fec12e477b6f50d4d49d1fed6fe" name="document-revision">
+  <meta content="ce7eac85d78050d2642048e31b71aac1c4dfb3a3" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -1002,18 +1002,17 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Let <var>tokens</var> be the result of <a data-link-type="dfn" href="#generate-masked-tokens" id="ref-for-generate-masked-tokens">generating masked tokens</a> with <var>numTokens</var>.</p>
     <li data-md>
-     <p>Configure the HTTP request.</p>
-     <ol>
-      <li data-md>
-       <p>Set a load flag to bypass the HTTP cache.</p>
-      <li data-md>
-       <p>Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token">Sec-Private-State-Token</a> request header containing a
-              base64-encoded version of <var>tokens</var>.</p>
-      <li data-md>
-       <p>Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a> request header that specifies
-              the version of the cryptographic protocol used.</p>
-     </ol>
-     <p class="issue" id="issue-cb4ffcd9"><a class="self-link" href="#issue-cb4ffcd9"></a> This step should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header">set a structured field value</a></p>
+     <p>Set a load flag to bypass the HTTP cache.</p>
+    <li data-md>
+     <p>Let <var>base64-encoded-tokens</var> be the base64-encoded version of <var>tokens</var>.</p>
+    <li data-md>
+     <p>Let <var>version</var> be the version of the cryptographic protocol used.</p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token"><code>Sec-Private-State-Token</code></a>, <var>base64-encoded-tokens</var>)
+            in <var>request</var>’s header list.</p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header①">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code></a>, <var>version</var>)
+            in <var>request</var>’s header list.</p>
    </ol>
    <div class="example" id="example-2005541d">
     <a class="self-link" href="#example-2005541d"></a> Private State Token HTTP request headers created for a typical fetch is as follows. 
@@ -1079,15 +1078,24 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="set-redemption-headers">set redemption headers</dfn> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a> <var>request</var> and a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①">Redemption Record</a> <var>record</var>:</p>
    <ol>
     <li data-md>
-     <p>Set redemption procedure result in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑥">Sec-Private-State-Token</a> request header.</p>
+     <p>Let <var>redemption-result</var> be the redemption procedure result.</p>
     <li data-md>
-     <p>Set <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version②">Sec-Private-State-Token-Version</a> header value to the cryptographic protocol used.</p>
+     <p>Let <var>version</var> be the version of the cryptographic protocol used.</p>
     <li data-md>
-     <p>Optionally, set <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime">Sec-Private-State-Token-Lifetime</a> header.</p>
+     <p>Let <var>token-lifetime</var> be the expiration time of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record②">redemption record</a> in seconds.</p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header②">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑥"><code>Sec-Private-State-Token</code></a>, <var>redemption-result</var>)
+            in <var>request</var>’s header list.</p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header③">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version②"><code>Sec-Private-State-Token-Version</code></a>, <var>version</var>)
+            in <var>request</var>’s header list.</p>
+    <li data-md>
+     <p>Optionally, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header④">set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></a>, <var>token-lifetime</var>)
+            in <var>request</var>’s header list.</p>
     <li data-md>
      <p>Configure the HTTP request. Set a load flag to bypass the HTTP cache.</p>
    </ol>
-   <p class="issue" id="issue-2131c336"><a class="self-link" href="#issue-2131c336"></a> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header①">set a structured field value</a></p>
+   <p class="issue" id="issue-2131c336"><a class="self-link" href="#issue-2131c336"></a> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header⑤">set a structured field value</a></p>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="append-private-state-token-redemption-request-headers">append private state token redemption request headers</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request③">request</a> <var>request</var>, run the following steps:</p>
    <ol>
     <li data-md>
@@ -1129,24 +1137,24 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
      <p><a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers①">Set redemption headers</a> with <var>request</var> and <var>record</var>.</p>
    </ol>
    <p class="issue" id="issue-045e65c0"><a class="self-link" href="#issue-045e65c0"></a> Add redemption response handling, including calling [= record redemption timestamp =]. <a href="https://github.com/WICG/trust-token-api/issues/165">[Issue #165]</a></p>
-   <p><a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime①">Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record②">redemption record</a> should be cached for. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime②">Sec-Private-State-Token-Lifetime</a> response header value
+   <p><a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime①">Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record③">redemption record</a> should be cached for. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime②">Sec-Private-State-Token-Lifetime</a> response header value
 is invalid (too large, a negative number or non-numeric), UA should ignore the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime③">Sec-Private-State-Token-Lifetime</a> header. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime④">Sec-Private-State-Token-Lifetime</a> header value
-is zero, UA should treat the record as expired. In case of multiple <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑥">Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record③">redemption record</a> will be
+is zero, UA should treat the record as expired. In case of multiple <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑥">Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record④">redemption record</a> will be
 tied to the lifetime of the Private State Token verification key that confirmed the
-redeemed token’s issuance. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record④">redemption record</a> is HTTP-only and JavaScript is only able to
-access/send the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑤">redemption record</a> via Private State Token Fetch APIs. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑥">redemption record</a> is treated as an
+redeemed token’s issuance. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑤">redemption record</a> is HTTP-only and JavaScript is only able to
+access/send the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑥">redemption record</a> via Private State Token Fetch APIs. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑦">redemption record</a> is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.</p>
    <h3 class="heading settled" data-level="7.1" id="redemption-records"><span class="secno">7.1. </span><span class="content">Redemption Records</span><a class="self-link" href="#redemption-records"></a></h3>
    <p>To reduce communication overhead, the browser might cache blobs returned in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑦">Sec-Private-State-Token</a> header value in redemption responses. These blobs are
-referred as <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑦">Redemption Records</a>. Browsers might choose to store these records
+referred as <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑧">Redemption Records</a>. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
 validity. Issuer might choose to include optional <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑦">Sec-Private-State-Token-Lifetime</a> header in the redemption response. The value of this header indicates the
-expiration time for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑧">redemption record</a> provided. This expiration is
+expiration time for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑨">redemption record</a> provided. This expiration is
 specified as number of seconds in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑧">Sec-Private-State-Token-Lifetime</a> HTTP response
 header value.</p>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="redemption-record">Redemption Record</dfn> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a>.</p>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="get-an-unexpired-redemption-record">get an unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑨">Redemption Record</a></dfn> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑦">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑧">origin</a> <var>topLevel</var>:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="get-an-unexpired-redemption-record">get an unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①⓪">Redemption Record</a></dfn> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑦">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑧">origin</a> <var>topLevel</var>:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
@@ -1230,7 +1238,7 @@ at Step 4.</p>
        <p><a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments③">Look up the key commitments</a> for <var>origin</var> and <var>topLevel</var>. If there are key commitments, <a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens③">discard tokens</a> from <var>origin</var> that are signed with keys other than those
      from the issuer’s most recent commitments.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task③">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source③">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve④">resolve</a> <var>p</var> with true if there is a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①⓪">redemption record</a> for the issuer and top level pair, with false otherwise.</p>
+       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task③">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source③">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve④">resolve</a> <var>p</var> with true if there is a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①①">redemption record</a> for the issuer and top level pair, with false otherwise.</p>
      </ol>
     <li data-md>
      <p>Return <var>p</var>.</p>
@@ -1251,7 +1259,7 @@ metadata.</p>
 signed, unsigned</p>
    <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑧">Sec-Private-State-Token</a> <em>response</em> header field sends
 a collection of signed, masked tokens. During redemption it sends the
-just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①①">redemption record</a>.</p>
+just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①②">redemption record</a>.</p>
    <p class="issue" id="issue-0f07ef70"><a class="self-link" href="#issue-0f07ef70"></a> Link stuff here too.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
@@ -1259,7 +1267,7 @@ just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-fo
 </pre>
    <h3 class="heading settled" data-level="9.2" id="sec-private-state-token-lifetime"><span class="secno">9.2. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></dfn> response header
-field gives the expiration for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①②">redemption record</a> given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
+field gives the expiration for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①③">redemption record</a> given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
@@ -1494,8 +1502,8 @@ Wilson for reviewing and mentoring this spec.</p>
   <aside aria-labelledby="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" class="dfn-panel" data-for="a50d6de302855c18285652c8be59e5b0" id="infopanel-for-a50d6de302855c18285652c8be59e5b0" role="menu">
    <span id="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" style="display:none">Info about the 'set a structured field value' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-header-list-set-structured-header">6.1. Browser Steps For Creating Issue Request</a>
-    <li><a href="#ref-for-concept-header-list-set-structured-header①">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-concept-header-list-set-structured-header">6.1. Browser Steps For Creating Issue Request</a> <a href="#ref-for-concept-header-list-set-structured-header①">(2)</a>
+    <li><a href="#ref-for-concept-header-list-set-structured-header②">7. Redeeming Tokens</a> <a href="#ref-for-concept-header-list-set-structured-header③">(2)</a> <a href="#ref-for-concept-header-list-set-structured-header④">(3)</a> <a href="#ref-for-concept-header-list-set-structured-header⑤">(4)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-6f4775873c70787775f9c70f0f110709" class="dfn-panel" data-for="6f4775873c70787775f9c70f0f110709" id="infopanel-for-6f4775873c70787775f9c70f0f110709" role="menu">
@@ -1934,7 +1942,6 @@ Wilson for reviewing and mentoring this spec.</p>
    <div class="issue"> Need to specify how <code>operation</code> and <code>issuers</code> are used. <a href="https://github.com/WICG/trust-token-api/issues/151">[Issue #151]</a> <a class="issue-return" href="#issue-1b149e55" title="Jump to section">↵</a></div>
    <div class="issue"> How do we get the issuer public keys here? <a class="issue-return" href="#issue-c631389b" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
-   <div class="issue"> This step should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-cb4ffcd9" title="Jump to section">↵</a></div>
    <div class="issue"> Define "cryptographic procedures to obtain a list of unmasked tokens" <a class="issue-return" href="#issue-63880884" title="Jump to section">↵</a></div>
    <div class="issue"> Define this in terms of fetch <a class="issue-return" href="#issue-bc47898b" title="Jump to section">↵</a></div>
    <div class="issue"> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-2131c336" title="Jump to section">↵</a></div>
@@ -2093,11 +2100,11 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
    <span id="infopaneltitle-for-redemption-record" style="display:none">Info about the 'Redemption Record' definition.</span><b><a href="#redemption-record">#redemption-record</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-redemption-record">5.1. Definitions</a>
-    <li><a href="#ref-for-redemption-record①">7. Redeeming Tokens</a> <a href="#ref-for-redemption-record②">(2)</a> <a href="#ref-for-redemption-record③">(3)</a> <a href="#ref-for-redemption-record④">(4)</a> <a href="#ref-for-redemption-record⑤">(5)</a> <a href="#ref-for-redemption-record⑥">(6)</a>
-    <li><a href="#ref-for-redemption-record⑦">7.1. Redemption Records</a> <a href="#ref-for-redemption-record⑧">(2)</a> <a href="#ref-for-redemption-record⑨">(3)</a>
-    <li><a href="#ref-for-redemption-record①⓪">8.2. Redemption Record Query</a>
-    <li><a href="#ref-for-redemption-record①①">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-redemption-record①②">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-redemption-record①">7. Redeeming Tokens</a> <a href="#ref-for-redemption-record②">(2)</a> <a href="#ref-for-redemption-record③">(3)</a> <a href="#ref-for-redemption-record④">(4)</a> <a href="#ref-for-redemption-record⑤">(5)</a> <a href="#ref-for-redemption-record⑥">(6)</a> <a href="#ref-for-redemption-record⑦">(7)</a>
+    <li><a href="#ref-for-redemption-record⑧">7.1. Redemption Records</a> <a href="#ref-for-redemption-record⑨">(2)</a> <a href="#ref-for-redemption-record①⓪">(3)</a>
+    <li><a href="#ref-for-redemption-record①①">8.2. Redemption Record Query</a>
+    <li><a href="#ref-for-redemption-record①②">9.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#ref-for-redemption-record①③">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-get-an-unexpired-redemption-record" class="dfn-panel" data-for="get-an-unexpired-redemption-record" id="infopanel-for-get-an-unexpired-redemption-record" role="dialog">
