@@ -124,7 +124,7 @@ Private State Tokens API performs cross site anonymous authentication without
 using linkable state carrying cookies [[RFC6265]]. Cookies do provide cross
 site authentication, however, they fail to provide anonymity.
 
-Cookies store large amounts of information. [[!RFC6265]] requires at least 4096
+Cookies store large amounts of information. [[RFC6265]] requires at least 4096
 bytes per cookie and 50 cookies per domain. This means an origin has
 50 x 4096 x 2^8 unique identifiers at its disposal. When backed with back end
 databases, a server can store arbitrary data for that many unique
