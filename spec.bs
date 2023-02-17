@@ -652,7 +652,7 @@ The 'Sec-Private-State-Token-Lifetime' Header Field {#sec-private-state-token-li
 ----------------------------
 
 The <dfn http-header>`Sec-Private-State-Token-Lifetime`</dfn> response header
-field gives the expiration for the [=redemption record=] <!-- TODO: link to dfn -->
+field gives the expiration for the [=redemption record=] 
 given in the associated <a http-header>`Sec-Private-State-Token`</a>
 response header. The expiration is given in seconds.
 
