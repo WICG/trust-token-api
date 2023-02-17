@@ -144,8 +144,8 @@ Private State Token operations rely on [[FETCH]]. A fetch request corresponding 
 specific Private State Token operation can be created and used as a parameter to the
 fetch function.
 
-Note that this specification uses the terms "masked" and "unmasked" where
-[[PMB]] uses "blinded" and "unblinded", respectively.
+Note: This specification uses the terms "masked" and "unmasked" where [[PMB]]
+uses "blinded" and "unblinded", respectively.
 
 <!--
 * how this is not as powerful like cookies, privacy guarantees?
