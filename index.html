@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="6bec73faa6161c08b9da98482c0239ef613cc6f6" name="document-revision">
+  <meta content="16e6bb19036eb462f27857d4a9cbcc35109740c7" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -812,11 +812,9 @@ properties in terms of privacy implications.</p>
     <li data-md>
      <p><code>"batchsize"</code> specifies the maximum number of masked tokens that the issuer
             supports for each token issuance operation. Its value is a
-            string representation of a positive integer. Maximum value
-            allowed is 100. If a larger value is specified, 100 will be
-            used. Browser might send fewer tokens in a single operation,
-            but will generally default to sending <code>batchsize</code> many tokens
-            per operation.</p>
+            string representation of a positive integer. The user agent might send
+            fewer tokens in a single operation, but will generally default to
+            sending <code>batchsize</code> many tokens per operation.</p>
     <li data-md>
      <p><code>"keys"</code> field is a dictionary of public keys listed by their identifiers.</p>
      <ul>
@@ -974,11 +972,7 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
         the issuer’s most recent commitments.</p>
      <p class="issue" id="issue-f6043e49"><a class="self-link" href="#issue-f6043e49"></a> This probably needs to be its own algorithm, how is "most recent" defined here?</p>
     <li data-md>
-     <p>Let <var>maxSize</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or the global limit of 100, whichever is smaller.</p>
-    <li data-md>
-     <p>Let <var>numTokens</var> be the right number of tokens considering issuer batch size and current
- number of tokens from the issuer.</p>
-     <p class="issue" id="issue-7513938b"><a class="self-link" href="#issue-7513938b"></a> How does one determine the right number of tokens?</p>
+     <p>Let <var>numTokens</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> limit on the number of tokens, whichever is smaller.</p>
     <li data-md>
      <p>Let <var>tokens</var> be the result of <a data-link-type="dfn" href="#generate-masked-tokens" id="ref-for-generate-masked-tokens">generating masked tokens</a> with <var>numTokens</var>.</p>
     <li data-md>
@@ -1078,7 +1072,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
        <p>If <var>record</var> is not null, <a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers">set redemption headers</a> with <var>request</var> and <var>record</var> and return.</p>
      </ol>
     <li data-md>
-     <p>Let <var>penultimate_redemption</var> be the result of <a data-link-type="dfn" href="#look-up-penultimate-redemption" id="ref-for-look-up-penultimate-redemption">look up penultimate redemption </a> with <var>issuer</var> and <var>topLevel</var>, if the value is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> timeperiod, return error.</p>
+     <p>Let <var>penultimate_redemption</var> be the result of <a data-link-type="dfn" href="#look-up-penultimate-redemption" id="ref-for-look-up-penultimate-redemption">look up penultimate redemption </a> with <var>issuer</var> and <var>topLevel</var>, if the value is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> timeperiod, return error.</p>
     <li data-md>
      <p>Let <var>commitments</var> be the result of <a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments①">looking up the key commitments</a> for <var>issuer</var> and <var>topLevel</var>.</p>
     <li data-md>
@@ -1558,7 +1552,8 @@ Wilson for reviewing and mentoring this spec.</p>
   <aside aria-labelledby="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" class="dfn-panel" data-for="fd74d8159933c4a74d0b23390bed43e3" id="infopanel-for-fd74d8159933c4a74d0b23390bed43e3" role="menu">
    <span id="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" style="display:none">Info about the 'implementation-defined' external reference.</span><a href="https://infra.spec.whatwg.org/#implementation-defined">https://infra.spec.whatwg.org/#implementation-defined</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-implementation-defined">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-implementation-defined">6.1. Browser Steps For Creating Issue Request</a>
+    <li><a href="#ref-for-implementation-defined①">7. Redeeming Tokens</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-3ee316b93eb2dbe81d01a666cce50f9b" class="dfn-panel" data-for="3ee316b93eb2dbe81d01a666cce50f9b" id="infopanel-for-3ee316b93eb2dbe81d01a666cce50f9b" role="menu">
@@ -1831,7 +1826,6 @@ Wilson for reviewing and mentoring this spec.</p>
    <div class="issue"> Need to specify how <code>operation</code> and <code>issuers</code> are used. <a href="https://github.com/WICG/trust-token-api/issues/151">[Issue #151]</a> <a class="issue-return" href="#issue-1b149e55" title="Jump to section">↵</a></div>
    <div class="issue"> How do we get the issuer public keys here? <a class="issue-return" href="#issue-c631389b" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
-   <div class="issue"> How does one determine the right number of tokens? <a class="issue-return" href="#issue-7513938b" title="Jump to section">↵</a></div>
    <div class="issue"> This step should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-cb4ffcd9" title="Jump to section">↵</a></div>
    <div class="issue"> Define this in terms of fetch <a class="issue-return" href="#issue-bc47898b" title="Jump to section">↵</a></div>
    <div class="issue"> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-2131c336" title="Jump to section">↵</a></div>
