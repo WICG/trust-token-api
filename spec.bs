@@ -479,7 +479,7 @@ Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
 <h3 id="modification-to-http-fetch-steps-header">Modification to HTTP fetch steps</h3>
-The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "If |actualResponse|'s status is a redirect status, ..."):
+The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
 
 1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
 1. If |issue response result| is a [=network error=], return |issue response result|.
