@@ -305,7 +305,7 @@ new one.
 enum RefreshPolicy { "none", "refresh" };
 </pre>
 
-The TokenType is currently set to "private-state-token", as this is the only token
+The {{TokenType}} is currently set to "private-state-token", as this is the only token
 type that the specification supports at this time.
 
 <pre class=idl>
