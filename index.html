@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="7ac85d49e69558f384bc17343451eb8ceac57aac" name="document-revision">
+  <meta content="6bec73faa6161c08b9da98482c0239ef613cc6f6" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -860,22 +860,32 @@ fetched for an issuer, previous commitments are discarded.</p>
     <li data-md>
      <p>TODO</p>
    </ol>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="retrieve-a-token">retrieve a token</dfn> for an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin⑧">origin</a> <var>issuer</var>, run the following steps:</p>
+   <p>To <dfn data-dfn-type="dfn" data-noexport id="record-redemption-timestamp">record redemption timestamp<a class="self-link" href="#record-redemption-timestamp"></a></dfn> given an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin⑧">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin⑨">origin</a> <var>topLevel</var>, run the following steps:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
    </ol>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="discard-tokens">discard tokens</dfn> from an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin⑨">origin</a> <var>issuer</var>, run the following steps:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="look-up-penultimate-redemption">look up penultimate redemption</dfn> given an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⓪">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①①">origin</a> <var>topLevel</var>, run the following steps:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
    </ol>
-   <p>To get the <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="number-of-tokens">number of tokens</dfn> from an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⓪">origin</a> <var>issuer</var>, run the following steps:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="retrieve-a-token">retrieve a token</dfn> for an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①②">origin</a> <var>issuer</var>, run the following steps:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
    </ol>
-   <p>To get the <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="max-batch-size">max batch size</dfn> for an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①①">origin</a> <var>issuer</var>, run the following steps:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="discard-tokens">discard tokens</dfn> from an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①③">origin</a> <var>issuer</var>, run the following steps:</p>
+   <ol>
+    <li data-md>
+     <p>TODO</p>
+   </ol>
+   <p>To get the <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="number-of-tokens">number of tokens</dfn> from an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①④">origin</a> <var>issuer</var>, run the following steps:</p>
+   <ol>
+    <li data-md>
+     <p>TODO</p>
+   </ol>
+   <p>To get the <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="max-batch-size">max batch size</dfn> for an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑤">origin</a> <var>issuer</var>, run the following steps:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
@@ -1068,9 +1078,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
        <p>If <var>record</var> is not null, <a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers">set redemption headers</a> with <var>request</var> and <var>record</var> and return.</p>
      </ol>
     <li data-md>
-     <p>If this is the third token exhausting redemption request within the
-   last 48 hours, return error.</p>
-     <p class="issue" id="issue-a9eb7556"><a class="self-link" href="#issue-a9eb7556"></a> Need to define how that is determined</p>
+     <p>Let <var>penultimate_redemption</var> be the result of <a data-link-type="dfn" href="#look-up-penultimate-redemption" id="ref-for-look-up-penultimate-redemption">look up penultimate redemption </a> with <var>issuer</var> and <var>topLevel</var>, if the value is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> timeperiod, return error.</p>
     <li data-md>
      <p>Let <var>commitments</var> be the result of <a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments①">looking up the key commitments</a> for <var>issuer</var> and <var>topLevel</var>.</p>
     <li data-md>
@@ -1089,6 +1097,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p><a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers①">Set redemption headers</a> with <var>request</var> and <var>record</var>.</p>
    </ol>
+   <p class="issue" id="issue-045e65c0"><a class="self-link" href="#issue-045e65c0"></a> Add redemption response handling, including calling [= record redemption timestamp =]. <a href="https://github.com/WICG/trust-token-api/issues/165">[Issue #165]</a></p>
    <p><a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime①">Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
     RR should be cached for. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime②">Sec-Private-State-Token-Lifetime</a> response header value
 is invalid (too large, a negative number or non-numeric), UA should ignore the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime③">Sec-Private-State-Token-Lifetime</a> header. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime④">Sec-Private-State-Token-Lifetime</a> header value
@@ -1108,7 +1117,7 @@ specified as number of seconds in the <a data-link-type="http-header" href="#htt
 header value.</p>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="redemption-record">Redemption Record</dfn> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#struct" id="ref-for-struct">struct</a> with the following items:</p>
    <p class="issue" id="issue-713a59cb"><a class="self-link" href="#issue-713a59cb"></a> Define RR here. <a href="https://github.com/WICG/trust-token-api/issues/150">[Issue #150]</a></p>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="get-an-unexpired-redemption-record">get an unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①">Redemption Record</a></dfn> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①②">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①③">origin</a> <var>topLevel</var>:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="get-an-unexpired-redemption-record">get an unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①">Redemption Record</a></dfn> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑥">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑦">origin</a> <var>topLevel</var>:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
@@ -1138,7 +1147,7 @@ header value.</p>
     <li data-md>
      <p>If <var>parsedURL</var> is failure, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror①">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException③">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
-     <p>Let <var>origin</var> be <var>parsedURL</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①④">origin</a>.</p>
+     <p>Let <var>origin</var> be <var>parsedURL</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑧">origin</a>.</p>
     <li data-md>
      <p>Let <var>topLevel</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-top-level-origin" id="ref-for-concept-environment-top-level-origin②">top-level origin</a> of <var>doc</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object">relevant settings object</a>.</p>
     <li data-md>
@@ -1180,7 +1189,7 @@ at Step 4.</p>
     <li data-md>
      <p>If <var>parsedURL</var> is failure, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑧">reject</a> <var>p</var> with a "<code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror③">TypeError</a></code>" <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-DOMException" id="ref-for-idl-DOMException⑧">DOMException</a></code> and return <var>p</var>.</p>
     <li data-md>
-     <p>Let <var>origin</var> be <var>parsedURL</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑤">origin</a>.</p>
+     <p>Let <var>origin</var> be <var>parsedURL</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑨">origin</a>.</p>
     <li data-md>
      <p>Let <var>topLevel</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-environment-top-level-origin" id="ref-for-concept-environment-top-level-origin③">top-level origin</a> of <var>doc</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object①">relevant settings object</a>.</p>
     <li data-md>
@@ -1375,6 +1384,7 @@ Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#dom-signrequestdata-include">"include"</a><span>, in § 5.1</span>
    <li><a href="#is-associated-with">is associated with</a><span>, in § 4</span>
    <li><a href="#dom-privatestatetoken-issuers">issuers</a><span>, in § 5.1</span>
+   <li><a href="#look-up-penultimate-redemption">look up penultimate redemption</a><span>, in § 4</span>
    <li><a href="#look-up-the-key-commitments">look up the key commitments</a><span>, in § 4</span>
    <li><a href="#max-batch-size">max batch size</a><span>, in § 4</span>
    <li><a href="#dom-refreshpolicy-none">"none"</a><span>, in § 5.1</span>
@@ -1385,6 +1395,7 @@ Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#dom-tokentype-private-state-token">"private-state-token"</a><span>, in § 5.1</span>
    <li><a href="#dictdef-privatestatetoken">PrivateStateToken</a><span>, in § 5.1</span>
    <li><a href="#dom-requestinit-privatestatetoken">privateStateToken</a><span>, in § 5.1</span>
+   <li><a href="#record-redemption-timestamp">record redemption timestamp</a><span>, in § 4</span>
    <li><a href="#redemption-record">Redemption Record</a><span>, in § 7.1</span>
    <li><a href="#dom-refreshpolicy-refresh">"refresh"</a><span>, in § 5.1</span>
    <li><a href="#enumdef-refreshpolicy">RefreshPolicy</a><span>, in § 5.1</span>
@@ -1486,10 +1497,10 @@ Wilson for reviewing and mentoring this spec.</p>
   <aside aria-labelledby="infopaneltitle-for-e66f9f7d45934e77669cb907bd0c7636" class="dfn-panel" data-for="e66f9f7d45934e77669cb907bd0c7636" id="infopanel-for-e66f9f7d45934e77669cb907bd0c7636" role="menu">
    <span id="infopaneltitle-for-e66f9f7d45934e77669cb907bd0c7636" style="display:none">Info about the 'origin' external reference.</span><a href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin">https://html.spec.whatwg.org/multipage/browsers.html#concept-origin</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-origin">4. Algorithms</a> <a href="#ref-for-concept-origin①">(2)</a> <a href="#ref-for-concept-origin②">(3)</a> <a href="#ref-for-concept-origin③">(4)</a> <a href="#ref-for-concept-origin④">(5)</a> <a href="#ref-for-concept-origin⑤">(6)</a> <a href="#ref-for-concept-origin⑥">(7)</a> <a href="#ref-for-concept-origin⑦">(8)</a> <a href="#ref-for-concept-origin⑧">(9)</a> <a href="#ref-for-concept-origin⑨">(10)</a> <a href="#ref-for-concept-origin①⓪">(11)</a> <a href="#ref-for-concept-origin①①">(12)</a>
-    <li><a href="#ref-for-concept-origin①②">7.1. Redemption Records</a> <a href="#ref-for-concept-origin①③">(2)</a>
-    <li><a href="#ref-for-concept-origin①④">8.1. Token Query</a>
-    <li><a href="#ref-for-concept-origin①⑤">8.2. Redemption Record Query</a>
+    <li><a href="#ref-for-concept-origin">4. Algorithms</a> <a href="#ref-for-concept-origin①">(2)</a> <a href="#ref-for-concept-origin②">(3)</a> <a href="#ref-for-concept-origin③">(4)</a> <a href="#ref-for-concept-origin④">(5)</a> <a href="#ref-for-concept-origin⑤">(6)</a> <a href="#ref-for-concept-origin⑥">(7)</a> <a href="#ref-for-concept-origin⑦">(8)</a> <a href="#ref-for-concept-origin⑧">(9)</a> <a href="#ref-for-concept-origin⑨">(10)</a> <a href="#ref-for-concept-origin①⓪">(11)</a> <a href="#ref-for-concept-origin①①">(12)</a> <a href="#ref-for-concept-origin①②">(13)</a> <a href="#ref-for-concept-origin①③">(14)</a> <a href="#ref-for-concept-origin①④">(15)</a> <a href="#ref-for-concept-origin①⑤">(16)</a>
+    <li><a href="#ref-for-concept-origin①⑥">7.1. Redemption Records</a> <a href="#ref-for-concept-origin①⑦">(2)</a>
+    <li><a href="#ref-for-concept-origin①⑧">8.1. Token Query</a>
+    <li><a href="#ref-for-concept-origin①⑨">8.2. Redemption Record Query</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-a8756513b792b8f203588906035a13bb" class="dfn-panel" data-for="a8756513b792b8f203588906035a13bb" id="infopanel-for-a8756513b792b8f203588906035a13bb" role="menu">
@@ -1542,6 +1553,12 @@ Wilson for reviewing and mentoring this spec.</p>
    <span id="infopaneltitle-for-0d3ee326a162c16997e7bb20e8b7133c" style="display:none">Info about the 'exist' external reference.</span><a href="https://infra.spec.whatwg.org/#map-exists">https://infra.spec.whatwg.org/#map-exists</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-map-exists">5.2. Modifications to request</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" class="dfn-panel" data-for="fd74d8159933c4a74d0b23390bed43e3" id="infopanel-for-fd74d8159933c4a74d0b23390bed43e3" role="menu">
+   <span id="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" style="display:none">Info about the 'implementation-defined' external reference.</span><a href="https://infra.spec.whatwg.org/#implementation-defined">https://infra.spec.whatwg.org/#implementation-defined</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-implementation-defined">7. Redeeming Tokens</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-3ee316b93eb2dbe81d01a666cce50f9b" class="dfn-panel" data-for="3ee316b93eb2dbe81d01a666cce50f9b" id="infopanel-for-3ee316b93eb2dbe81d01a666cce50f9b" role="menu">
@@ -1704,6 +1721,7 @@ Wilson for reviewing and mentoring this spec.</p>
     <ul>
      <li><span class="dfn-paneled" id="de8dad85bc31aef3359c7c7dbd918fe7">empty</span>
      <li><span class="dfn-paneled" id="0d3ee326a162c16997e7bb20e8b7133c">exist</span>
+     <li><span class="dfn-paneled" id="fd74d8159933c4a74d0b23390bed43e3">implementation-defined</span>
      <li><span class="dfn-paneled" id="3ee316b93eb2dbe81d01a666cce50f9b">struct</span>
     </ul>
    <li>
@@ -1817,9 +1835,9 @@ Wilson for reviewing and mentoring this spec.</p>
    <div class="issue"> This step should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-cb4ffcd9" title="Jump to section">↵</a></div>
    <div class="issue"> Define this in terms of fetch <a class="issue-return" href="#issue-bc47898b" title="Jump to section">↵</a></div>
    <div class="issue"> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-2131c336" title="Jump to section">↵</a></div>
-   <div class="issue"> Need to define how that is determined <a class="issue-return" href="#issue-a9eb7556" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a class="issue-return" href="#issue-f6043e49①" title="Jump to section">↵</a></div>
    <div class="issue"> This needs to be specified more clearly <a class="issue-return" href="#issue-907127dc" title="Jump to section">↵</a></div>
+   <div class="issue"> Add redemption response handling, including calling [= record redemption timestamp =]. <a href="https://github.com/WICG/trust-token-api/issues/165">[Issue #165]</a> <a class="issue-return" href="#issue-045e65c0" title="Jump to section">↵</a></div>
    <div class="issue"> Define RR here. <a href="https://github.com/WICG/trust-token-api/issues/150">[Issue #150]</a> <a class="issue-return" href="#issue-713a59cb" title="Jump to section">↵</a></div>
    <div class="issue"> Define and link issuance, redemption, masked (formerly blinded), unmasked,
 signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to section">↵</a></div>
@@ -1855,6 +1873,12 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
    <span id="infopaneltitle-for-is-associated-with" style="display:none">Info about the 'is associated with' definition.</span><b><a href="#is-associated-with">#is-associated-with</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-is-associated-with">8.2. Redemption Record Query</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-look-up-penultimate-redemption" class="dfn-panel" data-for="look-up-penultimate-redemption" id="infopanel-for-look-up-penultimate-redemption" role="dialog">
+   <span id="infopaneltitle-for-look-up-penultimate-redemption" style="display:none">Info about the 'look up penultimate redemption' definition.</span><b><a href="#look-up-penultimate-redemption">#look-up-penultimate-redemption</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-look-up-penultimate-redemption">7. Redeeming Tokens</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-retrieve-a-token" class="dfn-panel" data-for="retrieve-a-token" id="infopanel-for-retrieve-a-token" role="dialog">
