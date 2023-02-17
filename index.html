@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="f178b5d338127c75924327a8f30b64daa5482310" name="document-revision">
+  <meta content="0f1494a54e50999cdf8149b7b8264e8450f42d0f" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -906,24 +906,29 @@ fetched for an issuer, previous commitments are discarded.</p>
    </ol>
    <h2 class="heading settled" data-level="5" id="fetch-integration"><span class="secno">5. </span><span class="content">Integration with Fetch</span><a class="self-link" href="#fetch-integration"></a></h2>
    <h3 class="heading settled" data-level="5.1" id="definitions"><span class="secno">5.1. </span><span class="content">Definitions</span><a class="self-link" href="#definitions"></a></h3>
+   <p>The <code class="idl"><a data-link-type="idl" href="#enumdef-refreshpolicy" id="ref-for-enumdef-refreshpolicy">RefreshPolicy</a></code> is attached to a redemption request, determining whether or not the
+redemption should result in a previously returned, unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record">redemption record</a> or a
+new one.</p>
 <pre class="idl highlight def"><c- b>enum</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-refreshpolicy"><code><c- g>RefreshPolicy</c-></code></dfn> { <dfn class="idl-code" data-dfn-for="RefreshPolicy" data-dfn-type="enum-value" data-export id="dom-refreshpolicy-none"><code><c- s>"none"</c-></code><a class="self-link" href="#dom-refreshpolicy-none"></a></dfn>, <dfn class="idl-code" data-dfn-for="RefreshPolicy" data-dfn-type="enum-value" data-export id="dom-refreshpolicy-refresh"><code><c- s>"refresh"</c-></code><a class="self-link" href="#dom-refreshpolicy-refresh"></a></dfn> };
 </pre>
-<pre class="idl highlight def"><c- b>enum</c-> <dfn class="idl-code" data-dfn-type="enum" data-export id="enumdef-tokentype"><code><c- g>TokenType</c-></code><a class="self-link" href="#enumdef-tokentype"></a></dfn> { <dfn class="idl-code" data-dfn-for="TokenType" data-dfn-type="enum-value" data-export id="dom-tokentype-private-state-token"><code><c- s>"private-state-token"</c-></code><a class="self-link" href="#dom-tokentype-private-state-token"></a></dfn> };
+   <p>The <code class="idl"><a data-link-type="idl" href="#enumdef-tokentype" id="ref-for-enumdef-tokentype">TokenType</a></code> is currently set to "private-state-token", as this is the only token
+type that the specification supports at this time.</p>
+<pre class="idl highlight def"><c- b>enum</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-tokentype"><code><c- g>TokenType</c-></code></dfn> { <dfn class="idl-code" data-dfn-for="TokenType" data-dfn-type="enum-value" data-export id="dom-tokentype-private-state-token"><code><c- s>"private-state-token"</c-></code><a class="self-link" href="#dom-tokentype-private-state-token"></a></dfn> };
 </pre>
+   <p>The <code class="idl"><a data-link-type="idl" href="#enumdef-operationtype" id="ref-for-enumdef-operationtype">OperationType</a></code> refers to which operation the user agent is attempting to complete.</p>
 <pre class="idl highlight def"><c- b>enum</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export id="enumdef-operationtype"><code><c- g>OperationType</c-></code></dfn> { <dfn class="idl-code" data-dfn-for="OperationType" data-dfn-type="enum-value" data-export id="dom-operationtype-token-request"><code><c- s>"token-request"</c-></code><a class="self-link" href="#dom-operationtype-token-request"></a></dfn>, <dfn class="idl-code" data-dfn-for="OperationType" data-dfn-type="enum-value" data-export id="dom-operationtype-send-redemption-record"><code><c- s>"send-redemption-record"</c-></code><a class="self-link" href="#dom-operationtype-send-redemption-record"></a></dfn>, <dfn class="idl-code" data-dfn-for="OperationType" data-dfn-type="enum-value" data-export id="dom-operationtype-token-redemption"><code><c- s>"token-redemption"</c-></code><a class="self-link" href="#dom-operationtype-token-redemption"></a></dfn> };
 </pre>
-<pre class="idl highlight def"><c- b>enum</c-> <dfn class="idl-code" data-dfn-type="enum" data-export id="enumdef-signrequestdata"><code><c- g>SignRequestData</c-></code><a class="self-link" href="#enumdef-signrequestdata"></a></dfn> { <dfn class="idl-code" data-dfn-for="SignRequestData" data-dfn-type="enum-value" data-export id="dom-signrequestdata-omit"><code><c- s>"omit"</c-></code><a class="self-link" href="#dom-signrequestdata-omit"></a></dfn>, <dfn class="idl-code" data-dfn-for="SignRequestData" data-dfn-type="enum-value" data-export id="dom-signrequestdata-include"><code><c- s>"include"</c-></code><a class="self-link" href="#dom-signrequestdata-include"></a></dfn>, <dfn class="idl-code" data-dfn-for="SignRequestData" data-dfn-type="enum-value" data-export id="dom-signrequestdata-headers-only"><code><c- s>"headers-only"</c-></code><a class="self-link" href="#dom-signrequestdata-headers-only"></a></dfn> };
-</pre>
+   <p>The <code class="idl"><a data-link-type="idl" href="#dictdef-privatestatetoken" id="ref-for-dictdef-privatestatetoken">PrivateStateToken</a></code> contains the information required to make a fetch request.</p>
 <pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-privatestatetoken"><code><c- g>PrivateStateToken</c-></code></dfn> {
-  <c- b>required</c-> <a data-link-type="idl-name" href="#enumdef-operationtype" id="ref-for-enumdef-operationtype"><c- n>OperationType</c-></a> <dfn class="idl-code" data-dfn-for="PrivateStateToken" data-dfn-type="dict-member" data-export data-type="OperationType " id="dom-privatestatetoken-operation"><code><c- g>operation</c-></code><a class="self-link" href="#dom-privatestatetoken-operation"></a></dfn>;
-  <a data-link-type="idl-name" href="#enumdef-refreshpolicy" id="ref-for-enumdef-refreshpolicy"><c- n>RefreshPolicy</c-></a> <dfn class="dfn-paneled idl-code" data-default="&quot;none&quot;" data-dfn-for="PrivateStateToken" data-dfn-type="dict-member" data-export data-type="RefreshPolicy " id="dom-privatestatetoken-refreshpolicy"><code><c- g>refreshPolicy</c-></code></dfn> = "none";
+  <c- b>required</c-> <a data-link-type="idl-name" href="#enumdef-operationtype" id="ref-for-enumdef-operationtype①"><c- n>OperationType</c-></a> <dfn class="idl-code" data-dfn-for="PrivateStateToken" data-dfn-type="dict-member" data-export data-type="OperationType " id="dom-privatestatetoken-operation"><code><c- g>operation</c-></code><a class="self-link" href="#dom-privatestatetoken-operation"></a></dfn>;
+  <a data-link-type="idl-name" href="#enumdef-refreshpolicy" id="ref-for-enumdef-refreshpolicy①"><c- n>RefreshPolicy</c-></a> <dfn class="dfn-paneled idl-code" data-default="&quot;none&quot;" data-dfn-for="PrivateStateToken" data-dfn-type="dict-member" data-export data-type="RefreshPolicy " id="dom-privatestatetoken-refreshpolicy"><code><c- g>refreshPolicy</c-></code></dfn> = "none";
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#idl-sequence" id="ref-for-idl-sequence"><c- b>sequence</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-USVString" id="ref-for-idl-USVString"><c- b>USVString</c-></a>> <dfn class="idl-code" data-dfn-for="PrivateStateToken" data-dfn-type="dict-member" data-export data-type="sequence<USVString> " id="dom-privatestatetoken-issuers"><code><c- g>issuers</c-></code><a class="self-link" href="#dom-privatestatetoken-issuers"></a></dfn>;
 };
 </pre>
    <p class="issue" id="issue-1b149e55"><a class="self-link" href="#issue-1b149e55"></a> Need to specify how <code>operation</code> and <code>issuers</code> are used. <a href="https://github.com/WICG/trust-token-api/issues/151">[Issue #151]</a></p>
    <p>This specification adds a new property to the <code class="idl"><a data-link-type="idl" href="https://fetch.spec.whatwg.org/#requestinit" id="ref-for-requestinit">RequestInit</a></code> dictionary:</p>
 <pre class="idl highlight def"><c- b>partial</c-> <c- b>dictionary</c-> <a class="idl-code" data-link-type="dictionary" href="https://fetch.spec.whatwg.org/#requestinit" id="ref-for-requestinit①"><c- g>RequestInit</c-></a> {
-  <a data-link-type="idl-name" href="#dictdef-privatestatetoken" id="ref-for-dictdef-privatestatetoken"><c- n>PrivateStateToken</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="RequestInit" data-dfn-type="dict-member" data-export data-type="PrivateStateToken " id="dom-requestinit-privatestatetoken"><code><c- g>privateStateToken</c-></code></dfn>;
+  <a data-link-type="idl-name" href="#dictdef-privatestatetoken" id="ref-for-dictdef-privatestatetoken①"><c- n>PrivateStateToken</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="RequestInit" data-dfn-type="dict-member" data-export data-type="PrivateStateToken " id="dom-requestinit-privatestatetoken"><code><c- g>privateStateToken</c-></code></dfn>;
 };
 </pre>
    <h3 class="heading settled" data-level="5.2" id="fetch-request"><span class="secno">5.2. </span><span class="content">Modifications to request</span><a class="self-link" href="#fetch-request"></a></h3>
@@ -1060,7 +1065,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
 <c- p>});</c->
 </pre>
    </div>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="set-redemption-headers">set redemption headers</dfn> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a> <var>request</var> and a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record">Redemption Record</a> <var>record</var>:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="set-redemption-headers">set redemption headers</dfn> with <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request②">request</a> <var>request</var> and a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①">Redemption Record</a> <var>record</var>:</p>
    <ol>
     <li data-md>
      <p>Set redemption procedure result in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑥">Sec-Private-State-Token</a> request header.</p>
@@ -1113,24 +1118,24 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
      <p><a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers①">Set redemption headers</a> with <var>request</var> and <var>record</var>.</p>
    </ol>
    <p class="issue" id="issue-045e65c0"><a class="self-link" href="#issue-045e65c0"></a> Add redemption response handling, including calling [= record redemption timestamp =]. <a href="https://github.com/WICG/trust-token-api/issues/165">[Issue #165]</a></p>
-   <p><a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime①">Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①">redemption record</a> should be cached for. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime②">Sec-Private-State-Token-Lifetime</a> response header value
+   <p><a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime①">Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record②">redemption record</a> should be cached for. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime②">Sec-Private-State-Token-Lifetime</a> response header value
 is invalid (too large, a negative number or non-numeric), UA should ignore the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime③">Sec-Private-State-Token-Lifetime</a> header. When <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime④">Sec-Private-State-Token-Lifetime</a> header value
-is zero, UA should treat the record as expired. In case of multiple <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑥">Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record②">redemption record</a> will be
+is zero, UA should treat the record as expired. In case of multiple <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑥">Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record③">redemption record</a> will be
 tied to the lifetime of the Private State Token verification key that confirmed the
-redeemed token’s issuance. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record③">redemption record</a> is HTTP-only and JavaScript is only able to
-access/send the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record④">redemption record</a> via Private State Token Fetch APIs. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑤">redemption record</a> is treated as an
+redeemed token’s issuance. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record④">redemption record</a> is HTTP-only and JavaScript is only able to
+access/send the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑤">redemption record</a> via Private State Token Fetch APIs. The <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑥">redemption record</a> is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.</p>
    <h3 class="heading settled" data-level="7.1" id="redemption-records"><span class="secno">7.1. </span><span class="content">Redemption Records</span><a class="self-link" href="#redemption-records"></a></h3>
    <p>To reduce communication overhead, the browser might cache blobs returned in <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑦">Sec-Private-State-Token</a> header value in redemption responses. These blobs are
-referred as <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑥">Redemption Records</a>. Browsers might choose to store these records
+referred as <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑦">Redemption Records</a>. Browsers might choose to store these records
 to include them in subsequent requests to the origins that can verify its
 validity. Issuer might choose to include optional <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑦">Sec-Private-State-Token-Lifetime</a> header in the redemption response. The value of this header indicates the
-expiration time for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑦">redemption record</a> provided. This expiration is
+expiration time for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑧">redemption record</a> provided. This expiration is
 specified as number of seconds in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑧">Sec-Private-State-Token-Lifetime</a> HTTP response
 header value.</p>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="redemption-record">Redemption Record</dfn> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a>.</p>
-   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="get-an-unexpired-redemption-record">get an unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑧">Redemption Record</a></dfn> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑥">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑦">origin</a> <var>topLevel</var>:</p>
+   <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="get-an-unexpired-redemption-record">get an unexpired <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑨">Redemption Record</a></dfn> with an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑥">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑦">origin</a> <var>topLevel</var>:</p>
    <ol>
     <li data-md>
      <p>TODO</p>
@@ -1214,7 +1219,7 @@ at Step 4.</p>
        <p><a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments③">Look up the key commitments</a> for <var>origin</var> and <var>topLevel</var>. If there are key commitments, <a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens③">discard tokens</a> from <var>origin</var> that are signed with keys other than those
      from the issuer’s most recent commitments.</p>
       <li data-md>
-       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task③">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source③">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②">resolve</a> <var>p</var> with true if there is a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record⑨">redemption record</a> for the issuer and top level pair, with false otherwise.</p>
+       <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-global-task" id="ref-for-queue-a-global-task③">Queue a global task</a> on the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#networking-task-source" id="ref-for-networking-task-source③">networking task source</a> given <var>global</var> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②">resolve</a> <var>p</var> with true if there is a <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①⓪">redemption record</a> for the issuer and top level pair, with false otherwise.</p>
      </ol>
     <li data-md>
      <p>Return <var>p</var>.</p>
@@ -1235,7 +1240,7 @@ metadata.</p>
 signed, unsigned</p>
    <p>The <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑧">Sec-Private-State-Token</a> <em>response</em> header field sends
 a collection of signed, masked tokens. During redemption it sends the
-just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①⓪">redemption record</a>.</p>
+just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①①">redemption record</a>.</p>
    <p class="issue" id="issue-0f07ef70"><a class="self-link" href="#issue-0f07ef70"></a> Link stuff here too.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
@@ -1243,7 +1248,7 @@ just-created signed <a data-link-type="dfn" href="#redemption-record" id="ref-fo
 </pre>
    <h3 class="heading settled" data-level="9.2" id="sec-private-state-token-lifetime"><span class="secno">9.2. </span><span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span><a class="self-link" href="#sec-private-state-token-lifetime"></a></h3>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></dfn> response header
-field gives the expiration for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①①">redemption record</a> given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
+field gives the expiration for the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record①②">redemption record</a> given in the associated <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑨"><code>Sec-Private-State-Token</code></a> response header. The expiration is given in seconds.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31①">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.1" id="ref-for-section-3.3.1">integer</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
@@ -1392,8 +1397,6 @@ Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#get-an-unexpired-redemption-record">get an unexpired Redemption Record</a><span>, in § 7.1</span>
    <li><a href="#dom-document-hasprivatetokens">hasPrivateTokens(issuer, type)</a><span>, in § 8.1</span>
    <li><a href="#dom-document-hasredemptionrecord">hasRedemptionRecord(issuer, type)</a><span>, in § 8.2</span>
-   <li><a href="#dom-signrequestdata-headers-only">"headers-only"</a><span>, in § 5.1</span>
-   <li><a href="#dom-signrequestdata-include">"include"</a><span>, in § 5.1</span>
    <li><a href="#is-associated-with">is associated with</a><span>, in § 4</span>
    <li><a href="#dom-privatestatetoken-issuers">issuers</a><span>, in § 5.1</span>
    <li><a href="#look-up-penultimate-redemption">look up penultimate redemption</a><span>, in § 4</span>
@@ -1401,7 +1404,6 @@ Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#max-batch-size">max batch size</a><span>, in § 4</span>
    <li><a href="#dom-refreshpolicy-none">"none"</a><span>, in § 5.1</span>
    <li><a href="#number-of-tokens">number of tokens</a><span>, in § 4</span>
-   <li><a href="#dom-signrequestdata-omit">"omit"</a><span>, in § 5.1</span>
    <li><a href="#dom-privatestatetoken-operation">operation</a><span>, in § 5.1</span>
    <li><a href="#enumdef-operationtype">OperationType</a><span>, in § 5.1</span>
    <li><a href="#dom-tokentype-private-state-token">"private-state-token"</a><span>, in § 5.1</span>
@@ -1419,7 +1421,6 @@ Wilson for reviewing and mentoring this spec.</p>
    <li><a href="#http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a><span>, in § 9.3</span>
    <li><a href="#dom-operationtype-send-redemption-record">"send-redemption-record"</a><span>, in § 5.1</span>
    <li><a href="#set-redemption-headers">set redemption headers</a><span>, in § 7</span>
-   <li><a href="#enumdef-signrequestdata">SignRequestData</a><span>, in § 5.1</span>
    <li><a href="#dom-operationtype-token-redemption">"token-redemption"</a><span>, in § 5.1</span>
    <li><a href="#request-token-refresh-policy">token refresh policy</a><span>, in § 5.2</span>
    <li><a href="#dom-operationtype-token-request">"token-request"</a><span>, in § 5.1</span>
@@ -1846,8 +1847,6 @@ Wilson for reviewing and mentoring this spec.</p>
 
 <c- b>enum</c-> <a href="#enumdef-operationtype"><code><c- g>OperationType</c-></code></a> { <a href="#dom-operationtype-token-request"><code><c- s>"token-request"</c-></code></a>, <a href="#dom-operationtype-send-redemption-record"><code><c- s>"send-redemption-record"</c-></code></a>, <a href="#dom-operationtype-token-redemption"><code><c- s>"token-redemption"</c-></code></a> };
 
-<c- b>enum</c-> <a href="#enumdef-signrequestdata"><code><c- g>SignRequestData</c-></code></a> { <a href="#dom-signrequestdata-omit"><code><c- s>"omit"</c-></code></a>, <a href="#dom-signrequestdata-include"><code><c- s>"include"</c-></code></a>, <a href="#dom-signrequestdata-headers-only"><code><c- s>"headers-only"</c-></code></a> };
-
 <c- b>dictionary</c-> <a href="#dictdef-privatestatetoken"><code><c- g>PrivateStateToken</c-></code></a> {
   <c- b>required</c-> <a data-link-type="idl-name" href="#enumdef-operationtype"><c- n>OperationType</c-></a> <a data-type="OperationType " href="#dom-privatestatetoken-operation"><code><c- g>operation</c-></code></a>;
   <a data-link-type="idl-name" href="#enumdef-refreshpolicy"><c- n>RefreshPolicy</c-></a> <a data-default="&quot;none&quot;" data-type="RefreshPolicy " href="#dom-privatestatetoken-refreshpolicy"><code><c- g>refreshPolicy</c-></code></a> = "none";
@@ -1959,19 +1958,25 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
   <aside aria-labelledby="infopaneltitle-for-enumdef-refreshpolicy" class="dfn-panel" data-for="enumdef-refreshpolicy" id="infopanel-for-enumdef-refreshpolicy" role="dialog">
    <span id="infopaneltitle-for-enumdef-refreshpolicy" style="display:none">Info about the 'RefreshPolicy' definition.</span><b><a href="#enumdef-refreshpolicy">#enumdef-refreshpolicy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-enumdef-refreshpolicy">5.1. Definitions</a>
+    <li><a href="#ref-for-enumdef-refreshpolicy">5.1. Definitions</a> <a href="#ref-for-enumdef-refreshpolicy①">(2)</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-enumdef-tokentype" class="dfn-panel" data-for="enumdef-tokentype" id="infopanel-for-enumdef-tokentype" role="dialog">
+   <span id="infopaneltitle-for-enumdef-tokentype" style="display:none">Info about the 'TokenType' definition.</span><b><a href="#enumdef-tokentype">#enumdef-tokentype</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-enumdef-tokentype">5.1. Definitions</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-enumdef-operationtype" class="dfn-panel" data-for="enumdef-operationtype" id="infopanel-for-enumdef-operationtype" role="dialog">
    <span id="infopaneltitle-for-enumdef-operationtype" style="display:none">Info about the 'OperationType' definition.</span><b><a href="#enumdef-operationtype">#enumdef-operationtype</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-enumdef-operationtype">5.1. Definitions</a>
+    <li><a href="#ref-for-enumdef-operationtype">5.1. Definitions</a> <a href="#ref-for-enumdef-operationtype①">(2)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-dictdef-privatestatetoken" class="dfn-panel" data-for="dictdef-privatestatetoken" id="infopanel-for-dictdef-privatestatetoken" role="dialog">
    <span id="infopaneltitle-for-dictdef-privatestatetoken" style="display:none">Info about the 'PrivateStateToken' definition.</span><b><a href="#dictdef-privatestatetoken">#dictdef-privatestatetoken</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dictdef-privatestatetoken">5.1. Definitions</a>
+    <li><a href="#ref-for-dictdef-privatestatetoken">5.1. Definitions</a> <a href="#ref-for-dictdef-privatestatetoken①">(2)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-dom-privatestatetoken-refreshpolicy" class="dfn-panel" data-for="dom-privatestatetoken-refreshpolicy" id="infopanel-for-dom-privatestatetoken-refreshpolicy" role="dialog">
@@ -2014,11 +2019,12 @@ signed, unsigned <a class="issue-return" href="#issue-ed20d0c8" title="Jump to s
   <aside aria-labelledby="infopaneltitle-for-redemption-record" class="dfn-panel" data-for="redemption-record" id="infopanel-for-redemption-record" role="dialog">
    <span id="infopaneltitle-for-redemption-record" style="display:none">Info about the 'Redemption Record' definition.</span><b><a href="#redemption-record">#redemption-record</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-redemption-record">7. Redeeming Tokens</a> <a href="#ref-for-redemption-record①">(2)</a> <a href="#ref-for-redemption-record②">(3)</a> <a href="#ref-for-redemption-record③">(4)</a> <a href="#ref-for-redemption-record④">(5)</a> <a href="#ref-for-redemption-record⑤">(6)</a>
-    <li><a href="#ref-for-redemption-record⑥">7.1. Redemption Records</a> <a href="#ref-for-redemption-record⑦">(2)</a> <a href="#ref-for-redemption-record⑧">(3)</a>
-    <li><a href="#ref-for-redemption-record⑨">8.2. Redemption Record Query</a>
-    <li><a href="#ref-for-redemption-record①⓪">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-redemption-record①①">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
+    <li><a href="#ref-for-redemption-record">5.1. Definitions</a>
+    <li><a href="#ref-for-redemption-record①">7. Redeeming Tokens</a> <a href="#ref-for-redemption-record②">(2)</a> <a href="#ref-for-redemption-record③">(3)</a> <a href="#ref-for-redemption-record④">(4)</a> <a href="#ref-for-redemption-record⑤">(5)</a> <a href="#ref-for-redemption-record⑥">(6)</a>
+    <li><a href="#ref-for-redemption-record⑦">7.1. Redemption Records</a> <a href="#ref-for-redemption-record⑧">(2)</a> <a href="#ref-for-redemption-record⑨">(3)</a>
+    <li><a href="#ref-for-redemption-record①⓪">8.2. Redemption Record Query</a>
+    <li><a href="#ref-for-redemption-record①①">9.1. The 'Sec-Private-State-Token' Header Field</a>
+    <li><a href="#ref-for-redemption-record①②">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-get-an-unexpired-redemption-record" class="dfn-panel" data-for="get-an-unexpired-redemption-record" id="infopanel-for-get-an-unexpired-redemption-record" role="dialog">
