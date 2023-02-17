@@ -401,14 +401,13 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
  1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
- 1. Configure the HTTP request.
-     1. Set a load flag to bypass the HTTP cache.
-     1. Add <a http-header>Sec-Private-State-Token</a> request header containing a
-                      base64-encoded version of |tokens|.
-     1. Add <a http-header>Sec-Private-State-Token-Version</a> request header that specifies
-                      the version of the cryptographic protocol used.
-
-     Issue: This step should append structured headers using [=header list/set a structured field value=]
+ 1. Set a load flag to bypass the HTTP cache.
+ 1. Let |base64-encoded-tokens| be the base64-encoded version of |tokens|.
+ 1. Let |version| be the version of the cryptographic protocol used.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
+                in |request|'s header list.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+                in |request|'s header list.
 
 <div class=example>
 Private State Token HTTP request headers created for a typical fetch is as follows.
@@ -497,9 +496,15 @@ token.
 -->
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
- 1. Set redemption procedure result in <a http-header>Sec-Private-State-Token</a> request header.
- 1. Set <a http-header>Sec-Private-State-Token-Version</a> header value to the cryptographic protocol used.
- 1. Optionally, set <a http-header>Sec-Private-State-Token-Lifetime</a> header.
+ 1. Let |redemption-result| be the redemption procedure result.
+ 1. Let |version| be the version of the cryptographic protocol used.
+ 1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemption-result|)
+                in |request|'s header list.
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+                in |request|'s header list.
+ 1. Optionally, [=header list/set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Lifetime`</a>, |token-lifetime|)
+                in |request|'s header list.
  1. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
 
 Issue: This algorithm should append structured headers using [=header list/set a structured field value=]
