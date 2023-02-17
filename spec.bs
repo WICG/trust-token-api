@@ -859,6 +859,6 @@ Specification document: this specification ([[#sec-private-state-token-version]]
 
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
-Thanks to Charlie Harrison, David Van Cleve, Johann Hofmann, Kaustubha Govind,
-Mike Taylor, and Chris Fredrickson for their contributions. Thanks to Chris
-Wilson for reviewing and mentoring this spec.
+Thanks to Alex Kallam, Charlie Harrison, Chris Fredrickson, David Van Cleve, Dylan Cutler,
+Eric Trouton, Johann Hofmann, Kaustubha Govind, Mike Taylor, Ryan Kalla, and Sam
+Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and mentoring this spec.
