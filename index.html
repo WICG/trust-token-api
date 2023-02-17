@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 2fb26b4f8, updated Thu Feb 16 11:34:18 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="5f1bc159a2f033601920cf3f30cc5c384f12a3a8" name="document-revision">
+  <meta content="bc3b352fd01091ce0b0bb8cdbc1b825f8d3d7136" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -976,13 +976,17 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Let <var>tokens</var> be the result of <a data-link-type="dfn" href="#generate-masked-tokens" id="ref-for-generate-masked-tokens">generating masked tokens</a> with <var>numTokens</var>.</p>
     <li data-md>
-     <p>Configure the HTTP request.
-           a. Set a load flag to bypass the HTTP cache.
-      b. Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token">Sec-Private-State-Token</a> request header containing a
-                  base64-encoded version of the bytestring of tokens
-                  generated in Step 11.
-           c. Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a> request header that specifies
-                  the version of the cryptographic protocol used.</p>
+     <p>Configure the HTTP request.</p>
+     <ol>
+      <li data-md>
+       <p>Set a load flag to bypass the HTTP cache.</p>
+      <li data-md>
+       <p>Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token">Sec-Private-State-Token</a> request header containing a
+              base64-encoded version of <var>tokens</var>.</p>
+      <li data-md>
+       <p>Add <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a> request header that specifies
+              the version of the cryptographic protocol used.</p>
+     </ol>
      <p class="issue" id="issue-cb4ffcd9"><a class="self-link" href="#issue-cb4ffcd9"></a> This step should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header">set a structured field value</a></p>
    </ol>
    <div class="example" id="example-2005541d">
@@ -1017,10 +1021,14 @@ header.
      <p>If the response has an empty <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token④">Sec-Private-State-Token</a> header, return; this is a <code>Success</code> response bearing 0 tokens.</p>
     <li data-md>
      <p>Strip the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑤">Sec-Private-State-Token</a> header from the response and carry out the
-cryptographic procedures to obtain a list of unmasked tokens.
-a. If the cryptographic procedure succeeds, associate the tokens with the
-      issuing key’s label and store the tokens.
-b. Else, return an error.</p>
+cryptographic procedures to obtain a list of unmasked tokens.</p>
+     <ol>
+      <li data-md>
+       <p>If the cryptographic procedure succeeds, associate the tokens with the
+  issuing key’s label and store the tokens.</p>
+      <li data-md>
+       <p>Else, return an error.</p>
+     </ol>
    </ol>
    <p class="issue" id="issue-bc47898b"><a class="self-link" href="#issue-bc47898b"></a> Define this in terms of fetch</p>
    <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
