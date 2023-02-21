@@ -280,7 +280,7 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-An user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=] |issuer|, and the values are a [=map=] |commitment|. Populating <dfn>pstKeyCommitments</dfn> is [=implementation-defined=].
+An user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=] |issuer|, and the values are a [=map=] |commitment|. Populating |pstKeyCommitments| is [=implementation-defined=].
 
 To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run the following steps:
 
