@@ -280,9 +280,19 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
+An user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating |pstKeyCommitments| is [=implementation-defined=]. 
 
-1. TODO
+Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
+
+To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run the following steps:
+
+1. If [=pstKeyCommitments=][|issuer|] does not [=map/exist=], return null.
+1. Let |issuerKeys| be [=pstKeyCommitments=][|issuer|].
+1. For each |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
+    1. Return |issuerKeys|[|version|], if it [=map/exists=].
+1. Return null.
+
+Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
@@ -399,8 +409,8 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
- 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer| and |topLevel|.
- 1. If |commitments| is [=list/empty=], return.
+ 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+ 1. If |commitments| is null,  return.
  1. Pass issuer public keys to cryptographic procedures. Reject if keys are
          malformed.
 
@@ -541,8 +551,8 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
  1. Let |penultimate_redemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|, if the value is less than an [=implementation-defined=] time period (which is recommended to be 48 hours), return error.
 
- 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer| and |topLevel|.
- 1. If |commitments| is [=list/empty=], return.
+ 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+ 1. If |commitments| is null, return.
  1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
             the issuer's most recent commitments.
 
@@ -618,7 +628,7 @@ When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}}
 1. Run the following steps [=in parallel=]:
     1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], [=queue a global task=] on the [=networking task source=] given |global| to [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return.
     1. [=Associate the issuer=] |origin| with |topLevel|.
-    1. [=Look up the key commitments=] for |origin| and |topLevel|. If there are key commitments,
+    1. [=Look up the key commitments=] for |origin|. If there are key commitments,
              [=discard tokens=] from |origin| that are signed with keys other than those
              from the issuer's most recent commitments.
     1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there are tokens stored for the given issuer, with false otherwise.
@@ -646,7 +656,7 @@ When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}}
 1. Let |topLevel| be the [=top-level origin=] of |doc|'s [=relevant settings object=].
 1. Run the following steps [=in parallel=]:
     1. If |origin| [=is associated with|is not associated with=] |topLevel|, [=queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with false and return.
-    1. [=Look up the key commitments=] for |origin| and |topLevel|. If there are key commitments,
+    1. [=Look up the key commitments=] for |origin|. If there are key commitments,
              [=discard tokens=] from |origin| that are signed with keys other than those
              from the issuer's most recent commitments.
     1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there is a [=redemption record=] for the issuer and top level pair, with false otherwise.
