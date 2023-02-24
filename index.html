@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version f043d3484, updated Fri Feb 17 10:53:48 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="a04c5ca12bf9195f01279973971f430c21b64f58" name="document-revision">
+  <meta content="c7d65b1a01a7985a3076d64c39c8f66b5776f8bb" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -1016,7 +1016,7 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Let <var>tokens</var> be the result of <a data-link-type="dfn" href="#generate-masked-tokens" id="ref-for-generate-masked-tokens">generating masked tokens</a> with <var>numTokens</var>.</p>
     <li data-md>
-     <p>Set a load flag to bypass the HTTP cache.</p>
+     <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-cache-mode" id="ref-for-concept-request-cache-mode">cache mode</a> to <code>"no-store"</code>.</p>
     <li data-md>
      <p>Let <var>base64-encoded-tokens</var> be the base64-encoded version of <var>tokens</var>.</p>
     <li data-md>
@@ -1118,9 +1118,8 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
      <p>Optionally, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header④">set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></a>, <var>token-lifetime</var>)
             in <var>request</var>’s header list.</p>
     <li data-md>
-     <p>Configure the HTTP request. Set a load flag to bypass the HTTP cache.</p>
+     <p>Set <var>request</var>’s <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request-cache-mode" id="ref-for-concept-request-cache-mode①">cache mode</a> to <code>"no-store"</code>.</p>
    </ol>
-   <p class="issue" id="issue-2131c336"><a class="self-link" href="#issue-2131c336"></a> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header⑤">set a structured field value</a></p>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="append-private-state-token-redemption-request-headers">append private state token redemption request headers</dfn> given a <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request⑤">request</a> <var>request</var>, run the following steps:</p>
    <ol>
     <li data-md>
@@ -1500,6 +1499,13 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-requestinit">5.1. Definitions</a> <a href="#ref-for-requestinit①">(2)</a>
    </ul>
   </aside>
+  <aside aria-labelledby="infopaneltitle-for-b0566d6d660c85a1c0a11fe593f9993d" class="dfn-panel" data-for="b0566d6d660c85a1c0a11fe593f9993d" id="infopanel-for-b0566d6d660c85a1c0a11fe593f9993d">
+   <span id="infopaneltitle-for-b0566d6d660c85a1c0a11fe593f9993d" style="display:none">Info about the 'cache mode' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-cache-mode">https://fetch.spec.whatwg.org/#concept-request-cache-mode</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-request-cache-mode">6.1. Creating An Issue Request</a>
+    <li><a href="#ref-for-concept-request-cache-mode①">7. Redeeming Tokens</a>
+   </ul>
+  </aside>
   <aside aria-labelledby="infopaneltitle-for-136f2700e84634abd2f3d42487ba7f41" class="dfn-panel" data-for="136f2700e84634abd2f3d42487ba7f41" id="infopanel-for-136f2700e84634abd2f3d42487ba7f41">
    <span id="infopaneltitle-for-136f2700e84634abd2f3d42487ba7f41" style="display:none">Info about the 'client' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-request-client">https://fetch.spec.whatwg.org/#concept-request-client</a><b>Referenced in:</b>
    <ul>
@@ -1583,7 +1589,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <span id="infopaneltitle-for-a50d6de302855c18285652c8be59e5b0" style="display:none">Info about the 'set a structured field value' external reference.</span><a href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-header-list-set-structured-header">6.1. Creating An Issue Request</a> <a href="#ref-for-concept-header-list-set-structured-header①">(2)</a>
-    <li><a href="#ref-for-concept-header-list-set-structured-header②">7. Redeeming Tokens</a> <a href="#ref-for-concept-header-list-set-structured-header③">(2)</a> <a href="#ref-for-concept-header-list-set-structured-header④">(3)</a> <a href="#ref-for-concept-header-list-set-structured-header⑤">(4)</a>
+    <li><a href="#ref-for-concept-header-list-set-structured-header②">7. Redeeming Tokens</a> <a href="#ref-for-concept-header-list-set-structured-header③">(2)</a> <a href="#ref-for-concept-header-list-set-structured-header④">(3)</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-6f4775873c70787775f9c70f0f110709" class="dfn-panel" data-for="6f4775873c70787775f9c70f0f110709" id="infopanel-for-6f4775873c70787775f9c70f0f110709">
@@ -1856,6 +1862,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <ul>
      <li><span class="dfn-paneled" id="bda9e897bec9e1501aae0e763c882527">Request(input)</span>
      <li><span class="dfn-paneled" id="4293976a2fc689fa38243bca91f1f402">RequestInit</span>
+     <li><span class="dfn-paneled" id="b0566d6d660c85a1c0a11fe593f9993d">cache mode</span>
      <li><span class="dfn-paneled" id="136f2700e84634abd2f3d42487ba7f41">client</span>
      <li><span class="dfn-paneled" id="982a06b70b5b6719fe7a3fea8359cd5d">contains</span>
      <li><span class="dfn-paneled" id="fdb6c106dead7169eccfe54e56cec6bd">delete</span>
@@ -2006,7 +2013,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <div class="issue"> How do we get the issuer public keys here? <a href="https://github.com/WICG/trust-token-api/issues/187">[Issue #187]</a> <a class="issue-return" href="#issue-c631389b" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
    <div class="issue"> Define "cryptographic procedures to obtain a list of unmasked tokens" <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a> <a class="issue-return" href="#issue-63880884" title="Jump to section">↵</a></div>
-   <div class="issue"> This algorithm should append structured headers using <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header">set a structured field value</a> <a class="issue-return" href="#issue-2131c336" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49①" title="Jump to section">↵</a></div>
    <div class="issue"> This needs to be specified more clearly <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a> <a class="issue-return" href="#issue-907127dc" title="Jump to section">↵</a></div>
    <div class="issue"> Add redemption response handling, including calling <a data-link-type="dfn" href="#record-redemption-timestamp">record redemption timestamp</a>. <a href="https://github.com/WICG/trust-token-api/issues/165">[Issue #165]</a> <a class="issue-return" href="#issue-f14ce9b5" title="Jump to section">↵</a></div>
