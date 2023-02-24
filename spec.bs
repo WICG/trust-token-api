@@ -16,6 +16,12 @@ Markup Shorthands: css no, markdown yes
 Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
 </pre>
 
+<pre class="link-defaults">
+spec:fetch; type:dfn; for:/; text:response
+spec:fetch; type:dfn; for:/; text:request
+spec:infra; type:dfn; text:list
+</pre>
+
 <pre class="anchors">
 urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     text: http-network-or-cache fetch; url: #concept-http-network-or-cache-fetch; type: dfn
@@ -74,10 +80,6 @@ urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
             text: string; url: #section-3.3.3
 </pre>
 
-
-**This is a working version and is subject to change.**
-
-
 Goals {#goals}
 ==============
 
@@ -105,7 +107,7 @@ Background {#background}
 ========================
 
 The Private State Token API provides a mechanism for anonymous authentication. The
-API provided by the browser does not authenticate clients, instead it facilitates
+API provided by the user agent does not authenticate clients, instead it facilitates
 transfer of authentication information.
 
 Authentication of the clients and token signing are both carried by the same
@@ -113,11 +115,11 @@ entity referred to as the **issuer**. This is the joint attester and issuer
 architecture described in [[!PRIVACY-PASS-ARCHITECTURE]],
 [[!PRIVACY-PASS-AUTH-SCHEME]].
 
-Browsers store tokens in persistent storage. Navigated origins might fetch/spend
+User agents store tokens in persistent storage. Navigated origins might fetch/spend
 tokens in first party contexts or include third party code that fetch/spend
 tokens. Spending tokens is called **redeeming**.
 
-Origins may ask browser to fetch tokens from the issuers of their
+Origins may ask the user agent to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.
 
 Private State Tokens API performs cross site anonymous authentication without
@@ -173,7 +175,7 @@ An issuer needs to maintain a set of keys and implement the **Issue** and
 required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
-through secure HTTP [[!RFC8446]] endpoints. Browsers should fetch the key
+through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
 commitments periodically.
 
 Requests to key commitment endpoints should result in a JSON response
@@ -245,7 +247,7 @@ fetched for an issuer, previous commitments are discarded.
 Algorithms {#algorithms}
 ====================================
 
-An user agent has <dfn>issuerAssociations</dfn>, which is a [=map=] where the keys are [=/origin=] |topLevel|, and the values are a [=list=] of [=origins=].
+A user agent has <dfn>issuerAssociations</dfn>, which is a [=map=] where the keys are [=/origin=] |topLevel|, and the values are a [=list=] of [=/origins=].
 
 To <dfn>determine whether associating an issuer would exceed the top-level limit</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
@@ -265,14 +267,14 @@ To determine whether an [=/origin=] |issuer| <dfn>is associated with</dfn> a giv
 1. If [=issuerAssociations=][|topLevel|] [=list/contains=] |issuer|, return true.
 1. Return false.
 
-An user agent has <dfn>redemptionTimes</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|lastRedemption|, |penultimateRedemption|).
+A user agent has <dfn>redemptionTimes</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|lastRedemption|, |penultimateRedemption|).
 
 To <dfn>record redemption timestamp</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
 1. Let |currentTime| be the current date and time.
 1. Let |previousRedemption| be the earliest representable date and time.
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |previousRedemption| be the |lastRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
-1. [=map/set=] [=redemptionStore=][(|issuer|,|topLevel|)] to the tuple (|currentTime|, |previousRedemption|).
+1. [=map/set=] [=redemptionTimes=][(|issuer|,|topLevel|)] to the tuple (|currentTime|, |previousRedemption|).
 
 To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
@@ -280,7 +282,7 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-An user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating |pstKeyCommitments| is [=implementation-defined=]. 
+A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating [=pstKeyCommitments=] is [=implementation-defined=].
 
 Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
 
@@ -328,7 +330,7 @@ new one.
 enum RefreshPolicy { "none", "refresh" };
 </pre>
 
-The {{TokenType}} is currently set to "private-state-token", as this is the only token
+The {{TokenType}} is currently set to `"private-state-token"`, as this is the only token
 type that the specification supports at this time.
 
 <pre class=idl>
@@ -382,9 +384,9 @@ Issuing Protocol {#issuing-protocol}
 ====================================
 
 This section explains the issuing protocol. It has two sections that explains
-the issuing protocol steps happenning in browsers and issuers.
+the issuing protocol steps for user agents and issuers.
 
-Browser Steps For Creating Issue Request {#browser-issue-steps}
+Creating An Issue Request {#issue-request}
 ---------------------------------------------------------------
 
 <div class=example>
@@ -441,7 +443,6 @@ Sec-Private-State-Token-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 </div>
 
-
 Issuer Signing Tokens {#issuer-signing-tokens}
 ----------------------------------------------
 
@@ -469,7 +470,7 @@ Sec-Private-State-Token: <token encoded as base64 string>
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
-Browser Steps For Issue Response {#browser-issue-response}
+Handling Issue Responses {#issue-response}
 ----------------------------------------------------------
 
 To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
@@ -497,8 +498,8 @@ The following steps will be added to the [=HTTP fetch=] steps, before checking t
 Redeeming Tokens {#redeeming-tokens}
 ====================================
 
-When browser navigates to an origin, top level origin or a third party site
-embedded on the top level origin may redeem tokens stored in browser from a
+When the user agent navigates to a top-level origin, this top-level origin or a third party site
+embedded on the top level origin may redeem tokens stored in the user agent from a
 specific issuer to learn `public` and/or `private` data encoded in the
 tokens.
 
@@ -516,14 +517,6 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
 });
 ```
 </div>
-
-<!--
-checking fetch syntax, malformed input etc?
-
-When `refreshPolicy` is `'none'`,
-browser uses the previously cached [=redemption record=] instead of redeeming a new
-token.
--->
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
  1. Let |redemption-result| be the redemption procedure result.
@@ -549,7 +542,8 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |request|'s [=request/token refresh policy=] is `"none"`:
      1. Let |record| be the result of [=get an unexpired redemption record|getting an unexpired redemption record=].
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
- 1. Let |penultimate_redemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|, if the value is less than an [=implementation-defined=] time period (which is recommended to be 48 hours), return error.
+ 1. Let |penultimateRedemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|
+ 1. If |penultimateRedemption| is less than an [=implementation-defined=] time period (which is recommended to be 48 hours), return error.
 
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
  1. If |commitments| is null, return.
@@ -562,11 +556,11 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |token| is null, return.
  1. Let |record| be the result of running a cryptographic redemption procedure with |token|. If the procedure fails, return.
 
-    Issue: This needs to be specified more clearly
+    Issue(190): This needs to be specified more clearly
 
  1. [=Set redemption headers=] with |request| and |record|.
 
-ISSUE(165): Add redemption response handling, including calling [= record redemption timestamp =].
+ISSUE(165): Add redemption response handling, including calling [=record redemption timestamp=].
 
 <a http-header>Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
     [=redemption record=] should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
@@ -584,11 +578,11 @@ downstream consumers.
 Redemption Records {#redemption-records}
 ----------------------------------------
 
-To reduce communication overhead, the browser might cache blobs returned in
+To reduce communication overhead, the user agent might cache blobs returned in
 <a http-header>Sec-Private-State-Token</a> header value in redemption responses. These blobs are
-referred as [=Redemption Records=]. Browsers might choose to store these records
+referred as [=Redemption Records=]. User agents might choose to store these records
 to include them in subsequent requests to the origins that can verify its
-validity. Issuer might choose to include optional <a http-header>Sec-Private-State-Token-Lifetime</a>
+validity. An issuer might choose to include an optional <a http-header>Sec-Private-State-Token-Lifetime</a>
 header in the redemption response. The value of this header indicates the
 expiration time for the [=redemption record=] provided. This expiration is
 specified as number of seconds in the <a http-header>Sec-Private-State-Token-Lifetime</a> HTTP response
@@ -617,28 +611,27 @@ Token Query {#token-query}
 
 When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}} |type|, the <dfn export method for=Document><code>hasPrivateTokens(issuer, type)</code></dfn> method must run these steps:
 1. Let |p| be [=a new promise=].
-1. If |doc| is not [=Document/fully active=], then [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+1. If |doc| is not [=Document/fully active=], then [=reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
 1. Let |global| be |doc|'s [=relevant global object=].
-1. If |global| is not a [=secure context=], then [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
+1. If |global| is not a [=secure context=], then [=reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
 1. If |type| is not `"private-state-token"`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
 1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |origin| be |parsedURL|'s [=/origin=].
 1. Let |topLevel| be the [=top-level origin=] of |doc|'s [=relevant settings object=].
 1. Run the following steps [=in parallel=]:
-    1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], [=queue a global task=] on the [=networking task source=] given |global| to [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return.
+    1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], [=queue a global task=] on the [=networking task source=] given |global| to [=reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return.
     1. [=Associate the issuer=] |origin| with |topLevel|.
     1. [=Look up the key commitments=] for |origin|. If there are key commitments,
              [=discard tokens=] from |origin| that are signed with keys other than those
              from the issuer's most recent commitments.
-    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there are tokens stored for the given issuer, with false otherwise.
+    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=resolve=] |p| with true if there are tokens stored for the given issuer, with false otherwise.
 1. Return |p|.
 
-Note: This query modifies the browser state. It associates the issuer
-argument with the current origin. Browser allows at most 2 issuers associated
-with an origin. This is to prevent leaking information through the issers a
-user has tokens from. Note that token query triggers removal of stale tokens
-at Step 4.
+Note: This query modifies the user agent state. It associates the issuer
+argument with the current origin. The specification allows at most 2 issuers associated
+with an origin. This is to prevent leaking information through the issuers a
+user has tokens from. Note that querying tokens triggers removal of stale tokens.
 
 Redemption Record Query {#redemption-record-query}
 --------------------------------------------------
@@ -646,26 +639,26 @@ Redemption Record Query {#redemption-record-query}
 When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}} |type|, the <dfn export method for=Document><code>hasRedemptionRecord(issuer, type)</code></dfn> method must run these steps:
 
 1. Let |p| be [=a new promise=].
-1. If |doc| is not [=Document/fully active=], then [=/reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
+1. If |doc| is not [=Document/fully active=], then [=reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
 1. Let |global| be |doc|'s [=relevant global object=].
-1. If |global| is not a [=secure context=], then [=/reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
+1. If |global| is not a [=secure context=], then [=reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
 1. If |type| is not `"private-state-token"`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
 1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |origin| be |parsedURL|'s [=/origin=].
 1. Let |topLevel| be the [=top-level origin=] of |doc|'s [=relevant settings object=].
 1. Run the following steps [=in parallel=]:
-    1. If |origin| [=is associated with|is not associated with=] |topLevel|, [=queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with false and return.
+    1. If |origin| [=is associated with|is not associated with=] |topLevel|, [=queue a global task=] on the [=networking task source=] given |global| to [=resolve=] |p| with false and return.
     1. [=Look up the key commitments=] for |origin|. If there are key commitments,
              [=discard tokens=] from |origin| that are signed with keys other than those
              from the issuer's most recent commitments.
-    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=/resolve=] |p| with true if there is a [=redemption record=] for the issuer and top level pair, with false otherwise.
+    1. [=Queue a global task=] on the [=networking task source=] given |global| to [=resolve=] |p| with true if there is a [=redemption record=] for the issuer and top level pair, with false otherwise.
 1. Return |p|.
 
-Note: Similar to token query, redemption query might modify the browser state. Unlike
+Note: Similar to token query, redemption query might modify the user agent state. Unlike
 token query, redemption query does not associate issuer with the top level
 origin. There is no need to associate the issuer queried with the top level
-origin, because, answer to the redemption query does not leak information about
+origin, because the answer to the redemption query does not leak information about
 the issuers of the currently stored tokens. Similar to token query, redemption
 query clears stale tokens.
 
@@ -680,14 +673,9 @@ a collection of unsigned, masked tokens during issuance. During redemption, it
 sends a singled signed, unmasked token along with associated redemption
 metadata.
 
-Issue: Define and link issuance, redemption, masked (formerly blinded), unmasked,
-signed, unsigned
-
 The <a http-header>Sec-Private-State-Token</a> *response* header field sends
 a collection of signed, masked tokens. During redemption it sends the
 just-created signed [=redemption record=].
-
-Issue: Link stuff here too.
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
 [[!RFC8941]].
@@ -756,8 +744,8 @@ User agents should enforce limits on the number of unique keys an issuer can hav
 at any point in time, to preserve client privacy.  Without limits, an issuer could 
 de-anonymize clients by simply using a unique key for each client. For [[!VOPRF]], the
 number of keys is limited to six, and for [[!PMB]], the number is limited to
-three keys. 
-    
+three keys.
+
 Issuers can utilize different keys to represent different "labels", which correspond
 to an arbritrary client state, such as client trust level or some other useful 
 anti-fraud signal. Issuers are responsible for understanding this designation and 
@@ -773,10 +761,10 @@ difference is [[!PMB]] utilizing a private bit.
 ### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
 
 Unlinkability is lost if the issuer is able to use network-level fingerprinting
-or any other side-channel and can associate the browser at redemption time with
-the browser at token issuance time, even though the Private State Token API
+or any other side-channel and can associate the user agent at redemption time with
+the user agent at token issuance time, even though the Private State Token API
 itself has only stored and revealed limited amount of information about the
-browser.
+user agent.
 
 Cross-site Information Transfer {#cross-site-info}
 --------------------------------------------------
@@ -794,14 +782,15 @@ particular user, which could be identifying---have similar mitigations.
 
 ### Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}
 
-To mitigate this attack, browser places limits on both issuance and redemption.
+To mitigate this attack, the specification places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
-browser does not allow a third redemption in a 48 hour window.
+specification does not allow a third redemption in an [=implementation-defined=] time window,
+usually 48 hours.
 
 ### Mitigation: Per-Site Issuer Limits {#per-issuer-limits}
 
 The rate of identity leakage from one origin to another increases with the
-number of issuers allowed in an origin. To avoid abuse, the browser allows
+number of issuers allowed in an origin. To avoid abuse, the user agent allows
 association of at most two issers per top level origin. Issuers are associated
 with top level origins for token query API as well, see [[#token-query]].
 
@@ -811,11 +800,11 @@ Security Considerations {#security}
 Preventing Token Exhaustion {#token-exhaustion}
 -----------------------------------------------
 
-Malicious origins might attempt to exhaust all tokens stored in the browser by
-redeeming them all. To prevent this, the browser limits number of redemption
-operations. In an origin first two redemptions are allowed, however, the third
-redemption is not allowed in a 48 hour window. The third redemption is allowed
-once more than 48 hours have elapsed since the first redemption.
+Malicious origins might attempt to exhaust all tokens stored in the user agent by
+redeeming them all. To prevent this, the specification limits the number of redemption
+operations. In the context of a given origin, two redemptions are allowed initially. However,
+the third redemption is only allowed once more than an [=implementation-defined=] amount of time,
+usually 48 hours, have elapsed since the first redemption.
 
 Preventing Double Spending {#preventing-double-spend}
 -----------------------------------------------------
