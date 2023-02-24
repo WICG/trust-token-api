@@ -424,7 +424,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
  1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
- 1. Set a load flag to bypass the HTTP cache.
+ 1. Set |request|'s [=cache mode=] to `"no-store"`.
  1. Let |base64-encoded-tokens| be the base64-encoded version of |tokens|.
  1. Let |version| be the version of the cryptographic protocol used.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
@@ -535,9 +535,7 @@ To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redempt
                 in |request|'s header list.
  1. Optionally, [=header list/set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Lifetime`</a>, |token-lifetime|)
                 in |request|'s header list.
- 1. Configure the HTTP request. Set a load flag to bypass the HTTP cache.
-
-Issue: This algorithm should append structured headers using [=header list/set a structured field value=]
+ 1. Set |request|'s [=cache mode=] to `"no-store"`.
 
 To <dfn>append private state token redemption request headers</dfn> given a [=/request=] |request|, run the following steps:
 
