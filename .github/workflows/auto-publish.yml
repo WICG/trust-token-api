@@ -15,3 +15,4 @@ jobs:
           TOOLCHAIN: bikeshed
           SOURCE: spec.bs
           DESTINATION: index.html
+          BUILD_FAIL_ON: warning
