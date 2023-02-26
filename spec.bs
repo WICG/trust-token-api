@@ -17,9 +17,10 @@ Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
 </pre>
 
 <pre class="link-defaults">
+spec:infra; type:dfn; text:list
 spec:fetch; type:dfn; for:/; text:response
 spec:fetch; type:dfn; for:/; text:request
-spec:infra; type:dfn; text:list
+spec:webidl; type:dfn; text:resolve
 </pre>
 
 <pre class="anchors">
