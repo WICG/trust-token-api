@@ -337,6 +337,13 @@ type that the specification supports at this time.
 enum TokenType { "private-state-token" };
 </pre>
 
+The {{TokenVersion}} is currently set to `1`, as this is the only `"private-state-token"`
+version that the specification supports at this time.
+
+<pre class=idl>
+enum TokenVersion { 1 };
+</pre>
+
 The {{OperationType}} refers to which operation the user agent is attempting to complete.
 
 <pre class=idl>
@@ -347,6 +354,8 @@ The {{PrivateStateToken}} contains the information required to make a fetch requ
 
 <pre class=idl>
 dictionary PrivateStateToken {
+  required TokenType type;
+  required TokenVersion version;
   required OperationType operation;
   RefreshPolicy refreshPolicy = "none";
   sequence&lt;USVString> issuers;
@@ -396,6 +405,7 @@ An issue request is created and fetched as demonstrated in the following snippet
 let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
   privateStateToken: {
     type: "token-request",
+    version: 1,
     issuer: "https://example.issuer"
   }
 });
@@ -511,6 +521,7 @@ snippet. The default value for refreshPolicy is `'none'`.
 let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
   privateStateToken: {
     type: 'token-redemption',
+    version: 1,
     issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
   }
@@ -613,6 +624,7 @@ When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}}
 1. Let |global| be |doc|'s [=relevant global object=].
 1. If |global| is not a [=secure context=], then [=reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
 1. If |type| is not `"private-state-token"`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
+1. If |version| is not `1`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
 1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |origin| be |parsedURL|'s [=/origin=].
