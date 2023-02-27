@@ -299,7 +299,7 @@ Note: |pstVersion| is a string identifier representing different cryptographic v
 To <dfn>look up latest keys</dfn> for a given |commitment|, run the following steps:
 
 1. If |commitment| is null, return null.
-1. Let |choosenKey| be null.
+1. Let |chosenKey| be null.
 1. Let |currentTime| be the current date and time.
 1. For each |key| in |commitment|["keys"], run the following steps:
     1. If |key|["expiry"] is less than |currentTime|, skip processing this element.
