@@ -307,7 +307,7 @@ To <dfn>look up latest keys</dfn> for a given |commitment|, run the following st
     1. If |key|["expiry"] is less than |choosenKey|["expiry"], set |choosenKey| to |key|.
 1. Return |choosenKey|.
 
-A user agent has <dfn>tokenStore</dfn>, a [=map=] where the keys are [=/origins=] and the values are a [=list=] of <dfn>storedToken</dfn>. [=storedToken=] are a [=tuple=] of (byte sequence, byte sequence).
+A user agent has a <dfn>tokenStore</dfn>, a [=map=] where the keys are [=/origins=] and the values are [=lists=] of  [=storedTokens=]. A <dfn>storedToken</dfn> is a [=tuple=] of (byte sequence, byte sequence).
 
 To <dfn>insert a token</dfn> for an [=/origin=] |issuer|, byte sequence |token|, and byte sequence |signingKey|, run the following steps:
 
