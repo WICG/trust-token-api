@@ -182,6 +182,36 @@ struct {
 } DLEQBatchInput; // Used for Batch proof.
 ```
 
+### Mask Function
+
+The _Mask_ function corresponds to the **AT.Usr_0** stage of the PMBTokens protocol.
+
+Inputs:
+
+*   count (the number of tokens being requested, from the IssueRequest)
+*   publicKey (the public key corresponding to the secretKey)
+*   keyID (the ID corresponding to this key)
+
+Outputs:
+
+*   request (the request to issue against)
+*   pretokens (the data to finalize issuance against)
+
+```
+Mask:
+  issueRequestNonces = []
+  pretokens = []
+  for i in 0..count:
+    t <-$ Z_p
+    r <-$ Z_p
+    T = Ht(t)
+    T' = r^-1*T
+    issueRequestNonces += T'
+    pretokens += (publicKey,r,t,T')
+  issueRequest = {count: count, nonces: issueRequestNonces}
+  return (issueRequest, pretokens)
+```
+
 ### Issue Function
 
 The _Issue_ function corresponds to the **AT.Sig** stage of the PMBTokens protocol.
@@ -291,6 +321,19 @@ struct {
   opaque proof<1..2^16-1>; // Length-prefixed form of DLEQProof.
 } IssueResponse;
 ```
+
+### Unmask Function
+
+The _Unmask_ function corresponds to the **AT.Usr_1** stage of the PMBTokens protocol.
+
+Inputs:
+
+*   response (the IssueResponse)
+*   pretokens (the associated data from the Mask function)
+
+Outputs:
+
+*   tokens
 
 ### Redeem Function
 
@@ -429,9 +472,24 @@ struct {
 } DLEQBatchInput; // Used for Batch proof.
 ```
 
+### Mask Function
+
+The _Mask_ function corresponds to the **Blind** stage of the VOPRF protocol.
+
+Inputs:
+
+*   count (the number of tokens being requested, from the IssueRequest)
+*   publicKey (the public key corresponding to the secretKey)
+*   keyID (the ID corresponding to this key)
+
+Outputs:
+
+*   request (the request to issue against)
+*   pretokens (the data to finalize issuance against)
+
 ### Issue Function
 
-The _Issue_ **Blind**/**Evaluate**/**Unblind** stages of the VOPRF protocol.
+The _Issue_ **Evaluate** stage of the VOPRF protocol.
 
 Input Serialization:
 
@@ -467,6 +525,20 @@ struct {
   opaque proof<1..2^16-1>; // Length-prefixed form of DLEQProof.
 } IssueResponse;
 ```
+
+### Unmask Function
+
+The _Unmask_ function corresponds to the **Unblind** stage of the VOPRF protocol.
+
+Inputs:
+
+*   response (the IssueResponse)
+*   publicKey (the public key corresponding to the secretKey)
+*   pretokens (the associated data from the Mask function)
+
+Outputs:
+
+*   tokens
 
 ### Redeem Function
 

@@ -312,9 +312,18 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 1. TODO
 
-To <dfn>generate masked tokens</dfn> given a number |numTokens|, run the following steps:
+To <dfn>generate masked tokens</dfn> given [=struct=] |issuerKeys| (as described in [[#issuer-public-keys]]) and number |numTokens|, run the following steps:
 
-1. TODO
+1. Let |maskOperation| be the |Mask| operation corresponding to the |protocol_version| field of |issuerKeys|.
+1. Let |result| ([=tuple=] (byte string, byte string)) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
+1. If |result| is null, return an error.
+1. Return |result|.
+
+To <dfn>unmask tokens</dfn> given [=struct=] |issuerKeys| (as described in [[#issuer-public-keys]]), byte string |pretokens|, and a bytestring |response|, run the following steps:
+
+1. Let |unmaskOperation| be the |Unmask| operation corresponding to the |protocol_version| field of |issuerKeys|.
+1. Let |result| ([=list=] of byte strings) be the result of running |maskOperation| on |pretokens| and |response|.
+1. Return |result|.
 
 Integration with Fetch {#fetch-integration}
 ====================================
@@ -412,22 +421,17 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
- 1. If |commitments| is null,  return.
- 1. Pass issuer public keys to cryptographic procedures. Reject if keys are
-         malformed.
-
-    Issue(187): How do we get the issuer public keys here?
-
- 1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
+ 1. If |commitments| is null, return.
+ 1. Perform [=discard tokens=] with |issuer| that are signed with keys other than those from
             the issuer's most recent commitments.
 
     Issue(189): This probably needs to be its own algorithm, how is "most recent" defined here?
 
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
- 1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
+ 1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |commitments| and |numTokens|.
  1. Set |request|'s [=cache mode=] to `"no-store"`.
- 1. Let |base64-encoded-tokens| be the base64-encoded version of |tokens|.
+ 1. Let |base64-encoded-tokens| be the base64-encoded version of |issueHeader|.
  1. Let |version| be the version of the cryptographic protocol used.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
                 in |request|'s header list.
@@ -480,12 +484,12 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |header| is empty, return null.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
-1. If |unmasked tokens| is an error, return a [=network error=].
+1. Let |commitments| and |pretokens| be the variables used in [=append private state token issue request headers=]. 
+1. Let |rawResponse| be the base64-decoded version of |header|.
+1. Let |unmasked tokens| be the result of [=unmask tokens|unmasking response tokens=] given |commitments|, |pretokens|, and |rawResponse|.
+1. If |unmasked tokens| is null, return a [=network error=].
 1. Associate |unmasked tokens| with the issuing key's label and store |unmasked tokens|.
 1. Return null.
-
-Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
