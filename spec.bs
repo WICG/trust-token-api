@@ -624,7 +624,6 @@ When invoked on {{Document}} |doc| with {{USVString}} |issuer| and {{USVString}}
 1. Let |global| be |doc|'s [=relevant global object=].
 1. If |global| is not a [=secure context=], then [=reject=] |p| with a "{{NotAllowedError}}" {{DOMException}} and return |p|.
 1. If |type| is not `"private-state-token"`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
-1. If |version| is not `1`, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |parsedURL| be the the result of running the [=URL parser=] on |issuer|.
 1. If |parsedURL| is failure, [=reject=] |p| with a "{{TypeError}}" {{DOMException}} and return |p|.
 1. Let |origin| be |parsedURL|'s [=/origin=].
