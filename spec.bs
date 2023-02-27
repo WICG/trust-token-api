@@ -301,7 +301,7 @@ To <dfn>look up latest keys</dfn> for a given |commitment|, run the following st
 1. If |commitment| is null, return null.
 1. Let |choosenKey| be null.
 1. Let |currentTime| be the current date and time.
-1. For each |key| in |commitment|[|keys|], run the following steps:
+1. For each |key| in |commitment|["keys"], run the following steps:
     1. If |key|["expiry"] is less than |currentTime|, skip processing this element.
     1. If |choosenKey| is null, set |choosenKey| to |key|.
     1. If |key|["expiry"] is less than |choosenKey|["expiry"], set |choosenKey| to |key|.
@@ -504,7 +504,7 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. If |unmasked tokens| is an error, return a [=network error=].
 1. Let |issuer| and |signingKey| be the variables used in [=append private state token issue request headers=]. 
 1. For each |token| in |unmasked tokens|, run the following steps:
-    1. [Insert a token] for |issuer|, |token|, and |signingKey|.
+    1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return null.
 
 Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
