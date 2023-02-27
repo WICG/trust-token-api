@@ -499,7 +499,7 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
 1. If |unmasked tokens| is an error, return a [=network error=].
-1. Let |issuer| and |signingKey| be the variables used in [append private state token issue request headers]. 
+1. Let |issuer| and |signingKey| be the variables used in [=append private state token issue request headers=]. 
 1. For each |token| in |unmasked tokens|, run the following steps:
     1. [Insert a token] for |issuer|, |token|, and |signingKey|.
 1. Return null.
