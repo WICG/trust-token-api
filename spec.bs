@@ -340,7 +340,7 @@ The {{TokenVersion}} is currently set to `1`, as this is the only `"private-stat
 version that the specification supports at this time.
 
 <pre class=idl>
-enum TokenVersion { 1 };
+enum TokenVersion { "1" };
 </pre>
 
 The {{OperationType}} refers to which operation the user agent is attempting to complete.
