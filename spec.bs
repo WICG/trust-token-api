@@ -2,12 +2,13 @@
 Title: Private State Token API
 H1: Private State Token API
 Shortname: private-state-token-api
+Level: None
 Status: CG-DRAFT
 Group: WICG
 Repository: WICG/trust-token-api
 URL: https://wicg.github.io/trust-token-api/
-Editor: Aykut Bulut, Google LLC https://www.google.com/, aykutb@google.com
-Editor: Steven Valdez, Google LLC https://www.google.com/, svaldez@google.com
+Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
+Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
 Abstract: The Private State Token API is a web platform API that allows propagating a limited amount of signals across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
@@ -85,9 +86,8 @@ Goals {#goals}
 The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
 privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
-documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
-State Tokens can be considered to be a web platform implementation of Privacy
-Pass.
+documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
+State Tokens can be considered to be a web platform implementation of Privacy Pass.
 
 <!--
 
