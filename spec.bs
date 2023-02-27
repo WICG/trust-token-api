@@ -296,21 +296,38 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
+A user agent has <dfn>tokenStore</dfn>, a [=map=] where the keys are [=/origins=] and the values are a [=list=] of <dfn>storedToken</dfn>. [=storedToken=] are a [=tuple=] of (byte sequence, byte sequence).
+
+To <dfn>insert a token</dfn> for an [=/origin=] |issuer|, byte sequence |token|, and byte sequence |signingKey|, run the following steps:
+
+1. Create a new [=tuple=] |storedToken| consisting of (|token|, |signingKey|).
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], set [=tokenStore=][|issuer|] to an empty [=list=].
+1. [=list/Append=] |storedToken| to [=tokenStore=][|issuer|].
+
+1. If the [=list/size=] of [=tokenStore=][|issuer|] is zero, return null.
+1. [=list/Remove=] a random element of [=tokenStore=][|issuer|] and return the removed element.
+
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return null.
+1. If the [=list/size=] of [=tokenStore=][|issuer|] is zero, return null.
+1. [=list/Remove=] a random element of [=tokenStore=][|issuer|] and return the removed element.
 
-To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+To <dfn>discard tokens</dfn> from an [=/origin=] |issuer| and byte sequence |signingKey|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return.
+1. [=list/Remove=] all elements of [=tokenStore=][|issuer|] whose second element is not equal to |signingKey|.
 
 To get the <dfn>number of tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return 0.
+1. Return the [=list/size=] of [=tokenStore=][|issuer|].
 
 To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. Let |issuerKey| be the result of running [look up key commitments] on |issuer|.
+1. If |issuerKey| is null, return 0.
+1. Return |issuerKey|["batchsize"].
 
 To <dfn>generate masked tokens</dfn> given a number |numTokens|, run the following steps:
 
@@ -482,7 +499,9 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
 1. If |unmasked tokens| is an error, return a [=network error=].
-1. Associate |unmasked tokens| with the issuing key's label and store |unmasked tokens|.
+1. Let |issuer| and |signingKey| be the variables used in [append private state token issue request headers]. 
+1. For each |token| in |unmasked tokens|, run the following steps:
+    1. [Insert a token] for |issuer|, |token|, and |signingKey|.
 1. Return null.
 
 Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
