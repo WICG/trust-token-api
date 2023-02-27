@@ -2,18 +2,18 @@
 Title: Private State Token API
 H1: Private State Token API
 Shortname: private-state-token-api
-Level: 1
+Level: None
 Status: CG-DRAFT
 Group: WICG
 Repository: WICG/trust-token-api
 URL: https://wicg.github.io/trust-token-api/
 Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
 Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
-Abstract: Private State Token API is a web platform API that allows propagating a limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.
+Abstract: The Private State Token API is a web platform API that allows propagating a limited amount of signals across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
 Markup Shorthands: css no, markdown yes
-Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
+Complain About: missing-example-ids yes
 </pre>
 
 <pre class="link-defaults">
@@ -85,10 +85,9 @@ Goals {#goals}
 
 The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
-privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
-documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
-State Tokens can be considered as a web platform implementation of Privacy
-Pass.
+privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
+documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
+State Tokens can be considered to be a web platform implementation of Privacy Pass.
 
 <!--
 
@@ -389,7 +388,7 @@ the issuing protocol steps for user agents and issuers.
 Creating An Issue Request {#issue-request}
 ---------------------------------------------------------------
 
-<div class=example>
+<div class=example id="example-issue-request">
 An issue request is created and fetched as demonstrated in the following snippet.
 
 ```javascript
@@ -434,7 +433,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
                 in |request|'s header list.
 
-<div class=example>
+<div class=example id="example-pst-request-headers">
 Private State Token HTTP request headers created for a typical fetch is as follows.
 
 ```
@@ -459,7 +458,7 @@ passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
 value encoded as a base64 byte string.
 
-<div class=example>
+<div class=example id="example-pst-response">
 The following snippet displays a typical response demonstrating the Private State Token
 header.
 
@@ -503,7 +502,7 @@ embedded on the top level origin may redeem tokens stored in the user agent from
 specific issuer to learn `public` and/or `private` data encoded in the
 tokens.
 
-<div class=example>
+<div class=example id="example-redemption-request">
 Redemption is carried through fetch as demonstrated in the following
 snippet. The default value for refreshPolicy is `'none'`.
 
