@@ -314,15 +314,15 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 To <dfn>generate masked tokens</dfn> given [=struct=] |issuerKeys| (as described in [[#issuer-public-keys]]) and number |numTokens|, run the following steps:
 
-1. Let |maskOperation| be the |Mask| operation corresponding to the |protocol_version| field of |issuerKeys|.
+1. Let |maskOperation| be the Mask operation corresponding to the |protocol_version| field of |issuerKeys|.
 1. Let |result| ([=tuple=] (byte string, byte string)) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
 1. If |result| is null, return an error.
 1. Return |result|.
 
 To <dfn>unmask tokens</dfn> given [=struct=] |issuerKeys| (as described in [[#issuer-public-keys]]), byte string |pretokens|, and a bytestring |response|, run the following steps:
 
-1. Let |unmaskOperation| be the |Unmask| operation corresponding to the |protocol_version| field of |issuerKeys|.
-1. Let |result| ([=list=] of byte strings) be the result of running |maskOperation| on |pretokens| and |response|.
+1. Let |unmaskOperation| be the Unmask operation corresponding to the |protocol_version| field of |issuerKeys|.
+1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
 Integration with Fetch {#fetch-integration}
