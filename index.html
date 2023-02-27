@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version f043d3484, updated Fri Feb 17 10:53:48 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="c7d65b1a01a7985a3076d64c39c8f66b5776f8bb" name="document-revision">
+  <meta content="ba6b85836b64f1653d630073d0562e918c1ea474" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -587,7 +587,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-02-24">24 February 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-02-27">27 February 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -611,7 +611,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   </div>
   <div class="p-summary" data-fill-with="abstract">
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-   <p>Private State Token API is a web platform API that allows propagating a limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.</p>
+   <p>The Private State Token API is a web platform API that allows propagating a limited amount of signals across sites, using the Privacy Pass protocol as an underlying primitive.</p>
   </div>
   <div data-fill-with="at-risk"></div>
   <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
@@ -722,10 +722,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h2 class="heading settled" data-level="1" id="goals"><span class="secno">1. </span><span class="content">Goals</span><a class="self-link" href="#goals"></a></h2>
    <p>The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
-privacy pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol" title="Privacy Pass Issuance Protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in working
-documents of privacy pass working group of IETF <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Private
-State Tokens can be considered as a web platform implementation of Privacy
-Pass.</p>
+privacy pass protocol <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol" title="Privacy Pass Issuance Protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a> specified in the working
+documents of the IETF Privacy Pass Working Group <a data-link-type="biblio" href="#biblio-privacy-pass-wg">[PRIVACY-PASS-WG]</a>. Private
+State Tokens can be considered to be a web platform implementation of Privacy Pass.</p>
    <h2 class="heading settled" data-level="2" id="background"><span class="secno">2. </span><span class="content">Background</span><a class="self-link" href="#background"></a></h2>
    <p>The Private State Token API provides a mechanism for anonymous authentication. The
 API provided by the user agent does not authenticate clients, instead it facilitates
@@ -974,8 +973,8 @@ type that the specification supports at this time.</p>
    <p>This section explains the issuing protocol. It has two sections that explains
 the issuing protocol steps for user agents and issuers.</p>
    <h3 class="heading settled" data-level="6.1" id="issue-request"><span class="secno">6.1. </span><span class="content">Creating An Issue Request</span><a class="self-link" href="#issue-request"></a></h3>
-   <div class="example" id="example-e7886913">
-    <a class="self-link" href="#example-e7886913"></a> An issue request is created and fetched as demonstrated in the following snippet. 
+   <div class="example" id="example-issue-request">
+    <a class="self-link" href="#example-issue-request"></a> An issue request is created and fetched as demonstrated in the following snippet. 
 <pre class="language-javascript highlight"><c- a>let</c-> issueRequest <c- o>=</c-> <c- ow>new</c-> Request<c- p>(</c-><c- u>"https://example.issuer:1234/issuer_path?public=0&amp;private=0"</c-><c- p>,</c-> <c- p>{</c->
   privateStateToken<c- o>:</c-> <c- p>{</c->
     type<c- o>:</c-> <c- u>"token-request"</c-><c- p>,</c->
@@ -1028,8 +1027,8 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header①">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code></a>, <var>version</var>)
             in <var>request</var>’s header list.</p>
    </ol>
-   <div class="example" id="example-2005541d">
-    <a class="self-link" href="#example-2005541d"></a> Private State Token HTTP request headers created for a typical fetch is as follows. 
+   <div class="example" id="example-pst-request-headers">
+    <a class="self-link" href="#example-pst-request-headers"></a> Private State Token HTTP request headers created for a typical fetch is as follows. 
 <pre>Sec-Private-State-Token: &lt;masked tokens encoded as base64 string>
 Sec-Private-State-Token-Version: &lt;cryptographic protocol version, VOPRF or PMB>
 </pre>
@@ -1044,8 +1043,8 @@ specified in the request <a data-link-type="http-header" href="#http-headerdef-s
 passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
 step. Issuer returns the signed tokens in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②">Sec-Private-State-Token</a> response header
 value encoded as a base64 byte string.</p>
-   <div class="example" id="example-fd1d464a">
-    <a class="self-link" href="#example-fd1d464a"></a> The following snippet displays a typical response demonstrating the Private State Token
+   <div class="example" id="example-pst-response">
+    <a class="self-link" href="#example-pst-response"></a> The following snippet displays a typical response demonstrating the Private State Token
 header. 
 <pre>Sec-Private-State-Token: &lt;token encoded as base64 string>
 </pre>
@@ -1088,8 +1087,8 @@ header.
 embedded on the top level origin may redeem tokens stored in the user agent from a
 specific issuer to learn <code>public</code> and/or <code>private</code> data encoded in the
 tokens.</p>
-   <div class="example" id="example-39d3c3b4">
-    <a class="self-link" href="#example-39d3c3b4"></a> Redemption is carried through fetch as demonstrated in the following
+   <div class="example" id="example-redemption-request">
+    <a class="self-link" href="#example-redemption-request"></a> Redemption is carried through fetch as demonstrated in the following
 snippet. The default value for refreshPolicy is <code>'none'</code>. 
 <pre class="language-javascript highlight"><c- a>let</c-> redemptionRequest <c- o>=</c-> <c- ow>new</c-> Request<c- p>(</c-><c- t>'https://example.issuer:1234/redemption_path'</c-><c- p>,</c-> <c- p>{</c->
   privateStateToken<c- o>:</c-> <c- p>{</c->
