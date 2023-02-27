@@ -20,6 +20,7 @@ Complain About: missing-example-ids yes
 spec:fetch; type:dfn; for:/; text:response
 spec:fetch; type:dfn; for:/; text:request
 spec:infra; type:dfn; text:list
+spec:webidl; type:dfn; text:resolve
 </pre>
 
 <pre class="anchors">
