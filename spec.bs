@@ -431,9 +431,9 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
 
  1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |commitments| and |numTokens|.
  1. Set |request|'s [=cache mode=] to `"no-store"`.
- 1. Let |base64-encoded-tokens| be the base64-encoded version of |issueHeader|.
+ 1. Let |base64EncodedTokens| be the base64-encoded version of |issueHeader|.
  1. Let |version| be the version of the cryptographic protocol used.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
                 in |request|'s header list.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
                 in |request|'s header list.
