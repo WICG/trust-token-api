@@ -178,7 +178,7 @@ executing the issuance and redemption operations. Issuers make these available
 through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
 commitments periodically.
 
-A <dfn>pst Key</dfn> is a [=map=] representing an individual cryptographic key with the following entries:
+A <dfn>pst key</dfn> is a [=map=] representing an individual cryptographic key with the following entries:
 1. The key "expiry" with a value [=moment=] representing the key's expiration.
 1. Other cryptographic parameters keyed by string keys.
 
