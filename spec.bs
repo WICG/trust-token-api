@@ -178,6 +178,19 @@ executing the issuance and redemption operations. Issuers make these available
 through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
 commitments periodically.
 
+A <dfn>pst Key</dfn> is a [=map=] representing an individual cryptographic key with the following entries:
+1. The key "expiry" with a value [=moment=] representing the key's expiration.
+1. Other cryptographic parameters keyed by string keys.
+
+A <dfn>pst key set</dfn> is a [=map=] representing a collection of cryptographic keys for a specific version of PST with the following entries:
+1. The key "protocol_version" with a value string representing the version of this key set.
+1. The key "id" with a value string representing an identifier for this key set.
+1. The key "batchsize" with a value representing the batchsize for this keyset.
+1. The key "keys" with a value [=map=] where the keys are string key IDs and the values are [=pst keys=].
+
+A <dfn>key commitment</dfn> is a [=map=] representing a collection of cryptographic keys where the keys are strings and the values are [=pst key sets=].
+
+
 Requests to key commitment endpoints should result in a JSON response
 [[!RFC8259]] of the following format.
 
@@ -282,7 +295,7 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating [=pstKeyCommitments=] is [=implementation-defined=].
+A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are [=key commitments=].
 
 Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
 
@@ -296,8 +309,9 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
-To <dfn>look up the latest keys</dfn> for a given |commitment|, run the following steps:
+To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the following steps:
 
+1. Let |commitment| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
 1. If |commitment| is null, return null.
 1. Let |chosenKey| be null.
 1. Let |currentTime| be the current date and time.
@@ -438,7 +452,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
  1. If |commitments| is null,  return.
- 1. Let |signingKey| be the result [=look up latest keys=] for |commitments|.
+ 1. Let |signingKey| be the result of [=look up the latest keys|lookup of the latest keys=] for |issuer|.
  1. Run [=discard tokens=] with |issuer| and |signingKey|.
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
@@ -501,8 +515,8 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. If |unmasked tokens| is an error, return a [=network error=].
 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
-1. If |commitments| is null,  return.
-1. Let |signingKey| be the result [=look up latest keys=] for |commitments|.
+1. If |commitments| is null, return.
+1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
 1. For each |token| in |unmasked tokens|, run the following steps:
     1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return null.
