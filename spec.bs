@@ -281,14 +281,14 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-A user agent has <dfn>redemptionRecords</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|value|, |expiration|).
+A user agent has <dfn>redemptionRecords</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|record|, |expiration|).
 
 To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/origin=] |topLevel|, a [=byte sequence=] |header|, and a [=duration=] |lifetime|, run the following steps: 
 
 1. If |lifetime| is zero, return.
 1. Let |currentTime| be the current date and time.
 1. Let |expiration| be the sum of |currentTime| and |lifetime|.
-1. Set [=redemptionRecords][(|issuer|, |topLevel|))] to the tuple (|header|, |expiration|).
+1. Set [=redemptionRecords=][(|issuer|, |topLevel|))] to the tuple (|header|, |expiration|).
 
 To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps: 
 
@@ -505,7 +505,7 @@ Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
-<h3 id="modification-to-http-fetch-steps-header">Modification to HTTP fetch steps</h3>
+<h3 id="modification-to-http-fetch-steps-header-issue">Modification to HTTP fetch steps</h3>
 The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
 
 1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
@@ -591,7 +591,14 @@ To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=respon
 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
 1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
 1. Perform [=record redemption timestamp=] with |issuer| and |topLevel|. 
-1. Perform [=record redemption record=] with |issuer|, |topLevel|, |header|, and |lifetime|.
+1. Perform [=record a redemption record=] with |issuer|, |topLevel|, |header|, and |lifetime|.
+
+<h3 id="modification-to-http-fetch-steps-header-redeem">Modification to HTTP fetch steps</h3>
+The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
+
+1. Let |redeem response result| be the result of [=handle a redeem response|handling a redeem response=], given [=request=] |request| and [=response=] |actualResponse| as input.
+1. If |redeem response result| is a [=network error=], return |issue response result|.
+
 
 <a http-header>Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
     [=redemption record=] should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
