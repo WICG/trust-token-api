@@ -175,7 +175,10 @@ required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
 through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
-commitments periodically.
+commitments periodically. A <dfn>key commitment</dfn> is a [=map=] representing
+a collection of cryptographic keys and associated metadata necessary for executing
+the issuance and redemption operations.
+
 
 Requests to key commitment endpoints should result in a JSON response
 [[!RFC8259]] of the following format.
@@ -281,7 +284,7 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating [=pstKeyCommitments=] is [=implementation-defined=].
+A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are [=key commitments=].
 
 Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
 
@@ -295,21 +298,47 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
+To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the following steps:
+
+1. Let |commitment| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |commitment| is null, return null.
+1. Let |chosenKey| be null.
+1. Let |currentTime| be the current date and time.
+1. For each |key| in |commitment|["keys"], run the following steps:
+    1. If |key|["expiry"] is less than |currentTime|, continue.
+    1. If |chosenKey| is null, set |chosenKey| to |key|.
+    1. If |key|["expiry"] is less than |chosenKey|["expiry"], set |chosenKey| to |key|.
+1. Return |chosenKey|.
+
+A user agent has a <dfn>tokenStore</dfn>, a [=map=] where the keys are [=/origins=] and the values are [=lists=] of  [=storedTokens=]. A <dfn>storedToken</dfn> is a [=tuple=] of ([=byte sequence=], [=byte sequence=]).
+
+To <dfn>insert a token</dfn> for an [=/origin=] |issuer|, [=byte sequence=] |token|, and [=byte sequence=] |signingKey|, run the following steps:
+
+1. Create a new [=tuple=] |storedToken| consisting of (|token|, |signingKey|).
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], set [=tokenStore=][|issuer|] to an empty [=list=].
+1. [=list/Append=] |storedToken| to [=tokenStore=][|issuer|].
+
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return null.
+1. If the [=list/size=] of [=tokenStore=][|issuer|] is zero, return null.
+1. [=list/Remove=] a random element of [=tokenStore=][|issuer|] and return the removed element.
 
-To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+To <dfn>discard tokens</dfn> from an [=/origin=] |issuer| and [=byte sequence=] |signingKey|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return.
+1. [=list/Remove=] all elements of [=tokenStore=][|issuer|] whose second element is not equal to |signingKey|.
 
 To get the <dfn>number of tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return 0.
+1. Return the [=list/size=] of [=tokenStore=][|issuer|].
 
 To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. Let |issuerKey| be the result of running [=look up the key commitments=] on |issuer|.
+1. If |issuerKey| is null, return 0.
+1. Return |issuerKey|["batchsize"].
 
 To <dfn>generate masked tokens</dfn> given a number |numTokens|, run the following steps:
 
@@ -412,16 +441,8 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
  1. If |commitments| is null,  return.
- 1. Pass issuer public keys to cryptographic procedures. Reject if keys are
-         malformed.
-
-    Issue(187): How do we get the issuer public keys here?
-
- 1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
-            the issuer's most recent commitments.
-
-    Issue(189): This probably needs to be its own algorithm, how is "most recent" defined here?
-
+ 1. Let |signingKey| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+ 1. Run [=discard tokens=] with |issuer| and |signingKey|.
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
  1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
@@ -481,7 +502,12 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
 1. If |unmasked tokens| is an error, return a [=network error=].
-1. Associate |unmasked tokens| with the issuing key's label and store |unmasked tokens|.
+1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |commitments| is null, return.
+1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
+1. For each |token| in |unmasked tokens|, run the following steps:
+    1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return null.
 
 Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
