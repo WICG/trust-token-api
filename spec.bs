@@ -176,19 +176,9 @@ required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
 through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
-commitments periodically.
-
-A <dfn>pst key</dfn> is a [=map=] representing an individual cryptographic key with the following entries:
-1. The key "expiry" with a value [=moment=] representing the key's expiration.
-1. Other cryptographic parameters keyed by string keys.
-
-A <dfn>pst key set</dfn> is a [=map=] representing a collection of cryptographic keys for a specific version of PST with the following entries:
-1. The key "protocol_version" with a value string representing the version of this key set.
-1. The key "id" with a value string representing an identifier for this key set.
-1. The key "batchsize" with a value representing the batchsize for this keyset.
-1. The key "keys" with a value [=map=] where the keys are string key IDs and the values are [=pst keys=].
-
-A <dfn>key commitment</dfn> is a [=map=] representing a collection of cryptographic keys where the keys are strings and the values are [=pst key sets=].
+commitments periodically. A <dfn>key commitment</dfn> is a [=map=] representing
+a collection of cryptographic keys and associated metadata necessary for executing
+the issuance and redemption operations.
 
 
 Requests to key commitment endpoints should result in a JSON response
@@ -316,7 +306,7 @@ To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the 
 1. Let |chosenKey| be null.
 1. Let |currentTime| be the current date and time.
 1. For each |key| in |commitment|["keys"], run the following steps:
-    1. If |key|["expiry"] is less than |currentTime|, skip processing this element.
+    1. If |key|["expiry"] is less than |currentTime|, continue.
     1. If |chosenKey| is null, set |chosenKey| to |key|.
     1. If |key|["expiry"] is less than |chosenKey|["expiry"], set |chosenKey| to |key|.
 1. Return |chosenKey|.
@@ -452,7 +442,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
  1. If |commitments| is null,  return.
- 1. Let |signingKey| be the result of [=look up the latest keys|lookup of the latest keys=] for |issuer|.
+ 1. Let |signingKey| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
  1. Run [=discard tokens=] with |issuer| and |signingKey|.
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
