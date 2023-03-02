@@ -456,6 +456,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
 
  1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |issuerKeys| and |numTokens|.
  1. Set |request|'s [=cache mode=] to `"no-store"`.
+ 1. Set |request|'s <dfn>pstPretokens</dfn> to |pretokens|.
  1. Let |base64EncodedTokens| be the base64-encoded version of |issueHeader|.
  1. Let |version| be the version of the cryptographic protocol used.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
@@ -512,7 +513,8 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
 1. Let |issuerKeys| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
 1. If |issuerKeys| is null,  return.
-1. Let |pretokens| be the variables used in [=append private state token issue request headers=]. 
+1. Let |pretokens| be |request|'s [=pstPretokens=].
+1. If |pretokens| is null, return.
 1. Let |rawResponse| be the base64-decoded version of |header|.
 1. Let |unmasked tokens| be the result of [=unmask tokens|unmasking response tokens=] given |issuerKeys|, |pretokens|, and |rawResponse|.
 1. If |unmasked tokens| is null, return a [=network error=].
