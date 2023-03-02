@@ -2,18 +2,18 @@
 Title: Private State Token API
 H1: Private State Token API
 Shortname: private-state-token-api
-Level: 1
+Level: None
 Status: CG-DRAFT
 Group: WICG
 Repository: WICG/trust-token-api
 URL: https://wicg.github.io/trust-token-api/
 Editor: Aykut Bulut, Google https://www.google.com/, aykutb@google.com
 Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
-Abstract: Private State Token API is a web platform API that allows propagating a limited amount of anti-fraud signals across sites, using the Privacy Pass protocol as an underlying primitive.
+Abstract: The Private State Token API is a web platform API that allows propagating a limited amount of signals across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
 Markup Shorthands: css no, markdown yes
-Ignored Terms: h1, h2, h3, h4, h5, h6, xmp
+Complain About: missing-example-ids yes
 </pre>
 
 <pre class="link-defaults">
@@ -85,10 +85,9 @@ Goals {#goals}
 
 The goal of the Private State Token API is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
-privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in working
-documents of privacy pass working group of IETF [[PRIVACY-PASS-WG]]. Private
-State Tokens can be considered as a web platform implementation of Privacy
-Pass.
+privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
+documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
+State Tokens can be considered to be a web platform implementation of Privacy Pass.
 
 <!--
 
@@ -176,7 +175,10 @@ required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
 through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
-commitments periodically.
+commitments periodically. A <dfn>key commitment</dfn> is a [=map=] representing
+a collection of cryptographic keys and associated metadata necessary for executing
+the issuance and redemption operations.
+
 
 Requests to key commitment endpoints should result in a JSON response
 [[!RFC8259]] of the following format.
@@ -282,7 +284,7 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating [=pstKeyCommitments=] is [=implementation-defined=].
+A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are [=key commitments=].
 
 Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
 
@@ -296,21 +298,47 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
+To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the following steps:
+
+1. Let |commitment| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |commitment| is null, return null.
+1. Let |chosenKey| be null.
+1. Let |currentTime| be the current date and time.
+1. For each |key| in |commitment|["keys"], run the following steps:
+    1. If |key|["expiry"] is less than |currentTime|, continue.
+    1. If |chosenKey| is null, set |chosenKey| to |key|.
+    1. If |key|["expiry"] is less than |chosenKey|["expiry"], set |chosenKey| to |key|.
+1. Return |chosenKey|.
+
+A user agent has a <dfn>tokenStore</dfn>, a [=map=] where the keys are [=/origins=] and the values are [=lists=] of  [=storedTokens=]. A <dfn>storedToken</dfn> is a [=tuple=] of ([=byte sequence=], [=byte sequence=]).
+
+To <dfn>insert a token</dfn> for an [=/origin=] |issuer|, [=byte sequence=] |token|, and [=byte sequence=] |signingKey|, run the following steps:
+
+1. Create a new [=tuple=] |storedToken| consisting of (|token|, |signingKey|).
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], set [=tokenStore=][|issuer|] to an empty [=list=].
+1. [=list/Append=] |storedToken| to [=tokenStore=][|issuer|].
+
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return null.
+1. If the [=list/size=] of [=tokenStore=][|issuer|] is zero, return null.
+1. [=list/Remove=] a random element of [=tokenStore=][|issuer|] and return the removed element.
 
-To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+To <dfn>discard tokens</dfn> from an [=/origin=] |issuer| and [=byte sequence=] |signingKey|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return.
+1. [=list/Remove=] all elements of [=tokenStore=][|issuer|] whose second element is not equal to |signingKey|.
 
 To get the <dfn>number of tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return 0.
+1. Return the [=list/size=] of [=tokenStore=][|issuer|].
 
 To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. Let |issuerKey| be the result of running [=look up the key commitments=] on |issuer|.
+1. If |issuerKey| is null, return 0.
+1. Return |issuerKey|["batchsize"].
 
 To <dfn>generate masked tokens</dfn> given [=pst key set=] |issuerKeys| and number |numTokens|, run the following steps:
 
@@ -398,7 +426,7 @@ the issuing protocol steps for user agents and issuers.
 Creating An Issue Request {#issue-request}
 ---------------------------------------------------------------
 
-<div class=example>
+<div class=example id="example-issue-request">
 An issue request is created and fetched as demonstrated in the following snippet.
 
 ```javascript
@@ -421,12 +449,9 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
  1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
- 1. If |commitments| is null, return.
- 1. Perform [=discard tokens=] with |issuer| that are signed with keys other than those from
-            the issuer's most recent commitments.
-
-    Issue(189): This probably needs to be its own algorithm, how is "most recent" defined here?
-
+ 1. If |commitments| is null,  return.
+ 1. Let |signingKey| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+ 1. Run [=discard tokens=] with |issuer| and |signingKey|.
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
  1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |commitments| and |numTokens|.
@@ -438,7 +463,7 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
                 in |request|'s header list.
 
-<div class=example>
+<div class=example id="example-pst-request-headers">
 Private State Token HTTP request headers created for a typical fetch is as follows.
 
 ```
@@ -463,7 +488,7 @@ passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
 value encoded as a base64 byte string.
 
-<div class=example>
+<div class=example id="example-pst-response">
 The following snippet displays a typical response demonstrating the Private State Token
 header.
 
@@ -484,11 +509,16 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |header| is empty, return null.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. Let |commitments| and |pretokens| be the variables used in [=append private state token issue request headers=]. 
+1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |commitments| is null, return.
+1. Let |pretokens| be the variables used in [=append private state token issue request headers=]. 
 1. Let |rawResponse| be the base64-decoded version of |header|.
 1. Let |unmasked tokens| be the result of [=unmask tokens|unmasking response tokens=] given |commitments|, |pretokens|, and |rawResponse|.
 1. If |unmasked tokens| is null, return a [=network error=].
-1. Associate |unmasked tokens| with the issuing key's label and store |unmasked tokens|.
+1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
+1. For each |token| in |unmasked tokens|, run the following steps:
+    1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return null.
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
@@ -507,7 +537,7 @@ embedded on the top level origin may redeem tokens stored in the user agent from
 specific issuer to learn `public` and/or `private` data encoded in the
 tokens.
 
-<div class=example>
+<div class=example id="example-redemption-request">
 Redemption is carried through fetch as demonstrated in the following
 snippet. The default value for refreshPolicy is `'none'`.
 
