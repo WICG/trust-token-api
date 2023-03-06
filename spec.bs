@@ -255,7 +255,7 @@ To ensure this property, it is recommended that user agents fetch the key commit
 
 If using a centralized mechanism for fetching keys, user agents should have a registration process to allow for issuers to register to have their key commitments fetched and sent to clients at a regular client. The requirements and mechanisms for registering are [=implementation-defined=].
 
-Note: It is recommended that in the cases of a registration mechanism, that the user agents have an expiration for how long registration requests are valid for to allow for the removal of deprecated or no longer active issuers.
+When using a registration process, it is recommended that user agents apply an expiration date to registration requests, to allow for the removal of deprecated or no longer active issuers.
 
 Algorithms {#algorithms}
 ====================================
