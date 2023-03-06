@@ -246,6 +246,17 @@ Requests to key commitment endpoints should result in a JSON response
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
 
+Issuer Key Fetching/Registration {#issuer-registration}
+----------------------------
+
+To maintain the privacy of this API and avoid user-specific keys, issuers should present the same keys to all clients that issue and redeem tokens against them.
+
+To ensure this property, it is recommended that user agents fetch the key commitments in an user-agnostic manner, through some sort of proxied mechanism or centralized mechanism for fetching the keys and distributing them to individual clients.
+
+If using a centralized mechanism for fetching keys, user agents should have a registration process to allow for issuers to register to have their key commitments fetched and sent to clients at a regular client. The requirements and mechanisms for registering are [=implementation-defined=].
+
+When using a registration process, it is recommended that user agents apply an expiration date to registration requests, to allow for the removal of deprecated or no longer active issuers.
+
 Algorithms {#algorithms}
 ====================================
 
