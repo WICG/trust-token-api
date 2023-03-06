@@ -4,9 +4,9 @@
   <title>Private State Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 79b02508e, updated Tue Feb 28 10:48:19 2023 -0800" name="generator">
+  <meta content="Bikeshed version 077497365, updated Thu Mar 2 15:15:29 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="dde1cdd968bf7b50d3034d3fef4a8febe05b487e" name="document-revision">
+  <meta content="9d5f66590e401aa2665c2e5a7cce268117c21c52" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -587,7 +587,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-02">2 March 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-06">6 March 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -673,13 +673,13 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li>
        <a href="#limit-encoded-info"><span class="secno">10.2</span> <span class="content">Limiting Encoded Information</span></a>
        <ol class="toc">
-        <li><a href="#side-channel-fingerprinting"><span class="secno">10.2.1</span> <span class="content">Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}</span></a>
+        <li><a href="#side-channel-fingerprinting"><span class="secno">10.2.1</span> <span class="content">Potential Attack: Side Channel Fingerprinting</span></a>
        </ol>
       <li>
        <a href="#cross-site-info"><span class="secno">10.3</span> <span class="content">Cross-site Information Transfer</span></a>
        <ol class="toc">
-        <li><a href="#api-usage-limits"><span class="secno">10.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}</span></a>
-        <li><a href="#per-issuer-limits"><span class="secno">10.3.2</span> <span class="content">Mitigation: Per-Site Issuer Limits {#per-issuer-limits}</span></a>
+        <li><a href="#api-usage-limits"><span class="secno">10.3.1</span> <span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span></a>
+        <li><a href="#per-issuer-limits"><span class="secno">10.3.2</span> <span class="content">Mitigation: Per-Site Issuer Limits</span></a>
        </ol>
      </ol>
     <li>
@@ -1381,7 +1381,7 @@ even though there are only up to three keys, the issuer can still utilize six la
 by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels). 
 Both <a data-link-type="biblio" href="#biblio-voprf" title="Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups">[VOPRF]</a> and <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> encode the same amount of information in a token, however the
 difference is <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> utilizing a private bit.</p>
-   <h4 class="heading settled" data-level="10.2.1" id="side-channel-fingerprinting"><span class="secno">10.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}</span><a class="self-link" href="#side-channel-fingerprinting"></a></h4>
+   <h4 class="heading settled" data-level="10.2.1" id="side-channel-fingerprinting"><span class="secno">10.2.1. </span><span class="content">Potential Attack: Side Channel Fingerprinting</span><a class="self-link" href="#side-channel-fingerprinting"></a></h4>
    <p>Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the user agent at redemption time with
 the user agent at token issuance time, even though the Private State Token API
@@ -1398,12 +1398,12 @@ Separate from the concern of channels allowing arbitrary communication between
 domains, some identification attacks---for instance, a malicious redeemer
 attempting to learn the exact set of issuers that have granted tokens to a
 particular user, which could be identifying---have similar mitigations.</p>
-   <h4 class="heading settled" data-level="10.3.1" id="api-usage-limits"><span class="secno">10.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}</span><a class="self-link" href="#api-usage-limits"></a></h4>
+   <h4 class="heading settled" data-level="10.3.1" id="api-usage-limits"><span class="secno">10.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#api-usage-limits"></a></h4>
    <p>To mitigate this attack, the specification places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
 specification does not allow a third redemption in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined③">implementation-defined</a> time window,
 usually 48 hours.</p>
-   <h4 class="heading settled" data-level="10.3.2" id="per-issuer-limits"><span class="secno">10.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits {#per-issuer-limits}</span><a class="self-link" href="#per-issuer-limits"></a></h4>
+   <h4 class="heading settled" data-level="10.3.2" id="per-issuer-limits"><span class="secno">10.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#per-issuer-limits"></a></h4>
    <p>The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the user agent allows
 association of at most two issers per top level origin. Issuers are associated
@@ -1760,7 +1760,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-implementation-defined">4. Algorithms</a>
     <li><a href="#ref-for-implementation-defined①">6.1. Creating An Issue Request</a>
     <li><a href="#ref-for-implementation-defined②">7. Redeeming Tokens</a>
-    <li><a href="#ref-for-implementation-defined③">10.3.1. Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}</a>
+    <li><a href="#ref-for-implementation-defined③">10.3.1. Mitigation: Dynamic Issuance/Redemption Limits</a>
     <li><a href="#ref-for-implementation-defined④">11.1. Preventing Token Exhaustion</a>
    </ul>
   </aside>
