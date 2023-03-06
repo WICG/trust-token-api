@@ -292,7 +292,7 @@ To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/or
 
 To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps: 
 
-1. Let |currentTime| be the current date and time.
+1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists|does not exist=], return null.
 1. Let (|record|, |expiration|) be [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. If |expiration| is less than |currentTime|, return null.
