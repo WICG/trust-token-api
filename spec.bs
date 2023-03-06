@@ -67,6 +67,9 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
         "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
         "publisher": "Google",
         "title": "ISSUER_PROTOCOL"
+    },
+    "RFC4648": {
+        "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
 }
 </pre>
@@ -343,7 +346,7 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
 1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|["protocol_version"].
-1. Let |result| ([=tuple=] (byte string, byte string)) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
+1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
 1. If |result| is null, return an error.
 1. Return |result|.
 
@@ -399,6 +402,11 @@ partial dictionary RequestInit {
   PrivateStateToken privateStateToken;
 };
 </pre>
+
+## A request's PST pretokens ## {#mp-request-pretokens}
+
+A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which
+is null or a [=byte sequence=].
 
 Modifications to request {#fetch-request}
 ---------------------------------------------------------------
@@ -456,8 +464,8 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
 
  1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |issuerKeys| and |numTokens|.
  1. Set |request|'s [=cache mode=] to `"no-store"`.
- 1. Set |request|'s <dfn>pstPretokens</dfn> to |pretokens|.
- 1. Let |base64EncodedTokens| be the base64-encoded version of |issueHeader|.
+ 1. Set |request|'s [=pstPretokens=] to |pretokens|.
+ 1. Let |base64EncodedTokens| be the base64-encoded [[!RFC4648]] version of |issueHeader|.
  1. Let |version| be the version of the cryptographic protocol used.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
                 in |request|'s header list.
@@ -487,7 +495,7 @@ Using its private keys, issuer signs the masked tokens obtained in the
 specified in the request <a http-header>Sec-Private-State-Token-Version</a> header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
-value encoded as a base64 byte string.
+value encoded as a base64 [[!RFC4648]] byte string.
 
 <div class=example id="example-pst-response">
 The following snippet displays a typical response demonstrating the Private State Token
@@ -515,7 +523,7 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. If |issuerKeys| is null,  return.
 1. Let |pretokens| be |request|'s [=pstPretokens=].
 1. If |pretokens| is null, return.
-1. Let |rawResponse| be the base64-decoded version of |header|.
+1. Let |rawResponse| be the base64-decoded [[!RFC4648]] version of |header|.
 1. Let |unmasked tokens| be the result of [=unmask tokens|unmasking response tokens=] given |issuerKeys|, |pretokens|, and |rawResponse|.
 1. If |unmasked tokens| is null, return a [=network error=].
 1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
