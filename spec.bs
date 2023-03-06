@@ -781,7 +781,7 @@ by having each key correspond to the the private bit value (3 keys x 2 values = 
 Both [[!VOPRF]] and [[!PMB]] encode the same amount of information in a token, however the
 difference is [[!PMB]] utilizing a private bit.
 
-### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
+<h4 id="side-channel-fingerprinting">Potential Attack: Side Channel Fingerprinting</h4>
 
 Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the user agent at redemption time with
@@ -803,14 +803,14 @@ domains, some identification attacks---for instance, a malicious redeemer
 attempting to learn the exact set of issuers that have granted tokens to a
 particular user, which could be identifying---have similar mitigations.
 
-### Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}
+<h4 id="api-usage-limits">Mitigation: Dynamic Issuance/Redemption Limits</h4>
 
 To mitigate this attack, the specification places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
 specification does not allow a third redemption in an [=implementation-defined=] time window,
 usually 48 hours.
 
-### Mitigation: Per-Site Issuer Limits {#per-issuer-limits}
+<h4 id="per-issuer-limits">Mitigation: Per-Site Issuer Limits</h4>
 
 The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the user agent allows
