@@ -286,7 +286,7 @@ A user agent has <dfn>redemptionRecords</dfn>, a [=map=] where the keys are a [=
 To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/origin=] |topLevel|, a [=byte sequence=] |header|, and a [=duration=] |lifetime|, run the following steps: 
 
 1. If |lifetime| is zero, return.
-1. Let |currentTime| be the current date and time.
+1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
 1. Let |expiration| be the sum of |currentTime| and |lifetime|.
 1. Set [=redemptionRecords=][(|issuer|, |topLevel|))] to the tuple (|header|, |expiration|).
 
