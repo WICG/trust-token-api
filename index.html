@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 077497365, updated Thu Mar 2 15:15:29 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="9d5f66590e401aa2665c2e5a7cce268117c21c52" name="document-revision">
+  <meta content="917f09077c49c73c6dfd71e718fdcfd552bc7239" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -630,7 +630,11 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <ol class="toc" role="directory">
     <li><a href="#goals"><span class="secno">1</span> <span class="content">Goals</span></a>
     <li><a href="#background"><span class="secno">2</span> <span class="content">Background</span></a>
-    <li><a href="#issuer-public-keys"><span class="secno">3</span> <span class="content">Issuer Public Keys</span></a>
+    <li>
+     <a href="#issuer-public-keys"><span class="secno">3</span> <span class="content">Issuer Public Keys</span></a>
+     <ol class="toc">
+      <li><a href="#issuer-registration"><span class="secno">3.1</span> <span class="content">Issuer Key Fetching/Registration</span></a>
+     </ol>
     <li><a href="#algorithms"><span class="secno">4</span> <span class="content">Algorithms</span></a>
     <li>
      <a href="#fetch-integration"><span class="secno">5</span> <span class="content">Integration with Fetch</span></a>
@@ -836,6 +840,11 @@ properties in terms of privacy implications.</p>
    </ul>
    <p>All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.</p>
+   <h3 class="heading settled" data-level="3.1" id="issuer-registration"><span class="secno">3.1. </span><span class="content">Issuer Key Fetching/Registration</span><a class="self-link" href="#issuer-registration"></a></h3>
+   <p>To maintain the privacy of this API and avoid user-specific keys, issuers should present the same keys to all clients that issue and redeem tokens against them.</p>
+   <p>To ensure this property, it is recommended that user agents fetch the key commitments in an user-agnostic manner, through some sort of proxied mechanism or centralized mechanism for fetching the keys and distributing them to individual clients.</p>
+   <p>If using a centralized mechanism for fetching keys, user agents should have a registration process to allow for issuers to register to have their key commitments fetched and sent to clients at a regular client. The requirements and mechanisms for registering are <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a>.</p>
+   <p>When using a registration process, it is recommended that user agents apply an expiration date to registration requests, to allow for the removal of deprecated or no longer active issuers.</p>
    <h2 class="heading settled" data-level="4" id="algorithms"><span class="secno">4. </span><span class="content">Algorithms</span><a class="self-link" href="#algorithms"></a></h2>
    <p>A user agent has <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="issuerassociations">issuerAssociations</dfn>, which is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map①">map</a> where the keys are <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin">origin</a> <var>topLevel</var>, and the values are a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list">list</a> of <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①">origins</a>.</p>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="determine-whether-associating-an-issuer-would-exceed-the-top-level-limit">determine whether associating an issuer would exceed the top-level limit</dfn> given an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin②">origin</a> <var>issuer</var> and an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin③">origin</a> <var>topLevel</var>, run the following steps:</p>
@@ -895,7 +904,7 @@ fetched for an issuer, previous commitments are discarded.</p>
     <li data-md>
      <p>Let <var>issuerKeys</var> be <a data-link-type="dfn" href="#pstkeycommitments" id="ref-for-pstkeycommitments①">pstKeyCommitments</a>[<var>issuer</var>].</p>
     <li data-md>
-     <p>For each <var>pstVersion</var> that the user agent supports for this API in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined">implementation-defined</a> order, run the following steps:</p>
+     <p>For each <var>pstVersion</var> that the user agent supports for this API in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> order, run the following steps:</p>
      <ol>
       <li data-md>
        <p>Return <var>issuerKeys</var>[<var>version</var>], if it <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists⑥">exists</a>.</p>
@@ -1054,7 +1063,7 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Run <a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens">discard tokens</a> with <var>issuer</var> and <var>signingKey</var>.</p>
     <li data-md>
-     <p>Let <var>numTokens</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> limit on the number of tokens (which is recommended to be 100), whichever is smaller.</p>
+     <p>Let <var>numTokens</var> be <var>issuer</var>’s <a data-link-type="dfn" href="#max-batch-size" id="ref-for-max-batch-size">max batch size</a> or an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined②">implementation-defined</a> limit on the number of tokens (which is recommended to be 100), whichever is smaller.</p>
     <li data-md>
      <p>Let <var>tokens</var> be the result of <a data-link-type="dfn" href="#generate-masked-tokens" id="ref-for-generate-masked-tokens">generating masked tokens</a> with <var>numTokens</var>.</p>
     <li data-md>
@@ -1197,7 +1206,7 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p>Let <var>penultimateRedemption</var> be the result of <a data-link-type="dfn" href="#look-up-penultimate-redemption" id="ref-for-look-up-penultimate-redemption">look up penultimate redemption </a> with <var>issuer</var> and <var>topLevel</var></p>
     <li data-md>
-     <p>If <var>penultimateRedemption</var> is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined②">implementation-defined</a> time period (which is recommended to be 48 hours), return error.</p>
+     <p>If <var>penultimateRedemption</var> is less than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined③">implementation-defined</a> time period (which is recommended to be 48 hours), return error.</p>
     <li data-md>
      <p>Let <var>commitments</var> be the result of <a data-link-type="dfn" href="#look-up-the-key-commitments" id="ref-for-look-up-the-key-commitments④">looking up the key commitments</a> for <var>issuer</var>.</p>
     <li data-md>
@@ -1401,7 +1410,7 @@ particular user, which could be identifying---have similar mitigations.</p>
    <h4 class="heading settled" data-level="10.3.1" id="api-usage-limits"><span class="secno">10.3.1. </span><span class="content">Mitigation: Dynamic Issuance/Redemption Limits</span><a class="self-link" href="#api-usage-limits"></a></h4>
    <p>To mitigate this attack, the specification places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
-specification does not allow a third redemption in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined③">implementation-defined</a> time window,
+specification does not allow a third redemption in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined④">implementation-defined</a> time window,
 usually 48 hours.</p>
    <h4 class="heading settled" data-level="10.3.2" id="per-issuer-limits"><span class="secno">10.3.2. </span><span class="content">Mitigation: Per-Site Issuer Limits</span><a class="self-link" href="#per-issuer-limits"></a></h4>
    <p>The rate of identity leakage from one origin to another increases with the
@@ -1413,7 +1422,7 @@ with top level origins for token query API as well, see <a href="#token-query">�
    <p>Malicious origins might attempt to exhaust all tokens stored in the user agent by
 redeeming them all. To prevent this, the specification limits the number of redemption
 operations. In the context of a given origin, two redemptions are allowed initially. However,
-the third redemption is only allowed once more than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined④">implementation-defined</a> amount of time,
+the third redemption is only allowed once more than an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined⑤">implementation-defined</a> amount of time,
 usually 48 hours, have elapsed since the first redemption.</p>
    <h3 class="heading settled" data-level="11.2" id="preventing-double-spend"><span class="secno">11.2. </span><span class="content">Preventing Double Spending</span><a class="self-link" href="#preventing-double-spend"></a></h3>
    <p>Issuers can verify that each token is seen only once, because every redemption
@@ -1757,11 +1766,12 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
   <aside aria-labelledby="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" class="dfn-panel" data-for="fd74d8159933c4a74d0b23390bed43e3" id="infopanel-for-fd74d8159933c4a74d0b23390bed43e3">
    <span id="infopaneltitle-for-fd74d8159933c4a74d0b23390bed43e3" style="display:none">Info about the 'implementation-defined' external reference.</span><a href="https://infra.spec.whatwg.org/#implementation-defined">https://infra.spec.whatwg.org/#implementation-defined</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-implementation-defined">4. Algorithms</a>
-    <li><a href="#ref-for-implementation-defined①">6.1. Creating An Issue Request</a>
-    <li><a href="#ref-for-implementation-defined②">7. Redeeming Tokens</a>
-    <li><a href="#ref-for-implementation-defined③">10.3.1. Mitigation: Dynamic Issuance/Redemption Limits</a>
-    <li><a href="#ref-for-implementation-defined④">11.1. Preventing Token Exhaustion</a>
+    <li><a href="#ref-for-implementation-defined">3.1. Issuer Key Fetching/Registration</a>
+    <li><a href="#ref-for-implementation-defined①">4. Algorithms</a>
+    <li><a href="#ref-for-implementation-defined②">6.1. Creating An Issue Request</a>
+    <li><a href="#ref-for-implementation-defined③">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-implementation-defined④">10.3.1. Mitigation: Dynamic Issuance/Redemption Limits</a>
+    <li><a href="#ref-for-implementation-defined⑤">11.1. Preventing Token Exhaustion</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-fafd38d2108e357bcc9a6fd7f3cd04a7" class="dfn-panel" data-for="fafd38d2108e357bcc9a6fd7f3cd04a7" id="infopanel-for-fafd38d2108e357bcc9a6fd7f3cd04a7">
