@@ -67,6 +67,9 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
         "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
         "publisher": "Google",
         "title": "ISSUER_PROTOCOL"
+    },
+    "RFC4648": {
+        "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
 }
 </pre>
@@ -351,9 +354,18 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 1. If |issuerKey| is null, return 0.
 1. Return |issuerKey|["batchsize"].
 
-To <dfn>generate masked tokens</dfn> given a number |numTokens|, run the following steps:
+To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. TODO
+1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|["protocol_version"].
+1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
+1. If |result| is null, return an error.
+1. Return |result|.
+
+To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |pretokens|, and a bytestring |response|, run the following steps:
+
+1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|["protocol_version"].
+1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
+1. Return |result|.
 
 Integration with Fetch {#fetch-integration}
 ====================================
@@ -407,6 +419,8 @@ Modifications to request {#fetch-request}
 
 A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is <code>"none"</code> or <code>"refresh"</code>. Unless stated otherwise it is <code>"none"</code>.
 
+A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
+
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
  1. If |init|["{{RequestInit/privateStateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateStateToken}}"]["{{PrivateStateToken/refreshPolicy}}"].
@@ -450,17 +464,18 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
- 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
- 1. If |commitments| is null,  return.
+ 1. Let |issuerKeys| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+ 1. If |issuerKeys| is null,  return.
  1. Let |signingKey| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
  1. Run [=discard tokens=] with |issuer| and |signingKey|.
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
- 1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
+ 1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |issuerKeys| and |numTokens|.
  1. Set |request|'s [=cache mode=] to `"no-store"`.
- 1. Let |base64-encoded-tokens| be the base64-encoded version of |tokens|.
+ 1. Set |request|'s [=pstPretokens=] to |pretokens|.
+ 1. Let |base64EncodedTokens| be the base64-encoded [[!RFC4648]] version of |issueHeader|.
  1. Let |version| be the version of the cryptographic protocol used.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
                 in |request|'s header list.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
                 in |request|'s header list.
@@ -488,7 +503,7 @@ Using its private keys, issuer signs the masked tokens obtained in the
 specified in the request <a http-header>Sec-Private-State-Token-Version</a> header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
-value encoded as a base64 byte string.
+value encoded as a base64 [[!RFC4648]] byte string.
 
 <div class=example id="example-pst-response">
 The following snippet displays a typical response demonstrating the Private State Token
@@ -511,17 +526,18 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |header| is empty, return null.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
-1. If |unmasked tokens| is an error, return a [=network error=].
 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
-1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
-1. If |commitments| is null, return.
+1. Let |issuerKeys| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |issuerKeys| is null,  return.
+1. Let |pretokens| be |request|'s [=pstPretokens=].
+1. If |pretokens| is null, return.
+1. Let |rawResponse| be the base64-decoded [[!RFC4648]] version of |header|.
+1. Let |unmasked tokens| be the result of [=unmask tokens|unmasking response tokens=] given |issuerKeys|, |pretokens|, and |rawResponse|.
+1. If |unmasked tokens| is null, return a [=network error=].
 1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
 1. For each |token| in |unmasked tokens|, run the following steps:
     1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return null.
-
-Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
