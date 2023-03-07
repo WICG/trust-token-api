@@ -429,6 +429,7 @@ This specification adds the following steps to the [=http-network-or-cache fetch
     1. [=Append private state token redemption request headers=] on |httpRequest|.
 
 Modifications to HTTP fetch steps {#http-fetch}
+---------------------------------------------------------------
 
 The specification adds the following steps to the [=HTTP fetch=] algorithm, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
 
