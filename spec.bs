@@ -298,6 +298,26 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
+A user agent has <dfn>redemptionRecords</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|record|, |expiration|, |signingKeys|).
+
+To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/origin=] |topLevel|, a [=byte sequence=] |header|, and a [=duration=] |lifetime|, run the following steps: 
+
+1. If |lifetime| is zero, return.
+1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
+1. Let |expiration| be the sum of |currentTime| and |lifetime|.
+1. Let |signingKeys| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+1. Set [=redemptionRecords=][(|issuer|, |topLevel|))] to the tuple (|header|, |expiration|, |signingKeys|).
+
+To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps: 
+
+1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
+1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists|does not exist=], return null.
+1. Let (|record|, |expiration|, |signingKeys|) be [=redemptionTimes=][(|issuer|,|topLevel|)].
+1. If |expiration| is less than |currentTime|, return null.
+1. Let |currentSigningKeys| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+1. If |currentSigningKeys| does not equal |signingKeys|, return null.
+1. Return |record|.
+
 A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are [=key commitments=].
 
 Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
@@ -433,6 +453,17 @@ This specification adds the following steps to the [=http-network-or-cache fetch
     1. [=Append private state token issue request headers=] on |httpRequest|.
     1. [=Append private state token redemption request headers=] on |httpRequest|.
 
+Modifications to HTTP fetch steps {#http-fetch}
+---------------------------------------------------------------
+
+The specification adds the following steps to the [=HTTP fetch=] algorithm, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
+
+1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
+1. If |issue response result| is a [=network error=], return |issue response result|.
+1. Let |redeem response result| be the result of [=handle a redeem response|handling a redeem response=], given [=request=] |request| and [=response=] |actualResponse| as input.
+1. If |redeem response result| is a [=network error=], return |issue response result|.
+
+
 Issuing Protocol {#issuing-protocol}
 ====================================
 
@@ -541,12 +572,6 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
-<h3 id="modification-to-http-fetch-steps-header">Modification to HTTP fetch steps</h3>
-The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
-
-1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
-1. If |issue response result| is a [=network error=], return |issue response result|.
-
 Redeeming Tokens {#redeeming-tokens}
 ====================================
 
@@ -590,7 +615,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If |request|'s [=request/token refresh policy=] is `"none"`:
-     1. Let |record| be the result of [=get an unexpired redemption record|getting an unexpired redemption record=].
+     1. Let |record| be the result of performing [=retrieve a redemption record=] with |issuer| and |topLevel|.
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
  1. Let |penultimateRedemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|
  1. If |penultimateRedemption| is less than an [=implementation-defined=] time period (which is recommended to be 48 hours), return error.
@@ -610,17 +635,26 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
 
  1. [=Set redemption headers=] with |request| and |record|.
 
-ISSUE(165): Add redemption response handling, including calling [=record redemption timestamp=].
 
-<a http-header>Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
-    [=redemption record=] should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
-is invalid (too large, a negative number or non-numeric), UA should ignore the
-<a http-header>Sec-Private-State-Token-Lifetime</a> header. When <a http-header>Sec-Private-State-Token-Lifetime</a> header value
-is zero, UA should treat the record as expired. In case of multiple
-<a http-header>Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If
-<a http-header>Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the [=redemption record=] will be
-tied to the lifetime of the Private State Token verification key that confirmed the
-redeemed token's issuance. The [=redemption record=] is HTTP-only and JavaScript is only able to
+Handling Redeem Responses {#redeem-response}
+----------------------------------------------------------
+
+To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
+
+1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
+1. If |response|'s [=response/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return a [=network error=].
+1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. If |header| is empty, return null.
+1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. Set |lifetime| to be the largest representable duration.
+1. If |response|'s [=response/header list=] [=header list/contains=] <a http-header>Sec-Private-State-Token-Lifetime</a> response header, set |lifetime| to that value.
+1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token-Lifetime</a> from |response|'s [=response/header list=].
+1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
+1. Perform [=record redemption timestamp=] with |issuer| and |topLevel|. 
+1. Perform [=record a redemption record=] with |issuer|, |topLevel|, |header|, and |lifetime|.
+
+Note: The [=redemption record=] is HTTP-only and JavaScript is only able to
 access/send the [=redemption record=] via Private State Token Fetch APIs. The [=redemption record=] is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.
@@ -639,10 +673,6 @@ specified as number of seconds in the <a http-header>Sec-Private-State-Token-Lif
 header value.
 
 A <dfn>Redemption Record</dfn> is a [=byte sequence=].
-
-To <dfn>get an unexpired [=Redemption Record=]</dfn> with an [=/origin=] |issuer| and an [=/origin=] |topLevel|:
-
-1. TODO
 
 <h3 id="the-document-object">Changes to {{Document}}</h3>
 
