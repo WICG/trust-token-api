@@ -403,15 +403,12 @@ partial dictionary RequestInit {
 };
 </pre>
 
-## A request's PST pretokens ## {#mp-request-pretokens}
-
-A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which
-is null or a [=byte sequence=].
-
 Modifications to request {#fetch-request}
 ---------------------------------------------------------------
 
 A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is <code>"none"</code> or <code>"refresh"</code>. Unless stated otherwise it is <code>"none"</code>.
+
+A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
