@@ -83,11 +83,15 @@ urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
 Goals {#goals}
 ==============
 
-The goal of the Private State Token API is to transfer a limited amount of signals across
+The goal of the Private State Tokens is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
 privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
 documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
 State Tokens can be considered to be a web platform implementation of Privacy Pass.
+
+The spec introduces a new field in request dictionary to support token
+operations. It describes how Private State Tokens are utilized through this new
+dictionary.
 
 <!--
 
@@ -508,7 +512,7 @@ snippet. The default value for refreshPolicy is `'none'`.
 
 ```javascript
 let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
-  privateStateToken: {
+  privateToken: {
     type: 'token-redemption',
     issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
