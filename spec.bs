@@ -86,11 +86,15 @@ urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
 Goals {#goals}
 ==============
 
-The goal of the Private State Token API is to transfer a limited amount of signals across
+The goal of the Private State Tokens is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
 privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
 documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
 State Tokens can be considered to be a web platform implementation of Privacy Pass.
+
+The spec introduces a new field in request dictionary to support token
+operations. It describes how Private State Tokens are utilized through this new
+dictionary.
 
 <!--
 
@@ -414,10 +418,10 @@ The {{OperationType}} refers to which operation the user agent is attempting to 
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
 </pre>
 
-The {{PrivateStateToken}} contains the information required to make a fetch request.
+The {{PrivateToken}} contains the information required to make a fetch request.
 
 <pre class=idl>
-dictionary PrivateStateToken {
+dictionary PrivateToken {
   required OperationType operation;
   RefreshPolicy refreshPolicy = "none";
   sequence&lt;USVString> issuers;
@@ -430,7 +434,7 @@ This specification adds a new property to the {{RequestInit}} dictionary:
 
 <pre class=idl>
 partial dictionary RequestInit {
-  PrivateStateToken privateStateToken;
+  PrivateToken privateToken;
 };
 </pre>
 
@@ -443,7 +447,7 @@ A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is 
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
- 1. If |init|["{{RequestInit/privateStateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateStateToken}}"]["{{PrivateStateToken/refreshPolicy}}"].
+ 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
 ---------------------------------------------------------------
@@ -478,7 +482,7 @@ An issue request is created and fetched as demonstrated in the following snippet
 
 ```javascript
 let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
-  privateStateToken: {
+  privateToken: {
     type: "token-request",
     issuer: "https://example.issuer"
   }
@@ -586,7 +590,7 @@ snippet. The default value for refreshPolicy is `'none'`.
 
 ```javascript
 let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
-  privateStateToken: {
+  privateToken: {
     type: 'token-redemption',
     issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
