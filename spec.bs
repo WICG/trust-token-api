@@ -380,14 +380,14 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|[cryptoProtocolVersion].
+1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|["protocol_version"].
 1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
 1. If |result| is null, return an error.
 1. Return |result|.
 
 To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |pretokens|, and a bytestring |response|, run the following steps:
 
-1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|[cryptoProtocolVersion].
+1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|["protocol_version"].
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
