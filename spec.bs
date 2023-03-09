@@ -67,6 +67,9 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
         "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
         "publisher": "Google",
         "title": "ISSUER_PROTOCOL"
+    },
+    "RFC4648": {
+        "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
 }
 </pre>
@@ -83,11 +86,15 @@ urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
 Goals {#goals}
 ==============
 
-The goal of the Private State Token API is to transfer a limited amount of signals across
+The goal of the Private State Tokens is to transfer a limited amount of signals across
 sites through time in a privacy preserving manner. It achieves this using
 privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
 documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
 State Tokens can be considered to be a web platform implementation of Privacy Pass.
+
+The spec introduces a new field in request dictionary to support token
+operations. It describes how Private State Tokens are utilized through this new
+dictionary.
 
 <!--
 
@@ -175,7 +182,10 @@ required to serve a **key commitment** endpoint. Key commitments are
 collections of cryptographic keys and associated metadata necessary for
 executing the issuance and redemption operations. Issuers make these available
 through secure HTTP [[!RFC8446]] endpoints. User agents should fetch the key
-commitments periodically.
+commitments periodically. A <dfn>key commitment</dfn> is a [=map=] representing
+a collection of cryptographic keys and associated metadata necessary for executing
+the issuance and redemption operations.
+
 
 Requests to key commitment endpoints should result in a JSON response
 [[!RFC8259]] of the following format.
@@ -243,6 +253,17 @@ Requests to key commitment endpoints should result in a JSON response
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
 
+Issuer Key Fetching/Registration {#issuer-registration}
+----------------------------
+
+To maintain the privacy of this API and avoid user-specific keys, issuers should present the same keys to all clients that issue and redeem tokens against them.
+
+To ensure this property, it is recommended that user agents fetch the key commitments in an user-agnostic manner, through some sort of proxied mechanism or centralized mechanism for fetching the keys and distributing them to individual clients.
+
+If using a centralized mechanism for fetching keys, user agents should have a registration process to allow for issuers to register to have their key commitments fetched and sent to clients at a regular client. The requirements and mechanisms for registering are [=implementation-defined=].
+
+When using a registration process, it is recommended that user agents apply an expiration date to registration requests, to allow for the removal of deprecated or no longer active issuers.
+
 Algorithms {#algorithms}
 ====================================
 
@@ -281,7 +302,27 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists=], let |penultimateRedemption| be the |penultimateRedemption| field of the tuple [=redemptionTimes=][(|issuer|,|topLevel|)].
 1. Return |penultimateRedemption|.
 
-A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are a [=map=] formatted in the same way as the key commitments described in [[#issuer-public-keys]]. Populating [=pstKeyCommitments=] is [=implementation-defined=].
+A user agent has <dfn>redemptionRecords</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|record|, |expiration|, |signingKeys|).
+
+To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/origin=] |topLevel|, a [=byte sequence=] |header|, and a [=duration=] |lifetime|, run the following steps: 
+
+1. If |lifetime| is zero, return.
+1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
+1. Let |expiration| be the sum of |currentTime| and |lifetime|.
+1. Let |signingKeys| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+1. Set [=redemptionRecords=][(|issuer|, |topLevel|))] to the tuple (|header|, |expiration|, |signingKeys|).
+
+To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps: 
+
+1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
+1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists|does not exist=], return null.
+1. Let (|record|, |expiration|, |signingKeys|) be [=redemptionTimes=][(|issuer|,|topLevel|)].
+1. If |expiration| is less than |currentTime|, return null.
+1. Let |currentSigningKeys| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+1. If |currentSigningKeys| does not equal |signingKeys|, return null.
+1. Return |record|.
+
+A user agent has <dfn>pstKeyCommitments</dfn>, a [=map=] where the keys are an [=/origin=], and the values are [=key commitments=].
 
 Note: It is recommended that each user agent fetches the key commitments from issuers at a regular cadence and through trusted infrastructure, and then sends the concatenated map of issuers and key commitments to the client to ensure consistency between the keys different user agent instances use.
 
@@ -295,25 +336,60 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
+To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the following steps:
+
+1. Let |commitment| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |commitment| is null, return null.
+1. Let |chosenKey| be null.
+1. Let |currentTime| be the current date and time.
+1. For each |key| in |commitment|["keys"], run the following steps:
+    1. If |key|["expiry"] is less than |currentTime|, continue.
+    1. If |chosenKey| is null, set |chosenKey| to |key|.
+    1. If |key|["expiry"] is less than |chosenKey|["expiry"], set |chosenKey| to |key|.
+1. Return |chosenKey|.
+
+A user agent has a <dfn>tokenStore</dfn>, a [=map=] where the keys are [=/origins=] and the values are [=lists=] of  [=storedTokens=]. A <dfn>storedToken</dfn> is a [=tuple=] of ([=byte sequence=], [=byte sequence=]).
+
+To <dfn>insert a token</dfn> for an [=/origin=] |issuer|, [=byte sequence=] |token|, and [=byte sequence=] |signingKey|, run the following steps:
+
+1. Create a new [=tuple=] |storedToken| consisting of (|token|, |signingKey|).
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], set [=tokenStore=][|issuer|] to an empty [=list=].
+1. [=list/Append=] |storedToken| to [=tokenStore=][|issuer|].
+
 To <dfn>retrieve a token</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return null.
+1. If the [=list/size=] of [=tokenStore=][|issuer|] is zero, return null.
+1. [=list/Remove=] a random element of [=tokenStore=][|issuer|] and return the removed element.
 
-To <dfn>discard tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
+To <dfn>discard tokens</dfn> from an [=/origin=] |issuer| and [=byte sequence=] |signingKey|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return.
+1. [=list/Remove=] all elements of [=tokenStore=][|issuer|] whose second element is not equal to |signingKey|.
 
 To get the <dfn>number of tokens</dfn> from an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. If [=tokenStore=][|issuer|] does not [=map/exist=], return 0.
+1. Return the [=list/size=] of [=tokenStore=][|issuer|].
 
 To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the following steps:
 
-1. TODO
+1. Let |issuerKey| be the result of running [=look up the key commitments=] on |issuer|.
+1. If |issuerKey| is null, return 0.
+1. Return |issuerKey|["batchsize"].
 
-To <dfn>generate masked tokens</dfn> given a number |numTokens|, run the following steps:
+To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. TODO
+1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|["protocol_version"].
+1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
+1. If |result| is null, return an error.
+1. Return |result|.
+
+To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |pretokens|, and a bytestring |response|, run the following steps:
+
+1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|["protocol_version"].
+1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
+1. Return |result|.
 
 Integration with Fetch {#fetch-integration}
 ====================================
@@ -349,10 +425,10 @@ The {{OperationType}} refers to which operation the user agent is attempting to 
 enum OperationType { "token-request", "send-redemption-record", "token-redemption" };
 </pre>
 
-The {{PrivateStateToken}} contains the information required to make a fetch request.
+The {{PrivateToken}} contains the information required to make a fetch request.
 
 <pre class=idl>
-dictionary PrivateStateToken {
+dictionary PrivateToken {
   required TokenType type;
   required TokenVersion version;
   required OperationType operation;
@@ -367,7 +443,7 @@ This specification adds a new property to the {{RequestInit}} dictionary:
 
 <pre class=idl>
 partial dictionary RequestInit {
-  PrivateStateToken privateStateToken;
+  PrivateToken privateToken;
 };
 </pre>
 
@@ -376,9 +452,11 @@ Modifications to request {#fetch-request}
 
 A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is <code>"none"</code> or <code>"refresh"</code>. Unless stated otherwise it is <code>"none"</code>.
 
+A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
+
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
- 1. If |init|["{{RequestInit/privateStateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateStateToken}}"]["{{PrivateStateToken/refreshPolicy}}"].
+ 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
 ---------------------------------------------------------------
@@ -387,6 +465,17 @@ This specification adds the following steps to the [=http-network-or-cache fetch
 
     1. [=Append private state token issue request headers=] on |httpRequest|.
     1. [=Append private state token redemption request headers=] on |httpRequest|.
+
+Modifications to HTTP fetch steps {#http-fetch}
+---------------------------------------------------------------
+
+The specification adds the following steps to the [=HTTP fetch=] algorithm, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
+
+1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
+1. If |issue response result| is a [=network error=], return |issue response result|.
+1. Let |redeem response result| be the result of [=handle a redeem response|handling a redeem response=], given [=request=] |request| and [=response=] |actualResponse| as input.
+1. If |redeem response result| is a [=network error=], return |issue response result|.
+
 
 Issuing Protocol {#issuing-protocol}
 ====================================
@@ -402,7 +491,7 @@ An issue request is created and fetched as demonstrated in the following snippet
 
 ```javascript
 let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
-  privateStateToken: {
+  privateToken: {
     type: "private-state-token",
     version: 1,
     operation: "token-request",
@@ -421,25 +510,18 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If the [=number of tokens=] for |issuer| is at least 500, return.
- 1. Let |commitments| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
- 1. If |commitments| is null,  return.
- 1. Pass issuer public keys to cryptographic procedures. Reject if keys are
-         malformed.
-
-    Issue(187): How do we get the issuer public keys here?
-
- 1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
-            the issuer's most recent commitments.
-
-    Issue(189): This probably needs to be its own algorithm, how is "most recent" defined here?
-
+ 1. Let |issuerKeys| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+ 1. If |issuerKeys| is null,  return.
+ 1. Let |signingKey| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
+ 1. Run [=discard tokens=] with |issuer| and |signingKey|.
  1. Let |numTokens| be |issuer|'s [=max batch size=] or an [=implementation-defined=] limit on the number of tokens (which is recommended to be 100), whichever is smaller.
 
- 1. Let |tokens| be the result of [=generate masked tokens|generating masked tokens=] with |numTokens|.
+ 1. Let (|issueHeader|, |pretokens|) be the result of [=generate masked tokens|generating masked tokens=] with |issuerKeys| and |numTokens|.
  1. Set |request|'s [=cache mode=] to `"no-store"`.
- 1. Let |base64-encoded-tokens| be the base64-encoded version of |tokens|.
+ 1. Set |request|'s [=pstPretokens=] to |pretokens|.
+ 1. Let |base64EncodedTokens| be the base64-encoded [[!RFC4648]] version of |issueHeader|.
  1. Let |version| be the version of the cryptographic protocol used.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64-encoded-tokens|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
                 in |request|'s header list.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
                 in |request|'s header list.
@@ -467,7 +549,7 @@ Using its private keys, issuer signs the masked tokens obtained in the
 specified in the request <a http-header>Sec-Private-State-Token-Version</a> header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
-value encoded as a base64 byte string.
+value encoded as a base64 [[!RFC4648]] byte string.
 
 <div class=example id="example-pst-response">
 The following snippet displays a typical response demonstrating the Private State Token
@@ -490,20 +572,20 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |header| is empty, return null.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. Let |unmasked tokens| be the result of carrying out the cryptographic procedures to obtain a list of unmasked tokens given |header|.
-1. If |unmasked tokens| is an error, return a [=network error=].
-1. Associate |unmasked tokens| with the issuing key's label and store |unmasked tokens|.
+1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+1. Let |issuerKeys| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
+1. If |issuerKeys| is null,  return.
+1. Let |pretokens| be |request|'s [=pstPretokens=].
+1. If |pretokens| is null, return.
+1. Let |rawResponse| be the base64-decoded [[!RFC4648]] version of |header|.
+1. Let |unmasked tokens| be the result of [=unmask tokens|unmasking response tokens=] given |issuerKeys|, |pretokens|, and |rawResponse|.
+1. If |unmasked tokens| is null, return a [=network error=].
+1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
+1. For each |token| in |unmasked tokens|, run the following steps:
+    1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return null.
 
-Issue(190): Define "cryptographic procedures to obtain a list of unmasked tokens"
-
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
-
-<h3 id="modification-to-http-fetch-steps-header">Modification to HTTP fetch steps</h3>
-The following steps will be added to the [=HTTP fetch=] steps, before checking the redirect status (i.e. "7. If |actualResponse|'s status is a redirect status, ..."):
-
-1. Let |issue response result| be the result of [=handle an issue response|handling an issue response=], given [=request=] |request| and [=response=] |actualResponse| as input.
-1. If |issue response result| is a [=network error=], return |issue response result|.
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
@@ -519,7 +601,7 @@ snippet. The default value for refreshPolicy is `'none'`.
 
 ```javascript
 let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
-  privateStateToken: {
+  privateToken: {
     type: 'private-state-token',
     version: 1,
     operation: 'token-redemption',
@@ -550,7 +632,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
  1. If |request|'s [=request/token refresh policy=] is `"none"`:
-     1. Let |record| be the result of [=get an unexpired redemption record|getting an unexpired redemption record=].
+     1. Let |record| be the result of performing [=retrieve a redemption record=] with |issuer| and |topLevel|.
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
  1. Let |penultimateRedemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|
  1. If |penultimateRedemption| is less than an [=implementation-defined=] time period (which is recommended to be 48 hours), return error.
@@ -570,17 +652,26 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
 
  1. [=Set redemption headers=] with |request| and |record|.
 
-ISSUE(165): Add redemption response handling, including calling [=record redemption timestamp=].
 
-<a http-header>Sec-Private-State-Token-Lifetime</a> response header indicates how long (in seconds) the
-    [=redemption record=] should be cached for. When <a http-header>Sec-Private-State-Token-Lifetime</a> response header value
-is invalid (too large, a negative number or non-numeric), UA should ignore the
-<a http-header>Sec-Private-State-Token-Lifetime</a> header. When <a http-header>Sec-Private-State-Token-Lifetime</a> header value
-is zero, UA should treat the record as expired. In case of multiple
-<a http-header>Sec-Private-State-Token-Lifetime</a> headers, UA uses the last one. If
-<a http-header>Sec-Private-State-Token-Lifetime</a> header is omitted, the lifetime of the [=redemption record=] will be
-tied to the lifetime of the Private State Token verification key that confirmed the
-redeemed token's issuance. The [=redemption record=] is HTTP-only and JavaScript is only able to
+Handling Redeem Responses {#redeem-response}
+----------------------------------------------------------
+
+To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=response=] |response|, run the following steps:
+
+1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
+1. If |response|'s [=response/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return a [=network error=].
+1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. If |header| is empty, return null.
+1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. Set |lifetime| to be the largest representable duration.
+1. If |response|'s [=response/header list=] [=header list/contains=] <a http-header>Sec-Private-State-Token-Lifetime</a> response header, set |lifetime| to that value.
+1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token-Lifetime</a> from |response|'s [=response/header list=].
+1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
+1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
+1. Perform [=record redemption timestamp=] with |issuer| and |topLevel|. 
+1. Perform [=record a redemption record=] with |issuer|, |topLevel|, |header|, and |lifetime|.
+
+Note: The [=redemption record=] is HTTP-only and JavaScript is only able to
 access/send the [=redemption record=] via Private State Token Fetch APIs. The [=redemption record=] is treated as an
 arbitrary blob of bytes from the issuer, that may have semantic meaning to
 downstream consumers.
@@ -599,10 +690,6 @@ specified as number of seconds in the <a http-header>Sec-Private-State-Token-Lif
 header value.
 
 A <dfn>Redemption Record</dfn> is a [=byte sequence=].
-
-To <dfn>get an unexpired [=Redemption Record=]</dfn> with an [=/origin=] |issuer| and an [=/origin=] |topLevel|:
-
-1. TODO
 
 <h3 id="the-document-object">Changes to {{Document}}</h3>
 
@@ -768,7 +855,7 @@ by having each key correspond to the the private bit value (3 keys x 2 values = 
 Both [[!VOPRF]] and [[!PMB]] encode the same amount of information in a token, however the
 difference is [[!PMB]] utilizing a private bit.
 
-### Potential Attack: Side Channel Fingerprinting {#side-channel-fingerprinting}
+<h4 id="side-channel-fingerprinting">Potential Attack: Side Channel Fingerprinting</h4>
 
 Unlinkability is lost if the issuer is able to use network-level fingerprinting
 or any other side-channel and can associate the user agent at redemption time with
@@ -790,14 +877,14 @@ domains, some identification attacks---for instance, a malicious redeemer
 attempting to learn the exact set of issuers that have granted tokens to a
 particular user, which could be identifying---have similar mitigations.
 
-### Mitigation: Dynamic Issuance/Redemption Limits {#api-usage-limits}
+<h4 id="api-usage-limits">Mitigation: Dynamic Issuance/Redemption Limits</h4>
 
 To mitigate this attack, the specification places limits on both issuance and redemption.
 User activation with the issuing site is required in the issuing operation. The
 specification does not allow a third redemption in an [=implementation-defined=] time window,
 usually 48 hours.
 
-### Mitigation: Per-Site Issuer Limits {#per-issuer-limits}
+<h4 id="per-issuer-limits">Mitigation: Per-Site Issuer Limits</h4>
 
 The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the user agent allows
