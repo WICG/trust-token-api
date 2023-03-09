@@ -416,12 +416,6 @@ fetch(issueRequest);
 To <dfn>append private state token issue request headers</dfn> given a [=/request=] |request|, run the following steps:
 
  1. If |request|'s [=request/client=] is not a [=secure context=], return.
- 1. If |type| is not specified, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |type| is not `"private-state-token"`, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |version| is not specified, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |version| is not `1`, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |operation| is not specified, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |operation| is not one of {{OperationType}}, throw a "{{TypeError}}" {{DOMException}}.
  1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
  1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
@@ -540,12 +534,6 @@ To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redempt
  1. Let |redemption-result| be the redemption procedure result.
  1. Let |cryptoVersion| be the version of the cryptographic protocol used.
  1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
- 1. If |type| is not specified, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |type| is not `"private-state-token"`, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |version| is not specified, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |version| is not `1`, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |operation| is not specified, throw a "{{TypeError}}" {{DOMException}}.
- 1. If |operation| is not one of {{OperationType}}, throw a "{{TypeError}}" {{DOMException}}.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemption-result|)
                 in |request|'s header list.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |cryptoVersion|)
