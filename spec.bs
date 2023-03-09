@@ -330,11 +330,11 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 1. If [=pstKeyCommitments=][|issuer|] does not [=map/exist=], return null.
 1. Let |issuerKeys| be [=pstKeyCommitments=][|issuer|].
-1. For each |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
-    1. Return |issuerKeys|[|version|], if it [=map/exists=].
+1. For each |cryptoProtocolVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
+    1. Return |issuerKeys|[|cryptoProtocolVersion|], if it [=map/exists=].
 1. Return null.
 
-Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
+Note: |cryptoProtocolVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
 To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the following steps:
 
