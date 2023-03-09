@@ -380,14 +380,14 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|["protocol_version"].
+1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|[cryptoProtocolVersion].
 1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
 1. If |result| is null, return an error.
 1. Return |result|.
 
 To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |pretokens|, and a bytestring |response|, run the following steps:
 
-1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|["protocol_version"].
+1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|[cryptoProtocolVersion].
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
@@ -509,10 +509,10 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. Set |request|'s [=cache mode=] to `"no-store"`.
  1. Set |request|'s [=pstPretokens=] to |pretokens|.
  1. Let |base64EncodedTokens| be the base64-encoded [[!RFC4648]] version of |issueHeader|.
- 1. Let |version| be the version of the cryptographic protocol used.
+ 1. Let |cryptoProtocolVersion| be the version of the cryptographic protocol used.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
                 in |request|'s header list.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Crypto-Version`</a>, |cryptoProtocolVersion|)
                 in |request|'s header list.
 
 <div class=example id="example-pst-request-headers">
@@ -520,7 +520,7 @@ Private State Token HTTP request headers created for a typical fetch is as follo
 
 ```
 Sec-Private-State-Token: <masked tokens encoded as base64 string>
-Sec-Private-State-Token-Version: <cryptographic protocol version, VOPRF or PMB>
+Sec-Private-State-Token-Crypto-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 </div>
 
@@ -535,7 +535,7 @@ in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the masked tokens obtained in the
 <a http-header>Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
-specified in the request <a http-header>Sec-Private-State-Token-Version</a> header. Encoding the values
+specified in the request <a http-header>Sec-Private-State-Token-Crypto-Version</a> header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
 value encoded as a base64 [[!RFC4648]] byte string.
@@ -601,11 +601,11 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
  1. Let |redemption-result| be the redemption procedure result.
- 1. Let |version| be the version of the cryptographic protocol used.
+ 1. Let |cryptoProtocolVersion| be the version of the cryptographic protocol used.
  1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemption-result|)
                 in |request|'s header list.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Crypto-Version`</a>, |cryptoProtocolVersion|)
                 in |request|'s header list.
  1. Optionally, [=header list/set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Lifetime`</a>, |token-lifetime|)
                 in |request|'s header list.
@@ -789,13 +789,11 @@ Sec-Private-State-Token-Lifetime = sf-integer
 ```
 
 
-The 'Sec-Private-State-Token-Version' Header Field {#sec-private-state-token-version}
+The 'Sec-Private-State-Token-Crypto-Version' Header Field {#sec-private-state-token-crypto-version}
 ----------------------------
 
-The <dfn http-header>`Sec-Private-State-Token-Version`</dfn> header field gives
-the "major version" of Private State Token protocol.
-
-ISSUE(188): Define what "major version" actually means.
+The <dfn http-header>`Sec-Private-State-Token-Crypto-Version`</dfn> header field gives
+the cryptographic protocol version of the Private State Token.
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
 [[!RFC8941]].
@@ -803,7 +801,7 @@ It is a [=Structured Header=] whose value MUST be an [=structured header/string=
 The header’s ABNF is:
 
 ``` abnf
-Sec-Private-State-Token-Version = sf-string
+Sec-Private-State-Token-Crypto-Version = sf-string
 ```
 
 
@@ -902,7 +900,7 @@ IANA Considerations {#iana-considerations}
 ==========================================
 
 This document intends to define the <a http-header>Sec-Private-State-Token</a>,
-<a http-header>Sec-Private-State-Token-Lifetime</a>, <a http-header>Sec-Private-State-Token-Version</a>,
+<a http-header>Sec-Private-State-Token-Lifetime</a>, <a http-header>Sec-Private-State-Token-Crypto-Version</a>,
 HTTP request header fields, and register them in the permanent message
 header field registry ([[!RFC9110]]).
 
@@ -934,10 +932,10 @@ Author/Change controller: IETF
 Specification document: this specification ([[#sec-private-state-token-lifetime]])
 
 
-'Sec-Private-State-Token-Version' Header Field {#iana-sec-private-state-token-version}
+'Sec-Private-State-Token-Crypto-Version' Header Field {#iana-sec-private-state-token-crypto-version}
 ------------------------
 
-Header field name: Sec-Private-State-Token-Version
+Header field name: Sec-Private-State-Token-Crypto-Version
 
 Applicable protocol: http
 
@@ -945,7 +943,7 @@ Status: standard
 
 Author/Change controller: IETF
 
-Specification document: this specification ([[#sec-private-state-token-version]])
+Specification document: this specification ([[#sec-private-state-token-crypto-version]])
 
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
