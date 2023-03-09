@@ -330,7 +330,7 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 1. If [=pstKeyCommitments=][|issuer|] does not [=map/exist=], return null.
 1. Let |issuerKeys| be [=pstKeyCommitments=][|issuer|].
-1. For each |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
+1. [=list/For each=] |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
     1. Return |issuerKeys|[|version|], if it [=map/exists=].
 1. Return null.
 
@@ -342,7 +342,7 @@ To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the 
 1. If |commitment| is null, return null.
 1. Let |chosenKey| be null.
 1. Let |currentTime| be the current date and time.
-1. For each |key| in |commitment|["keys"], run the following steps:
+1. [=list/For each=] |key| of |commitment|["keys"], run the following steps:
     1. If |key|["expiry"] is less than |currentTime|, continue.
     1. If |chosenKey| is null, set |chosenKey| to |key|.
     1. If |key|["expiry"] is less than |chosenKey|["expiry"], set |chosenKey| to |key|.
@@ -428,8 +428,6 @@ dictionary PrivateToken {
 };
 </pre>
 
-Issue(151): Need to specify how `operation` and `issuers` are used.
-
 This specification adds a new property to the {{RequestInit}} dictionary:
 
 <pre class=idl>
@@ -441,13 +439,30 @@ partial dictionary RequestInit {
 Modifications to request {#fetch-request}
 ---------------------------------------------------------------
 
-A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is <code>"none"</code> or <code>"refresh"</code>. Unless stated otherwise it is <code>"none"</code>.
+A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.  [=request/Token refresh policy=] specifies whether to <a lt="set redemption headers">execute redemption procedure</a> or [=retrieve a redemption record=].
+
+A [=/request=] has an associated <dfn for=request>operation</dfn>, which is of type {{OperationType}}. [=request/operation=] specifies the Private Token operation.
+
+A [=/request=] has an associated <dfn for=request>issuers</dfn>, which is a list of strings.
+
+[=request/Token refresh policy=] is ignored unless [=request/operation=] is <code>"token-redemption"</code>. [=request/issuers=] is ignored unless [=request/operation=] is <code>"send-redemption-record"</code>. [=request/issuers=] must be specified and non-empty when [=request/operation=] is <code>"send-redemption-record"</code>.
 
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
-Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
+Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
- 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+ 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
+     1. Set <var ignore>request</var>'s [=request/operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then return.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
+         1. Set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+         1. Return.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] not [=map/exists=], then throw {{TypeError}}.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
+     1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
+         1. If |issuer| is not HTTP family, then throw {{TypeError}}.
+         1. If |issuer| is not trustworthy, then throw {{TypeError}}.
+         1. [=list/Append=] |issuer| to <var ignore>request</var>'s [=request/issuers=].
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
 ---------------------------------------------------------------
@@ -484,7 +499,6 @@ An issue request is created and fetched as demonstrated in the following snippet
 let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
   privateToken: {
     type: "token-request",
-    issuer: "https://example.issuer"
   }
 });
 fetch(issueRequest);
@@ -592,7 +606,6 @@ snippet. The default value for refreshPolicy is `'none'`.
 let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
   privateToken: {
     type: 'token-redemption',
-    issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
   }
 });
