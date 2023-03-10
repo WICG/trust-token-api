@@ -457,7 +457,7 @@ Add the following steps to the <code><a constructor lt="Request()">new Request (
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
          1. Set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
          1. Return.
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] not [=map/exists=], then throw {{TypeError}}.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
      1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
          1. If |issuer| is not HTTP family, then throw {{TypeError}}.
