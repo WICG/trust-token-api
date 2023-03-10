@@ -217,7 +217,7 @@ Requests to key commitment endpoints should result in a JSON response
                protocol. In this protocol, each token contains a private
                metadata bit.
 
-    * Protocol version `“PrivateStateTokenV2VOPRF”` implements [[!VOPRF]] cryptographic
+    * Protocol version `“PrivateStateTokenV3VOPRF”` implements [[!VOPRF]] cryptographic
                protocol. Contrary to [[!PMB]], tokens do not contain private
                metadata bits. However, issuers can use twice as many
                concurrently valid token signing keys (six compared to three of
