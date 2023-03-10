@@ -441,7 +441,9 @@ Modifications to request {#fetch-request}
 
 A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.  [=request/Token refresh policy=] specifies whether to <a lt="set redemption headers">execute redemption procedure</a> or [=retrieve a redemption record=].
 
-A [=/request=] has an associated <dfn for=request>operation</dfn>, which is of type {{OperationType}}. [=request/operation=] specifies the Private Token operation.
+A [=/request=] has an associated <dfn for=request>operation</dfn>, which is of type {{OperationType}}.
+
+Note: [=request/operation=] specifies the Private Token operation.
 
 A [=/request=] has an associated <dfn for=request>issuers</dfn>, which is a list of strings.
 
