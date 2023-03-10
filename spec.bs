@@ -330,7 +330,7 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 1. If [=pstKeyCommitments=][|issuer|] does not [=map/exist=], return null.
 1. Let |issuerKeys| be [=pstKeyCommitments=][|issuer|].
-1. [=list/For each=] |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
+1. For each |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
     1. Return |issuerKeys|[|version|], if it [=map/exists=].
 1. Return null.
 
@@ -439,15 +439,13 @@ partial dictionary RequestInit {
 Modifications to request {#fetch-request}
 ---------------------------------------------------------------
 
-A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.  [=request/Token refresh policy=] specifies whether to <a lt="set redemption headers">execute redemption procedure</a> or [=retrieve a redemption record=].
+A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.
 
 A [=/request=] has an associated <dfn for=request>operation</dfn>, which is of type {{OperationType}}.
 
-Note: [=request/operation=] specifies the Private Token operation.
-
 A [=/request=] has an associated <dfn for=request>issuers</dfn>, which is a list of strings.
 
-[=request/Token refresh policy=] is ignored unless [=request/operation=] is <code>"token-redemption"</code>. [=request/issuers=] is ignored unless [=request/operation=] is <code>"send-redemption-record"</code>. [=request/issuers=] must be specified and non-empty when [=request/operation=] is <code>"send-redemption-record"</code>.
+Note: [=request/Token refresh policy=] is ignored unless [=request/operation=] is <code>"token-redemption"</code>. [=request/issuers=] is ignored unless [=request/operation=] is <code>"send-redemption-record"</code>. [=request/issuers=] must be specified and non-empty when [=request/operation=] is <code>"send-redemption-record"</code>.
 
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
@@ -462,9 +460,13 @@ Add the following steps to the <code><a constructor lt="Request()">new Request (
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
      1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
-         1. If |issuer| is not HTTP family, then throw {{TypeError}}.
-         1. If |issuer| is not trustworthy, then throw {{TypeError}}.
-         1. [=list/Append=] |issuer| to <var ignore>request</var>'s [=request/issuers=].
+         1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
+         1. If |issuerURL| is failure, then throw {{TypeError}}.
+         1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then throw {{TypeError}}.
+         1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
+         1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then throw {{TypeError}}.
+         1. [=list/Append=] |issuerURL| to <var ignore>request</var>'s [=request/issuers=].
+
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
 ---------------------------------------------------------------
