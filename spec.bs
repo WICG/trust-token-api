@@ -453,7 +453,7 @@ Add the following steps to the <code><a constructor lt="Request()">new Request (
 
  1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
      1. Set <var ignore>request</var>'s [=request/operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then return.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then abort these steps.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
          1. Set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
          1. Return.
