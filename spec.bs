@@ -330,11 +330,11 @@ To <dfn>look up the key commitments</dfn> for a given [=/origin=] |issuer|, run 
 
 1. If [=pstKeyCommitments=][|issuer|] does not [=map/exist=], return null.
 1. Let |issuerKeys| be [=pstKeyCommitments=][|issuer|].
-1. For each |pstVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
-    1. Return |issuerKeys|[|version|], if it [=map/exists=].
+1. For each |cryptoProtocolVersion| that the user agent supports for this API in an [=implementation-defined=] order, run the following steps:
+    1. Return |issuerKeys|[|cryptoProtocolVersion|], if it [=map/exists=].
 1. Return null.
 
-Note: |pstVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
+Note: |cryptoProtocolVersion| is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.
 
 To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the following steps:
 
@@ -412,6 +412,13 @@ type that the specification supports at this time.
 enum TokenType { "private-state-token" };
 </pre>
 
+The {{TokenVersion}} is currently set to `1`, as this is the only `"private-state-token"`
+version that the specification supports at this time.
+
+<pre class=idl>
+enum TokenVersion { "1" };
+</pre>
+
 The {{OperationType}} refers to which operation the user agent is attempting to complete.
 
 <pre class=idl>
@@ -422,6 +429,8 @@ The {{PrivateToken}} contains the information required to make a fetch request.
 
 <pre class=idl>
 dictionary PrivateToken {
+  required TokenType type;
+  required TokenVersion version;
   required OperationType operation;
   RefreshPolicy refreshPolicy = "none";
   sequence&lt;USVString> issuers;
@@ -502,7 +511,9 @@ An issue request is created and fetched as demonstrated in the following snippet
 ```javascript
 let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
   privateToken: {
-    type: "token-request",
+    type: "private-state-token",
+    version: 1,
+    operation: "token-request",
   }
 });
 fetch(issueRequest);
@@ -527,10 +538,10 @@ To <dfn>append private state token issue request headers</dfn> given a [=/reques
  1. Set |request|'s [=cache mode=] to `"no-store"`.
  1. Set |request|'s [=pstPretokens=] to |pretokens|.
  1. Let |base64EncodedTokens| be the base64-encoded [[!RFC4648]] version of |issueHeader|.
- 1. Let |version| be the version of the cryptographic protocol used.
+ 1. Let |cryptoProtocolVersion| be the version of the cryptographic protocol used.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |base64EncodedTokens|)
                 in |request|'s header list.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Crypto-Version`</a>, |cryptoProtocolVersion|)
                 in |request|'s header list.
 
 <div class=example id="example-pst-request-headers">
@@ -538,7 +549,7 @@ Private State Token HTTP request headers created for a typical fetch is as follo
 
 ```
 Sec-Private-State-Token: <masked tokens encoded as base64 string>
-Sec-Private-State-Token-Version: <cryptographic protocol version, VOPRF or PMB>
+Sec-Private-State-Token-Crypto-Version: <cryptographic protocol version, VOPRF or PMB>
 ```
 </div>
 
@@ -553,7 +564,7 @@ in `public` and a value from set {0,1} in `private` parameter.
 
 Using its private keys, issuer signs the masked tokens obtained in the
 <a http-header>Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
-specified in the request <a http-header>Sec-Private-State-Token-Version</a> header. Encoding the values
+specified in the request <a http-header>Sec-Private-State-Token-Crypto-Version</a> header. Encoding the values
 passed in URL `private` and `public` parameters happens in this signing
 step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
 value encoded as a base64 [[!RFC4648]] byte string.
@@ -609,7 +620,9 @@ snippet. The default value for refreshPolicy is `'none'`.
 ```javascript
 let redemptionRequest = new Request('https://example.issuer:1234/redemption_path', {
   privateToken: {
-    type: 'token-redemption',
+    type: 'private-state-token',
+    version: 1,
+    operation: 'token-redemption',
     refreshPolicy: {'none', 'refresh'}
   }
 });
@@ -618,11 +631,11 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
  1. Let |redemption-result| be the redemption procedure result.
- 1. Let |version| be the version of the cryptographic protocol used.
+ 1. Let |cryptoProtocolVersion| be the version of the cryptographic protocol used.
  1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemption-result|)
                 in |request|'s header list.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Version`</a>, |version|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Crypto-Version`</a>, |cryptoProtocolVersion|)
                 in |request|'s header list.
  1. Optionally, [=header list/set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Lifetime`</a>, |token-lifetime|)
                 in |request|'s header list.
@@ -806,13 +819,11 @@ Sec-Private-State-Token-Lifetime = sf-integer
 ```
 
 
-The 'Sec-Private-State-Token-Version' Header Field {#sec-private-state-token-version}
+The 'Sec-Private-State-Token-Crypto-Version' Header Field {#sec-private-state-token-crypto-version}
 ----------------------------
 
-The <dfn http-header>`Sec-Private-State-Token-Version`</dfn> header field gives
-the "major version" of Private State Token protocol.
-
-ISSUE(188): Define what "major version" actually means.
+The <dfn http-header>`Sec-Private-State-Token-Crypto-Version`</dfn> header field gives
+the cryptographic protocol version of the Private State Token.
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
 [[!RFC8941]].
@@ -820,7 +831,7 @@ It is a [=Structured Header=] whose value MUST be an [=structured header/string=
 The header’s ABNF is:
 
 ``` abnf
-Sec-Private-State-Token-Version = sf-string
+Sec-Private-State-Token-Crypto-Version = sf-string
 ```
 
 
@@ -919,7 +930,7 @@ IANA Considerations {#iana-considerations}
 ==========================================
 
 This document intends to define the <a http-header>Sec-Private-State-Token</a>,
-<a http-header>Sec-Private-State-Token-Lifetime</a>, <a http-header>Sec-Private-State-Token-Version</a>,
+<a http-header>Sec-Private-State-Token-Lifetime</a>, <a http-header>Sec-Private-State-Token-Crypto-Version</a>,
 HTTP request header fields, and register them in the permanent message
 header field registry ([[!RFC9110]]).
 
@@ -951,10 +962,10 @@ Author/Change controller: IETF
 Specification document: this specification ([[#sec-private-state-token-lifetime]])
 
 
-'Sec-Private-State-Token-Version' Header Field {#iana-sec-private-state-token-version}
+'Sec-Private-State-Token-Crypto-Version' Header Field {#iana-sec-private-state-token-crypto-version}
 ------------------------
 
-Header field name: Sec-Private-State-Token-Version
+Header field name: Sec-Private-State-Token-Crypto-Version
 
 Applicable protocol: http
 
@@ -962,7 +973,7 @@ Status: standard
 
 Author/Change controller: IETF
 
-Specification document: this specification ([[#sec-private-state-token-version]])
+Specification document: this specification ([[#sec-private-state-token-crypto-version]])
 
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
