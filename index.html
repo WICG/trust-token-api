@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 71458e5bb, updated Thu Mar 9 17:18:51 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="1fadee9ca38cf22a8ea539d5d682df0352e914f0" name="document-revision">
+  <meta content="79c75e88fe0d18c133a66560ca267ba85e553e7f" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -669,7 +669,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <ol class="toc">
       <li><a href="#sec-private-state-token"><span class="secno">9.1</span> <span class="content">The 'Sec-Private-State-Token' Header Field</span></a>
       <li><a href="#sec-private-state-token-lifetime"><span class="secno">9.2</span> <span class="content">The 'Sec-Private-State-Token-Lifetime' Header Field</span></a>
-      <li><a href="#sec-private-state-token-version"><span class="secno">9.3</span> <span class="content">The 'Sec-Private-State-Token-Version' Header Field</span></a>
+      <li><a href="#sec-private-state-token-crypto-version"><span class="secno">9.3</span> <span class="content">The 'Sec-Private-State-Token-Crypto-Version' Header Field</span></a>
      </ol>
     <li>
      <a href="#privacy"><span class="secno">10</span> <span class="content">Privacy Considerations</span></a>
@@ -698,7 +698,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <ol class="toc">
       <li><a href="#iana-sec-private-state-token"><span class="secno">12.1</span> <span class="content">'Sec-Private-State-Token' Header Field</span></a>
       <li><a href="#iana-sec-private-state-token-lifetime"><span class="secno">12.2</span> <span class="content">'Sec-Private-State-Token-Lifetime' Header Field</span></a>
-      <li><a href="#iana-sec-private-state-token-version"><span class="secno">12.3</span> <span class="content">'Sec-Private-State-Token-Version' Header Field</span></a>
+      <li><a href="#iana-sec-private-state-token-crypto-version"><span class="secno">12.3</span> <span class="content">'Sec-Private-State-Token-Crypto-Version' Header Field</span></a>
      </ol>
     <li><a href="#acknowledgments"><span class="secno"></span> <span class="content">Acknowledgments</span></a>
     <li>
@@ -939,15 +939,15 @@ fetched for an issuer, previous commitments are discarded.</p>
     <li data-md>
      <p>Let <var>issuerKeys</var> be <a data-link-type="dfn" href="#pstkeycommitments" id="ref-for-pstkeycommitments①">pstKeyCommitments</a>[<var>issuer</var>].</p>
     <li data-md>
-     <p>For each <var>pstVersion</var> that the user agent supports for this API in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> order, run the following steps:</p>
+     <p>For each <var>cryptoProtocolVersion</var> that the user agent supports for this API in an <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#implementation-defined" id="ref-for-implementation-defined①">implementation-defined</a> order, run the following steps:</p>
      <ol>
       <li data-md>
-       <p>Return <var>issuerKeys</var>[<var>version</var>], if it <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists⑦">exists</a>.</p>
+       <p>Return <var>issuerKeys</var>[<var>cryptoProtocolVersion</var>], if it <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists⑦">exists</a>.</p>
      </ol>
     <li data-md>
      <p>Return null.</p>
    </ol>
-   <p class="note" role="note"><span class="marker">Note:</span> <var>pstVersion</var> is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.</p>
+   <p class="note" role="note"><span class="marker">Note:</span> <var>cryptoProtocolVersion</var> is a string identifier representing different cryptographic versions of tokens that can be used with this API. User agents should only select keys for versions they support, ordered by which versions they prefer based on performance and any user defined preferences.</p>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="look-up-the-latest-keys">look up the latest keys</dfn> for a given <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#concept-origin" id="ref-for-concept-origin①⑧">origin</a> <var>issuer</var>, run the following steps:</p>
    <ol>
     <li data-md>
@@ -1143,18 +1143,18 @@ fetch<c- p>(</c->issueRequest<c- p>);</c->
     <li data-md>
      <p>Let <var>base64EncodedTokens</var> be the base64-encoded <a data-link-type="biblio" href="#biblio-rfc4648">[RFC4648]</a> version of <var>issueHeader</var>.</p>
     <li data-md>
-     <p>Let <var>version</var> be the version of the cryptographic protocol used.</p>
+     <p>Let <var>cryptoProtocolVersion</var> be the version of the cryptographic protocol used.</p>
     <li data-md>
      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token"><code>Sec-Private-State-Token</code></a>, <var>base64EncodedTokens</var>)
             in <var>request</var>’s header list.</p>
     <li data-md>
-     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header①">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code></a>, <var>version</var>)
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header①">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-crypto-version" id="ref-for-http-headerdef-sec-private-state-token-crypto-version"><code>Sec-Private-State-Token-Crypto-Version</code></a>, <var>cryptoProtocolVersion</var>)
             in <var>request</var>’s header list.</p>
    </ol>
    <div class="example" id="example-pst-request-headers">
     <a class="self-link" href="#example-pst-request-headers"></a> Private State Token HTTP request headers created for a typical fetch is as follows. 
 <pre>Sec-Private-State-Token: &lt;masked tokens encoded as base64 string>
-Sec-Private-State-Token-Version: &lt;cryptographic protocol version, VOPRF or PMB>
+Sec-Private-State-Token-Crypto-Version: &lt;cryptographic protocol version, VOPRF or PMB>
 </pre>
    </div>
    <h3 class="heading settled" data-level="6.2" id="issuer-signing-tokens"><span class="secno">6.2. </span><span class="content">Issuer Signing Tokens</span><a class="self-link" href="#issuer-signing-tokens"></a></h3>
@@ -1163,7 +1163,7 @@ servers. Information to be encoded in the tokens are passed in the URL <code>pub
 passed in the URL <code>public</code> parameter. <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> can encode a value from set {0,1,2}
 in <code>public</code> and a value from set {0,1} in <code>private</code> parameter.</p>
    <p>Using its private keys, issuer signs the masked tokens obtained in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①">Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
-specified in the request <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version①">Sec-Private-State-Token-Version</a> header. Encoding the values
+specified in the request <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-crypto-version" id="ref-for-http-headerdef-sec-private-state-token-crypto-version①">Sec-Private-State-Token-Crypto-Version</a> header. Encoding the values
 passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
 step. Issuer returns the signed tokens in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②">Sec-Private-State-Token</a> response header
 value encoded as a base64 <a data-link-type="biblio" href="#biblio-rfc4648">[RFC4648]</a> byte string.</p>
@@ -1239,14 +1239,14 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p>Let <var>redemption-result</var> be the redemption procedure result.</p>
     <li data-md>
-     <p>Let <var>cryptoVersion</var> be the version of the cryptographic protocol used.</p>
+     <p>Let <var>cryptoProtocolVersion</var> be the version of the cryptographic protocol used.</p>
     <li data-md>
      <p>Let <var>token-lifetime</var> be the expiration time of the <a data-link-type="dfn" href="#redemption-record" id="ref-for-redemption-record②">redemption record</a> in seconds.</p>
     <li data-md>
      <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header②">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token⑦"><code>Sec-Private-State-Token</code></a>, <var>redemption-result</var>)
             in <var>request</var>’s header list.</p>
     <li data-md>
-     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header③">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version②"><code>Sec-Private-State-Token-Version</code></a>, <var>cryptoVersion</var>)
+     <p><a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header③">Set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-crypto-version" id="ref-for-http-headerdef-sec-private-state-token-crypto-version②"><code>Sec-Private-State-Token-Crypto-Version</code></a>, <var>cryptoProtocolVersion</var>)
             in <var>request</var>’s header list.</p>
     <li data-md>
      <p>Optionally, <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-header-list-set-structured-header" id="ref-for-concept-header-list-set-structured-header④">set a structured field value</a> given (<a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime"><code>Sec-Private-State-Token-Lifetime</code></a>, <var>token-lifetime</var>)
@@ -1446,13 +1446,12 @@ field gives the expiration for the <a data-link-type="dfn" href="#redemption-rec
    <p>The header’s ABNF is:</p>
 <pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Lifetime</c-> <c- o>=</c-> <c- nc>sf-integer</c->
 </pre>
-   <h3 class="heading settled" data-level="9.3" id="sec-private-state-token-version"><span class="secno">9.3. </span><span class="content">The 'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-version"></a></h3>
-   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-version"><code>Sec-Private-State-Token-Version</code></dfn> header field gives
-the "major version" of Private State Token protocol.</p>
-   <p class="issue" id="issue-411a11f5"><a class="self-link" href="#issue-411a11f5"></a> Define what "major version" actually means. <a href="https://github.com/WICG/trust-token-api/issues/188">[Issue #188]</a></p>
+   <h3 class="heading settled" data-level="9.3" id="sec-private-state-token-crypto-version"><span class="secno">9.3. </span><span class="content">The 'Sec-Private-State-Token-Crypto-Version' Header Field</span><a class="self-link" href="#sec-private-state-token-crypto-version"></a></h3>
+   <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token-crypto-version"><code>Sec-Private-State-Token-Crypto-Version</code></dfn> header field gives
+the cryptographic protocol version of the Private State Token.</p>
    <p>It is a <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#" id="ref-for-edc3e3324b8239e1191d55af2617bd31②">Structured Header</a> whose value MUST be an <a data-link-type="dfn" href="https://tools.ietf.org/html/rfc8941#section-3.3.3" id="ref-for-section-3.3.3①">string</a> <a data-link-type="biblio" href="#biblio-rfc8941" title="Structured Field Values for HTTP">[RFC8941]</a>.</p>
    <p>The header’s ABNF is:</p>
-<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Version</c-> <c- o>=</c-> <c- nc>sf-string</c->
+<pre class="language-abnf highlight"><c- nc>Sec-Private-State-Token-Crypto-Version</c-> <c- o>=</c-> <c- nc>sf-string</c->
 </pre>
    <h2 class="heading settled" data-level="10" id="privacy"><span class="secno">10. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy"></a></h2>
    <h3 class="heading settled" data-level="10.1" id="unlinkability"><span class="secno">10.1. </span><span class="content">Unlinkability</span><a class="self-link" href="#unlinkability"></a></h3>
@@ -1519,7 +1518,7 @@ is sent to the same token issuer. This means that even if a malicious piece of
 malware exfiltrates all of a user’s tokens, the tokens will run out over time.
 Issuers can sign fewer tokens at a time to mitigate the risk.</p>
    <h2 class="heading settled" data-level="12" id="iana-considerations"><span class="secno">12. </span><span class="content">IANA Considerations</span><a class="self-link" href="#iana-considerations"></a></h2>
-   <p>This document intends to define the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①⑤">Sec-Private-State-Token</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-version" id="ref-for-http-headerdef-sec-private-state-token-version③">Sec-Private-State-Token-Version</a>,
+   <p>This document intends to define the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①⑤">Sec-Private-State-Token</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-lifetime" id="ref-for-http-headerdef-sec-private-state-token-lifetime⑤">Sec-Private-State-Token-Lifetime</a>, <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-crypto-version" id="ref-for-http-headerdef-sec-private-state-token-crypto-version③">Sec-Private-State-Token-Crypto-Version</a>,
 HTTP request header fields, and register them in the permanent message
 header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="HTTP Semantics">[RFC9110]</a>).</p>
    <h3 class="heading settled" data-level="12.1" id="iana-sec-private-state-token"><span class="secno">12.1. </span><span class="content">'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#iana-sec-private-state-token"></a></h3>
@@ -1534,12 +1533,12 @@ header field registry (<a data-link-type="biblio" href="#biblio-rfc9110" title="
    <p>Status: standard</p>
    <p>Author/Change controller: IETF</p>
    <p>Specification document: this specification (<a href="#sec-private-state-token-lifetime">§ 9.2 The 'Sec-Private-State-Token-Lifetime' Header Field</a>)</p>
-   <h3 class="heading settled" data-level="12.3" id="iana-sec-private-state-token-version"><span class="secno">12.3. </span><span class="content">'Sec-Private-State-Token-Version' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-version"></a></h3>
-   <p>Header field name: Sec-Private-State-Token-Version</p>
+   <h3 class="heading settled" data-level="12.3" id="iana-sec-private-state-token-crypto-version"><span class="secno">12.3. </span><span class="content">'Sec-Private-State-Token-Crypto-Version' Header Field</span><a class="self-link" href="#iana-sec-private-state-token-crypto-version"></a></h3>
+   <p>Header field name: Sec-Private-State-Token-Crypto-Version</p>
    <p>Applicable protocol: http</p>
    <p>Status: standard</p>
    <p>Author/Change controller: IETF</p>
-   <p>Specification document: this specification (<a href="#sec-private-state-token-version">§ 9.3 The 'Sec-Private-State-Token-Version' Header Field</a>)</p>
+   <p>Specification document: this specification (<a href="#sec-private-state-token-crypto-version">§ 9.3 The 'Sec-Private-State-Token-Crypto-Version' Header Field</a>)</p>
    <h2 class="no-num heading settled" id="acknowledgments"><span class="content">Acknowledgments</span><a class="self-link" href="#acknowledgments"></a></h2>
    <p>Thanks to Alex Kallam, Charlie Harrison, Chris Fredrickson, David Van Cleve, Dylan Cutler,
 Eric Trouton, Johann Hofmann, Kaustubha Govind, Mike Taylor, Ryan Kalla, and Sam
@@ -1630,8 +1629,8 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <li><a href="#retrieve-a-redemption-record">retrieve a redemption record</a><span>, in § 4</span>
    <li><a href="#retrieve-a-token">retrieve a token</a><span>, in § 4</span>
    <li><a href="#http-headerdef-sec-private-state-token">Sec-Private-State-Token</a><span>, in § 9.1</span>
+   <li><a href="#http-headerdef-sec-private-state-token-crypto-version">Sec-Private-State-Token-Crypto-Version</a><span>, in § 9.3</span>
    <li><a href="#http-headerdef-sec-private-state-token-lifetime">Sec-Private-State-Token-Lifetime</a><span>, in § 9.2</span>
-   <li><a href="#http-headerdef-sec-private-state-token-version">Sec-Private-State-Token-Version</a><span>, in § 9.3</span>
    <li><a href="#dom-operationtype-send-redemption-record">"send-redemption-record"</a><span>, in § 5.1</span>
    <li><a href="#set-redemption-headers">set redemption headers</a><span>, in § 7</span>
    <li><a href="#storedtoken">storedToken</a><span>, in § 4</span>
@@ -1936,7 +1935,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <span id="infopaneltitle-for-74d52bb72ef9fb1bb5520406f010079c" style="display:none">Info about the 'string' external reference.</span><a href="https://tools.ietf.org/html/rfc8941#section-3.3.3">https://tools.ietf.org/html/rfc8941#section-3.3.3</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-section-3.3.3">9.1. The 'Sec-Private-State-Token' Header Field</a>
-    <li><a href="#ref-for-section-3.3.3①">9.3. The 'Sec-Private-State-Token-Version' Header Field</a>
+    <li><a href="#ref-for-section-3.3.3①">9.3. The 'Sec-Private-State-Token-Crypto-Version' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-edc3e3324b8239e1191d55af2617bd31" class="dfn-panel" data-for="edc3e3324b8239e1191d55af2617bd31" id="infopanel-for-edc3e3324b8239e1191d55af2617bd31">
@@ -1944,7 +1943,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <ul>
     <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.1. The 'Sec-Private-State-Token' Header Field</a>
     <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.2. The 'Sec-Private-State-Token-Lifetime' Header Field</a>
-    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.3. The 'Sec-Private-State-Token-Version' Header Field</a>
+    <li><a href="#ref-for-edc3e3324b8239e1191d55af2617bd31">9.3. The 'Sec-Private-State-Token-Crypto-Version' Header Field</a>
    </ul>
   </aside>
   <aside aria-labelledby="infopaneltitle-for-eb0e1698348a5ae30cd3aa882b6dff01" class="dfn-panel" data-for="eb0e1698348a5ae30cd3aa882b6dff01" id="infopanel-for-eb0e1698348a5ae30cd3aa882b6dff01">
@@ -2219,7 +2218,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <div class="issue"> Need to specify how <code>operation</code> and <code>issuers</code> are used. <a href="https://github.com/WICG/trust-token-api/issues/151">[Issue #151]</a> <a class="issue-return" href="#issue-1b149e55" title="Jump to section">↵</a></div>
    <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
    <div class="issue"> This needs to be specified more clearly <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a> <a class="issue-return" href="#issue-907127dc" title="Jump to section">↵</a></div>
-   <div class="issue"> Define what "major version" actually means. <a href="https://github.com/WICG/trust-token-api/issues/188">[Issue #188]</a> <a class="issue-return" href="#issue-411a11f5" title="Jump to section">↵</a></div>
   </div>
   <aside aria-labelledby="infopaneltitle-for-key-commitment" class="dfn-panel" data-for="key-commitment" id="infopanel-for-key-commitment">
    <span id="infopaneltitle-for-key-commitment" style="display:none">Info about the 'key commitment' definition.</span><b><a href="#key-commitment">#key-commitment</a></b><b>Referenced in:</b>
@@ -2506,13 +2504,13 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     <li><a href="#ref-for-http-headerdef-sec-private-state-token-lifetime⑤">12. IANA Considerations</a>
    </ul>
   </aside>
-  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-version" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-version" id="infopanel-for-http-headerdef-sec-private-state-token-version">
-   <span id="infopaneltitle-for-http-headerdef-sec-private-state-token-version" style="display:none">Info about the 'Sec-Private-State-Token-Version' definition.</span><b><a href="#http-headerdef-sec-private-state-token-version">#http-headerdef-sec-private-state-token-version</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-http-headerdef-sec-private-state-token-crypto-version" class="dfn-panel" data-for="http-headerdef-sec-private-state-token-crypto-version" id="infopanel-for-http-headerdef-sec-private-state-token-crypto-version">
+   <span id="infopaneltitle-for-http-headerdef-sec-private-state-token-crypto-version" style="display:none">Info about the 'Sec-Private-State-Token-Crypto-Version' definition.</span><b><a href="#http-headerdef-sec-private-state-token-crypto-version">#http-headerdef-sec-private-state-token-crypto-version</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version">6.1. Creating An Issue Request</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version①">6.2. Issuer Signing Tokens</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version②">7. Redeeming Tokens</a>
-    <li><a href="#ref-for-http-headerdef-sec-private-state-token-version③">12. IANA Considerations</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-crypto-version">6.1. Creating An Issue Request</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-crypto-version①">6.2. Issuer Signing Tokens</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-crypto-version②">7. Redeeming Tokens</a>
+    <li><a href="#ref-for-http-headerdef-sec-private-state-token-crypto-version③">12. IANA Considerations</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
