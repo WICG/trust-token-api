@@ -641,15 +641,9 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |commitments| is null, return.
  1. [=Discard tokens=] from |issuer| that are signed with keys other than those from
             the issuer's most recent commitments.
-
-    Issue(189): This probably needs to be its own algorithm, how is "most recent" defined here?
-
  1. Let |token| be the result of [=retrieve a token|retrieving a token=] for |issuer|.
  1. If |token| is null, return.
  1. Let |record| be the result of running a cryptographic redemption procedure with |token|. If the procedure fails, return.
-
-    Issue(190): This needs to be specified more clearly
-
  1. [=Set redemption headers=] with |request| and |record|.
 
 
