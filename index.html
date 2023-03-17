@@ -4,9 +4,9 @@
   <title>Private State Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 71458e5bb, updated Thu Mar 9 17:18:51 2023 -0800" name="generator">
+  <meta content="Bikeshed version d9f9c3533, updated Fri Mar 10 11:31:29 2023 -0800" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="5d89c0a33e5e330d1e60d708505ec12c77dcffae" name="document-revision">
+  <meta content="1386cfa4ead1946b58085ce24e010fca620fc7d9" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -587,7 +587,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-10">10 March 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-17">17 March 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1285,14 +1285,12 @@ snippet. The default value for refreshPolicy is <code>'none'</code>.
     <li data-md>
      <p><a data-link-type="dfn" href="#discard-tokens" id="ref-for-discard-tokens①">Discard tokens</a> from <var>issuer</var> that are signed with keys other than those from
         the issuer’s most recent commitments.</p>
-     <p class="issue" id="issue-f6043e49"><a class="self-link" href="#issue-f6043e49"></a> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a></p>
     <li data-md>
      <p>Let <var>token</var> be the result of <a data-link-type="dfn" href="#retrieve-a-token" id="ref-for-retrieve-a-token">retrieving a token</a> for <var>issuer</var>.</p>
     <li data-md>
      <p>If <var>token</var> is null, return.</p>
     <li data-md>
      <p>Let <var>record</var> be the result of running a cryptographic redemption procedure with <var>token</var>. If the procedure fails, return.</p>
-     <p class="issue" id="issue-907127dc"><a class="self-link" href="#issue-907127dc"></a> This needs to be specified more clearly <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a></p>
     <li data-md>
      <p><a data-link-type="dfn" href="#set-redemption-headers" id="ref-for-set-redemption-headers①">Set redemption headers</a> with <var>request</var> and <var>record</var>.</p>
    </ol>
@@ -2216,8 +2214,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
    <div class="issue"> Need to specify how <code>operation</code> and <code>issuers</code> are used. <a href="https://github.com/WICG/trust-token-api/issues/151">[Issue #151]</a> <a class="issue-return" href="#issue-1b149e55" title="Jump to section">↵</a></div>
-   <div class="issue"> This probably needs to be its own algorithm, how is "most recent" defined here? <a href="https://github.com/WICG/trust-token-api/issues/189">[Issue #189]</a> <a class="issue-return" href="#issue-f6043e49" title="Jump to section">↵</a></div>
-   <div class="issue"> This needs to be specified more clearly <a href="https://github.com/WICG/trust-token-api/issues/190">[Issue #190]</a> <a class="issue-return" href="#issue-907127dc" title="Jump to section">↵</a></div>
   </div>
   <aside aria-labelledby="infopaneltitle-for-key-commitment" class="dfn-panel" data-for="key-commitment" id="infopanel-for-key-commitment">
    <span id="infopaneltitle-for-key-commitment" style="display:none">Info about the 'key commitment' definition.</span><b><a href="#key-commitment">#key-commitment</a></b><b>Referenced in:</b>
