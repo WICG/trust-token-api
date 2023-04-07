@@ -716,7 +716,7 @@ header value.
 
 A <dfn>Redemption Record</dfn> is a [=byte sequence=].
 
-Private State Tokens API provides `'send-redemption-record'` operation to [=append private state token redemption record headers=]. This operation attaches a previously [=record a redemption record=] from [=handle a redeem response=].
+The Private State Tokens API provides a `'send-redemption-record'` operation to [=append private state token redemption record headers=]. This operation attaches a previously [=record a redemption record|recorded redemption record=] from [=handle a redeem response=].
 
 To <dfn>append private state token redemption record headers</dfn> given a [=/request=] |request|, run the following steps:
 
