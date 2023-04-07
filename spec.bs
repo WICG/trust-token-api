@@ -743,7 +743,6 @@ To <dfn>append private state token redemption record headers</dfn> given a [=/re
   1. If |serializedHeaderItems| is null, then abort these steps.
   1. Set <a http-header>`Sec-Redemption-Record`</a> to |serializedHeaderItems|.
 
-<!-- "<a for=map>For each</a> |key| → |value| of |map|" -->
 
 <h3 id="the-document-object">Changes to {{Document}}</h3>
 
