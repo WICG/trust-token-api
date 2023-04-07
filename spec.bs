@@ -448,24 +448,25 @@ partial dictionary RequestInit {
 Modifications to request {#fetch-request}
 ---------------------------------------------------------------
 
-A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.
+A [=/request=] has an associated <dfn for=request>private token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.
 
-A [=/request=] has an associated <dfn for=request>operation</dfn>, which is of type {{OperationType}}.
+A [=/request=] has an associated <dfn for=request>private token operation</dfn>, which is of type {{OperationType}}.
 
-A [=/request=] has an associated <dfn for=request>issuers</dfn>, which is a list of strings.
+A [=/request=] has an associated <dfn for=request>private token issuers</dfn>, which is a list of strings.
 
-Note: [=request/Token refresh policy=] is ignored unless [=request/operation=] is <code>"token-redemption"</code>. [=request/issuers=] is ignored unless [=request/operation=] is <code>"send-redemption-record"</code>. [=request/issuers=] must be specified and non-empty when [=request/operation=] is <code>"send-redemption-record"</code>.
+Note: [=request/Private token refresh policy=] is ignored unless [=request/private token operation=] is <code>"token-redemption"</code>. [=request/Private token issuers=] is ignored unless [=request/private token operation=] is <code>"send-redemption-record"</code>. [=request/Private token issuers=] must be specified and non-empty when [=request/private token operation=] is <code>"send-redemption-record"</code>.
 
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
  1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
-     1. Set <var ignore>request</var>'s [=request/operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
+     1. Set <var ignore>request</var>'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then abort these steps.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
-         1. Set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+         1. Set <var ignore>request</var>'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
          1. Abort the remaining steps.
+     1. [=Assert=]: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"send-redemption-record"</code>.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
      1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
@@ -474,7 +475,7 @@ Add the following steps to the <code><a constructor lt="Request()">new Request (
          1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then throw {{TypeError}}.
          1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
          1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then throw {{TypeError}}.
-         1. [=list/Append=] |issuerURL| to <var ignore>request</var>'s [=request/issuers=].
+         1. [=list/Append=] |issuerURL| to <var ignore>request</var>'s [=request/private token issuers=].
 
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
@@ -482,8 +483,14 @@ Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
 
 This specification adds the following steps to the [=http-network-or-cache fetch=] algorithm, before modifying the header list:
 
-    1. [=Append private state token issue request headers=] on |httpRequest|.
-    1. [=Append private state token redemption request headers=] on |httpRequest|.
+    1. If |request|'s [=request/private token operation=] is null, abort remaining steps.
+    1. If |request|'s [=request/private token operation=] is <code>"token-request"</code>:
+        1. [=Append private state token issue request headers=] on |httpRequest|.
+        1. Abort the remaining steps.
+    1. If |request|'s [=request/private token operation=] is <code>"token-redemption"</code>:
+        1. [=Append private state token redemption request headers=] on |httpRequest|.
+        1. Abort the remaining steps.
+    1. [=Assert=]: |request|'s [=request/private token operation=] is <code>"send-redemption-record"</code>.
     1. [=Append private state token redemption record headers=] on |httpRequest|.
 
 Modifications to HTTP fetch steps {#http-fetch}
@@ -649,7 +656,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |request|'s [=request/client=] is not a [=secure context=], return.
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
- 1. If |request|'s [=request/token refresh policy=] is `"none"`:
+ 1. If |request|'s [=request/private token refresh policy=] is `"none"`:
      1. Let |record| be the result of performing [=retrieve a redemption record=] with |issuer| and |topLevel|.
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
  1. Let |penultimateRedemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|
@@ -715,14 +722,14 @@ To <dfn>append private state token redemption record headers</dfn> given a [=/re
 
   1. If |request|'s [=request/client=] is not a [=secure context=], then abort these steps.
   1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
-  1. [=list/For each=] |issuer| of [=request/issuers=]:
+  1. [=list/For each=] |issuer| of [=request/private token issuers=]:
     1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
     1. If |issuerURL| is failure, then abort these steps.
     1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then abort these steps.
     1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
     1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then abort these steps.
   1. Let |records_per_issuer| be a [=map=] where keys are USVString and values are [=redemption records=].
-  1. [=list/For each=] |issuer| of [=request/issuers=]:
+  1. [=list/For each=] |issuer| of [=request/private token issuers=]:
     1. Let |record| be the result of performing [=retrieve a redemption record=] with |issuer| and |topLevel|.
     1. If |record| is null, then [=iteration/continue=].
     1. [=map/Set=] |records_per_issuer|[|issuer|] to |record|.
