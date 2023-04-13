@@ -4,9 +4,9 @@
   <title>Private State Token API</title>
   <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version d9f9c3533, updated Fri Mar 10 11:31:29 2023 -0800" name="generator">
+  <meta content="Bikeshed version d9bd89757, updated Thu Mar 23 10:06:53 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="1386cfa4ead1946b58085ce24e010fca620fc7d9" name="document-revision">
+  <meta content="9594b66897b547d1fc20f7a88c7bc81971bd257c" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -587,7 +587,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-17">17 March 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-04-13">13 April 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -705,7 +705,6 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
      <ol class="toc">
       <li><a href="#w3c-conventions"><span class="secno"></span> <span class="content">Document conventions</span></a>
-      <li><a href="#w3c-conformant-algorithms"><span class="secno"></span> <span class="content">Conformant Algorithms</span></a>
      </ol>
     <li>
      <a href="#index"><span class="secno"></span> <span class="content">Index</span></a>
@@ -1099,7 +1098,7 @@ the issuing protocol steps for user agents and issuers.</p>
    <h3 class="heading settled" data-level="6.1" id="issue-request"><span class="secno">6.1. </span><span class="content">Creating An Issue Request</span><a class="self-link" href="#issue-request"></a></h3>
    <div class="example" id="example-issue-request">
     <a class="self-link" href="#example-issue-request"></a> An issue request is created and fetched as demonstrated in the following snippet. 
-<pre class="language-javascript highlight"><c- a>let</c-> issueRequest <c- o>=</c-> <c- ow>new</c-> Request<c- p>(</c-><c- u>"https://example.issuer:1234/issuer_path?public=0&amp;private=0"</c-><c- p>,</c-> <c- p>{</c->
+<pre class="language-javascript highlight"><c- a>let</c-> issueRequest <c- o>=</c-> <c- ow>new</c-> Request<c- p>(</c-><c- u>"https://example.issuer:1234/issuer_path"</c-><c- p>,</c-> <c- p>{</c->
   privateToken<c- o>:</c-> <c- p>{</c->
     type<c- o>:</c-> <c- u>"private-state-token"</c-><c- p>,</c->
     version<c- o>:</c-> <c- mf>1</c-><c- p>,</c->
@@ -1159,13 +1158,13 @@ Sec-Private-State-Token-Crypto-Version: &lt;cryptographic protocol version, VOPR
    </div>
    <h3 class="heading settled" data-level="6.2" id="issuer-signing-tokens"><span class="secno">6.2. </span><span class="content">Issuer Signing Tokens</span><a class="self-link" href="#issuer-signing-tokens"></a></h3>
    <p>This section explains the signing of tokens that happens in the issuer
-servers. Information to be encoded in the tokens are passed in the URL <code>public</code> and <code>private</code> parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
-passed in the URL <code>public</code> parameter. <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> can encode a value from set {0,1,2}
-in <code>public</code> and a value from set {0,1} in <code>private</code> parameter.</p>
-   <p>Using its private keys, issuer signs the masked tokens obtained in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①">Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
-specified in the request <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-crypto-version" id="ref-for-http-headerdef-sec-private-state-token-crypto-version①">Sec-Private-State-Token-Crypto-Version</a> header. Encoding the values
-passed in URL <code>private</code> and <code>public</code> parameters happens in this signing
-step. Issuer returns the signed tokens in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②">Sec-Private-State-Token</a> response header
+servers. VOPRF can only encode one of six values by the selection of which
+key to use, while <a data-link-type="biblio" href="#biblio-pmb" title="Anonymous Tokens with Private Metadata Bit">[PMB]</a> can encode one of three values by the selection of
+which key to use and an additional bit via the private metadata value.</p>
+   <p>Using its private keys, issuer signs the masked tokens obtained in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token①">Sec-Private-State-Token</a> request header value with a value
+dependent on other information passed as part of the issuance request. Issuer uses the cryptographic protocol
+specified in the request <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token-crypto-version" id="ref-for-http-headerdef-sec-private-state-token-crypto-version①">Sec-Private-State-Token-Crypto-Version</a> header. Issuer returns
+the signed tokens in the <a data-link-type="http-header" href="#http-headerdef-sec-private-state-token" id="ref-for-http-headerdef-sec-private-state-token②">Sec-Private-State-Token</a> response header
 value encoded as a base64 <a data-link-type="biblio" href="#biblio-rfc4648">[RFC4648]</a> byte string.</p>
    <div class="example" id="example-pst-response">
     <a class="self-link" href="#example-pst-response"></a> The following snippet displays a typical response demonstrating the Private State Token
@@ -1218,8 +1217,7 @@ header.
    <h2 class="heading settled" data-level="7" id="redeeming-tokens"><span class="secno">7. </span><span class="content">Redeeming Tokens</span><a class="self-link" href="#redeeming-tokens"></a></h2>
    <p>When the user agent navigates to a top-level origin, this top-level origin or a third party site
 embedded on the top level origin may redeem tokens stored in the user agent from a
-specific issuer to learn <code>public</code> and/or <code>private</code> data encoded in the
-tokens.</p>
+specific issuer to learn the data encoded in the tokens.</p>
    <div class="example" id="example-redemption-request">
     <a class="self-link" href="#example-redemption-request"></a> Redemption is carried through fetch as demonstrated in the following
 snippet. The default value for refreshPolicy is <code>'none'</code>. 
@@ -1568,20 +1566,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
     with <code>class="note"</code>,
     like this: </p>
    <p class="note" role="note">Note, this is an informative note.</p>
-   <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">Conformant Algorithms</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
-   <p>Requirements phrased in the imperative as part of algorithms
-    (such as "strip any leading space characters"
-    or "return false and abort these steps")
-    are to be interpreted with the meaning of the key word
-    ("must", "should", "may", etc)
-    used in introducing the algorithm. </p>
-   <p>Conformance requirements phrased as algorithms or specific steps
-    can be implemented in any manner,
-    so long as the end result is equivalent.
-    In particular, the algorithms defined in this specification
-    are intended to be easy to understand
-    and are not intended to be performant.
-    Implementers are encouraged to optimize. </p>
   </div>
 <script src="https://www.w3.org/scripts/TR/2021/fixup.js"></script>
   <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
