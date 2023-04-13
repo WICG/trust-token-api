@@ -61,11 +61,6 @@ To support the redemption of tokens by the client, server paths that support tok
 
 At redemption time, the token is decoded and provided via the redemption API. The issuer can then choose to encode this in the Redemption Record in whatever way it prefers.
 
-#### Request Signing
-
-In Version 3, the algorithm used for [request signing](https://github.com/WICG/trust-token-api#extension-trust-bound-keypair-and-request-signing) is [`ecdsa_secp256r1_sha256`](https://tools.ietf.org/html/rfc8446#section-4.2.3).
-
-
 ## PrivateStateTokenV2PMB Crypto Protocol
 
 This Private State Token crypto protocol is based on the PMBTokens design in https://eprint.iacr.org/2020/072 (appendix H) using P-384. This crypto protocol is used in both the V2 and V3 Private State Token protocol versions. The necessary keys and function mappings are described below.

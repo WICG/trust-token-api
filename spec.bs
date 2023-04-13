@@ -490,7 +490,7 @@ Creating An Issue Request {#issue-request}
 An issue request is created and fetched as demonstrated in the following snippet.
 
 ```javascript
-let issueRequest = new Request("https://example.issuer:1234/issuer_path?public=0&private=0", {
+let issueRequest = new Request("https://example.issuer:1234/issuer_path", {
   privateToken: {
     type: "private-state-token",
     version: 1,
@@ -539,16 +539,15 @@ Issuer Signing Tokens {#issuer-signing-tokens}
 ----------------------------------------------
 
 This section explains the signing of tokens that happens in the issuer
-servers. Information to be encoded in the tokens are passed in the URL `public`
-and `private` parameters. VOPRF can only encode a value from set {0,1,2,3,4,5}
-passed in the URL `public` parameter. [[!PMB]] can encode a value from set {0,1,2}
-in `public` and a value from set {0,1} in `private` parameter.
+servers. VOPRF can only encode one of six values by the selection of which
+key to use, while [[!PMB]] can encode one of three values by the selection of
+which key to use and an additional bit via the private metadata value.
 
 Using its private keys, issuer signs the masked tokens obtained in the
-<a http-header>Sec-Private-State-Token</a> request header value. Issuer uses the cryptographic protocol
-specified in the request <a http-header>Sec-Private-State-Token-Crypto-Version</a> header. Encoding the values
-passed in URL `private` and `public` parameters happens in this signing
-step. Issuer returns the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
+<a http-header>Sec-Private-State-Token</a> request header value with a value
+dependent on other information passed as part of the issuance request. Issuer uses the cryptographic protocol
+specified in the request <a http-header>Sec-Private-State-Token-Crypto-Version</a> header. Issuer returns
+the signed tokens in the <a http-header>Sec-Private-State-Token</a> response header
 value encoded as a base64 [[!RFC4648]] byte string.
 
 <div class=example id="example-pst-response">
@@ -592,8 +591,7 @@ Redeeming Tokens {#redeeming-tokens}
 
 When the user agent navigates to a top-level origin, this top-level origin or a third party site
 embedded on the top level origin may redeem tokens stored in the user agent from a
-specific issuer to learn `public` and/or `private` data encoded in the
-tokens.
+specific issuer to learn the data encoded in the tokens.
 
 <div class=example id="example-redemption-request">
 Redemption is carried through fetch as demonstrated in the following
