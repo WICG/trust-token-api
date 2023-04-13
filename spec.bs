@@ -165,9 +165,9 @@ Requests to key commitment endpoints should result in a JSON response
     "batchsize": <batch size>,
     "keys": {
       <keyID>: { "Y": <base64-encoded public key>,
-                 "expiry": <key expirion data>},
+                 "expiry": <key expiration data>},
       <keyID>: { "Y": <base64-encoded public key>,
-                 "expiry": <key expirion data}, ...
+                 "expiry": <key expiration data}, ...
     }
   },
   ...
