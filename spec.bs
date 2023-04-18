@@ -201,8 +201,7 @@ Requests to key commitment endpoints should result in a JSON response
 * `<cryptographic protocol version>` is a string identifier for the Private State Token
     protocol version used. The same string is used as a value of the inner
     `"protocol_version"` field. Protocol version string identifier is
-    `"PrivateStateTokenV3VOPRF"`. Both protocols have similar
-    properties in terms of privacy implications.
+    `"PrivateStateTokenV3VOPRF"`.
 
     * Protocol version `“PrivateStateTokenV3VOPRF”` implements [[!VOPRF]] cryptographic
                protocol. Issuers can use up to six valid token signing keys.
