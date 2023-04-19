@@ -342,7 +342,7 @@ To <dfn>look up the latest keys</dfn> for a given [=/origin=] |issuer|, run the 
 1. If |commitment| is null, return null.
 1. Let |chosenKey| be null.
 1. Let |currentTime| be the current date and time.
-1. For each |key| in |commitment|["keys"], run the following steps:
+1. [=list/For each=] |key| of |commitment|["keys"], run the following steps:
     1. If |key|["expiry"] is less than |currentTime|, continue.
     1. If |chosenKey| is null, set |chosenKey| to |key|.
     1. If |key|["expiry"] is less than |chosenKey|["expiry"], set |chosenKey| to |key|.
@@ -437,8 +437,6 @@ dictionary PrivateToken {
 };
 </pre>
 
-Issue(151): Need to specify how `operation` and `issuers` are used.
-
 This specification adds a new property to the {{RequestInit}} dictionary:
 
 <pre class=idl>
@@ -450,21 +448,50 @@ partial dictionary RequestInit {
 Modifications to request {#fetch-request}
 ---------------------------------------------------------------
 
-A [=/request=] has an associated <dfn for=request>token refresh policy</dfn>, which is <code>"none"</code> or <code>"refresh"</code>. Unless stated otherwise it is <code>"none"</code>.
+A [=/request=] has an associated <dfn for=request>private token refresh policy</dfn>, which is of type {{RefreshPolicy}} with default value of <code>"none"</code>.
+
+A [=/request=] has an associated <dfn for=request>private token operation</dfn>, which is of type {{OperationType}}.
+
+A [=/request=] has an associated <dfn for=request>private token issuers</dfn>, which is a list of strings.
+
+Note: [=request/Private token refresh policy=] is ignored unless [=request/private token operation=] is <code>"token-redemption"</code>. [=request/Private token issuers=] is ignored unless [=request/private token operation=] is <code>"send-redemption-record"</code>. [=request/Private token issuers=] must be specified and non-empty when [=request/private token operation=] is <code>"send-redemption-record"</code>.
 
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
-Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|])</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
+Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
- 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=], then set <var ignore>request</var>'s [=request/token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+ 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
+     1. Set <var ignore>request</var>'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then abort these steps.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
+         1. Set <var ignore>request</var>'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+         1. Abort the remaining steps.
+     1. [=Assert=]: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"send-redemption-record"</code>.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
+     1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
+         1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
+         1. If |issuerURL| is failure, then throw {{TypeError}}.
+         1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then throw {{TypeError}}.
+         1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
+         1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then throw {{TypeError}}.
+         1. [=list/Append=] |issuerURL| to <var ignore>request</var>'s [=request/private token issuers=].
+
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
 ---------------------------------------------------------------
 
 This specification adds the following steps to the [=http-network-or-cache fetch=] algorithm, before modifying the header list:
 
-    1. [=Append private state token issue request headers=] on |httpRequest|.
-    1. [=Append private state token redemption request headers=] on |httpRequest|.
+    1. If |request|'s [=request/private token operation=] is null, abort remaining steps.
+    1. If |request|'s [=request/private token operation=] is <code>"token-request"</code>:
+        1. [=Append private state token issue request headers=] on |httpRequest|.
+        1. Abort the remaining steps.
+    1. If |request|'s [=request/private token operation=] is <code>"token-redemption"</code>:
+        1. [=Append private state token redemption request headers=] on |httpRequest|.
+        1. Abort the remaining steps.
+    1. [=Assert=]: |request|'s [=request/private token operation=] is <code>"send-redemption-record"</code>.
+    1. [=Append private state token redemption record headers=] on |httpRequest|.
 
 Modifications to HTTP fetch steps {#http-fetch}
 ---------------------------------------------------------------
@@ -495,7 +522,6 @@ let issueRequest = new Request("https://example.issuer:1234/issuer_path", {
     type: "private-state-token",
     version: 1,
     operation: "token-request",
-    issuer: "https://example.issuer"
   }
 });
 fetch(issueRequest);
@@ -603,7 +629,6 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
     type: 'private-state-token',
     version: 1,
     operation: 'token-redemption',
-    issuer: 'https://example.issuer',
     refreshPolicy: {'none', 'refresh'}
   }
 });
@@ -629,7 +654,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
  1. If |request|'s [=request/client=] is not a [=secure context=], return.
  1. If associating |issuer| with |topLevel| [=determine whether associating an issuer would exceed the top-level limit|would exceed the top level’s number-of-issuers limit=], return.
  1. [=Associate the issuer=] |issuer| with |topLevel|.
- 1. If |request|'s [=request/token refresh policy=] is `"none"`:
+ 1. If |request|'s [=request/private token refresh policy=] is `"none"`:
      1. Let |record| be the result of performing [=retrieve a redemption record=] with |issuer| and |topLevel|.
      1. If |record| is not null, [=set redemption headers=] with |request| and |record| and return.
  1. Let |penultimateRedemption| be the result of [=look up penultimate redemption =] with |issuer| and |topLevel|
@@ -678,10 +703,38 @@ to include them in subsequent requests to the origins that can verify its
 validity. An issuer might choose to include an optional <a http-header>Sec-Private-State-Token-Lifetime</a>
 header in the redemption response. The value of this header indicates the
 expiration time for the [=redemption record=] provided. This expiration is
-specified as number of seconds in the <a http-header>Sec-Private-State-Token-Lifetime</a> HTTP response
+specified as number of seconds in the <a http-header>`Sec-Private-State-Token-Lifetime`</a> HTTP response
 header value.
 
 A <dfn>Redemption Record</dfn> is a [=byte sequence=].
+
+The Private State Tokens API provides a `'send-redemption-record'` operation to [=append private state token redemption record headers=]. This operation attaches a previously [=record a redemption record|recorded redemption record=] from [=handle a redeem response=].
+
+To <dfn>append private state token redemption record headers</dfn> given a [=/request=] |request|, run the following steps:
+
+  1. If |request|'s [=request/client=] is not a [=secure context=], then abort these steps.
+  1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
+  1. [=list/For each=] |issuer| of [=request/private token issuers=]:
+    1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
+    1. If |issuerURL| is failure, then abort these steps.
+    1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then abort these steps.
+    1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
+    1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then abort these steps.
+  1. Let |records_per_issuer| be a [=map=] where keys are USVString and values are [=redemption records=].
+  1. [=list/For each=] |issuer| of [=request/private token issuers=]:
+    1. Let |record| be the result of performing [=retrieve a redemption record=] with |issuer| and |topLevel|.
+    1. If |record| is null, then [=iteration/continue=].
+    1. [=map/Set=] |records_per_issuer|[|issuer|] to |record|.
+  1. If |records_per_issuer| is empty, then abort these steps.
+  1. Let |headerItems| be a structured headers list [[RFC8941]].
+  1. [=map/For each=] |issuer| -> |record| of |records_per_issuer|:
+    1. Let |serializedIssuer| be result of serializing |issuer|.
+    1. Let |serializedRecord| be result of serializing |record|.
+    1. [=list/Append=] |serializedIssuer| and |serializedRecord| pairs to |headerItems|.
+  1. Let |serializedHeaderItems| be result of serializing |headerItems|.
+  1. If |serializedHeaderItems| is null, then abort these steps.
+  1. Set <a http-header>`Sec-Redemption-Record`</a> to |serializedHeaderItems|.
+
 
 <h3 id="the-document-object">Changes to {{Document}}</h3>
 
@@ -809,6 +862,20 @@ The header’s ABNF is:
 Sec-Private-State-Token-Crypto-Version = sf-string
 ```
 
+The 'Sec-Redemption-Record' Header Field {#sec-redemption-record}
+----------------------------
+
+The <dfn http-header>`Sec-Redemption-Record`</dfn> *request* header field sends
+a cached [=redemption record=] of a previous redemption operation.
+
+It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
+[[!RFC8941]].
+
+The header’s ABNF is:
+
+``` abnf
+Sec-Redemption-Record = sf-string
+```
 
 Privacy Considerations {#privacy}
 =================================
@@ -878,7 +945,7 @@ usually 48 hours.
 
 The rate of identity leakage from one origin to another increases with the
 number of issuers allowed in an origin. To avoid abuse, the user agent allows
-association of at most two issers per top level origin. Issuers are associated
+association of at most two issuers per top level origin. Issuers are associated
 with top level origins for token query API as well, see [[#token-query]].
 
 Security Considerations {#security}
@@ -949,6 +1016,21 @@ Status: standard
 Author/Change controller: IETF
 
 Specification document: this specification ([[#sec-private-state-token-crypto-version]])
+
+
+'Sec-Redemption-Record' Header Field {#iana-sec-redemption-record}
+------------------------
+
+Header field name: Sec-Redemption-Record
+
+Applicable protocol: http
+
+Status: standard
+
+Author/Change controller: IETF
+
+Specification document: this specification ([[#sec-redemption-record]])
+
 
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
