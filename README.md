@@ -43,7 +43,7 @@ The web ecosystem relies heavily on building trust signals to detect fraudulent 
 
 Preventing fraud is a legitimate use case that the web should support, but it shouldn’t require an API as powerful as a stable, global, per-user identifier. In third party contexts, merely segmenting users into trusted and untrusted sets seems like a useful primitive that also preserves privacy. This kind of fraud protection is important both for CDNs, as well as for the ad industry which receives a large amount of invalid, fraudulent traffic.
 
-Segmenting users into very coarse sets satisfies other use-cases as well. For instance, sites could use this as a set inclusion primitive in order to ask questions like, “do I have identity at all for this user?” or even do non-personalized cross-site authentication ("Is this user a subscriber?").
+Segmenting users into very coarse sets satisfies other use cases that establish web trust as well. For instance, sites could use this as a set inclusion primitive in order to ask questions like, “do I have identity at all for this user?” or even do non-personalized cross-site authentication ("Is this user a subscriber?").  While we encourage exploration into solving a broad set of use cases, Private State Tokens should only be utilized for anti-fraud, anti-abuse, web security, or other web trust and safety purposes.  PSTs are not intented to convey artibrary cross-site information, such as user demographic information for ad targeting or measurement.  
 
 
 ## Overview
