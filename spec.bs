@@ -70,7 +70,7 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
 <pre class="anchors">
 urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
     type: dfn
-        text: structured header; url: #
+        text: structured header; url: #name-introduction
     for: structured header
         type: dfn
             text: integer; url: #section-3.3.1
