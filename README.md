@@ -16,7 +16,6 @@ This API was formerly called the Trust Token API and the repository and API surf
   - [Private State Token Issuance](#private-state-token-issuance)
   - [Private State Token Redemption](#private-state-token-redemption)
   - [Forwarding Redemption Attestation](#forwarding-redemption-attestation)
-  - [Extension: Private Metadata](#extension-private-metadata)
 - [Privacy Considerations](#privacy-considerations)
   - [Cryptographic Property: Unlinkability](#cryptographic-property-unlinkability)
     - [Key Consistency](#key-consistency)
@@ -167,12 +166,6 @@ Once the metadata has been passed along to the redemption request, the issuer ca
 Some information about the token can be publicly visible by the client. Issuers could use this limited information to run A/B experiments or other comparisons against different trust metrics, so they can iterate on and improve their token issuing logic.
 
 This can be managed by assigning different keys in the key commitment to have different labels, indicating a different value of the public metadata. The client and issuer would be able to determine what the value of the public metadata is based on which key is used to sign at issuance time.
-
-### Extension: Private Metadata
-
-Other information about the token may need to be shared with themselves (on redemption) and other partners (via the RR) without revealing the metadata to the client. This could be used as a negative indicator of trust or other limited information that the client shouldn't know about. Private metadata makes it possible to mask a decision about whether traffic is fraudulent, and increase the time it takes to reverse-engineer detection algorithms. This is because distrusted clients would still be issued tokens, but with the private distrusted bit set.
-
-This can be managed using the [PMBTokens construction](https://eprint.iacr.org/2020/072.pdf) that combines two different entwined secret keys being used to indicate the value of the metadata. At redemption time, the issuer can then check which of the two keys was used to retrieve the value of the private metadata.
 
 
 ### Extension: iframe Activation

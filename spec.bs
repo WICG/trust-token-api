@@ -50,12 +50,6 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     "PRIVACY-PASS-WG": {
         "href": "https://datatracker.ietf.org/wg/privacypass/about/"
     },
-    "PMB": {
-        "authors": ["Ben Kreuter", "Tancrede Lepoint", "Michele Orru", "Mariana Raykova"],
-        "href": "https://eprint.iacr.org/2020/072",
-        "publisher": "Cryptology ePrint Archive",
-        "title": "Anonymous Tokens with Private Metadata Bit"
-    },
     "VOPRF": {
         "authors": ["A. Davidson", "A. Faz-Hernandez",  "N. Sullivan", "C. A. Wood"],
         "href": "https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-13.html",
@@ -158,9 +152,6 @@ Private State Token operations rely on [[!FETCH]]. A fetch request corresponding
 specific Private State Token operation can be created and used as a parameter to the
 fetch function.
 
-Note: This specification uses the terms "masked" and "unmasked" where [[!PMB]]
-uses "blinded" and "unblinded", respectively.
-
 <!--
 * how this is not as powerful like cookies, privacy guarantees?
 * Between first and second para there is some gap. We should fill in.
@@ -209,19 +200,11 @@ Requests to key commitment endpoints should result in a JSON response
 
 * `<cryptographic protocol version>` is a string identifier for the Private State Token
     protocol version used. The same string is used as a value of the inner
-    `"protocol_version"` field. Protocol version string identifier is either
-    `"PrivateStateTokenV3PMB"` or `"PrivateStateTokenV3VOPRF"`. Both protocols have similar
-    properties in terms of privacy implications.
-
-    * Protocol version `“PrivateStateTokenV3PMB”` implements [[!PMB]] cryptographic
-               protocol. In this protocol, each token contains a private
-               metadata bit.
+    `"protocol_version"` field. Protocol version string identifier is
+    `"PrivateStateTokenV3VOPRF"`.
 
     * Protocol version `“PrivateStateTokenV3VOPRF”` implements [[!VOPRF]] cryptographic
-               protocol. Contrary to [[!PMB]], tokens do not contain private
-               metadata bits. However, issuers can use twice as many
-               concurrently valid token signing keys (six compared to three of
-               [[!PMB]]).
+               protocol. Issuers can use up to six valid token signing keys.
 
 * `"id"` field provides the identifier of the key commitment. It is a string
          representation of a non-negative integer that is within the range of
@@ -304,7 +287,7 @@ To <dfn>look up penultimate redemption</dfn> given an [=/origin=] |issuer| and a
 
 A user agent has <dfn>redemptionRecords</dfn>, a [=map=] where the keys are a [=tuple=] (|issuer|, |topLevel|), and the values are a [=tuple=] (|record|, |expiration|, |signingKeys|).
 
-To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/origin=] |topLevel|, a [=byte sequence=] |header|, and a [=duration=] |lifetime|, run the following steps: 
+To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/origin=] |topLevel|, a [=byte sequence=] |header|, and a [=duration=] |lifetime|, run the following steps:
 
 1. If |lifetime| is zero, return.
 1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
@@ -312,7 +295,7 @@ To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/or
 1. Let |signingKeys| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
 1. Set [=redemptionRecords=][(|issuer|, |topLevel|))] to the tuple (|header|, |expiration|, |signingKeys|).
 
-To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps: 
+To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
 1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
 1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists|does not exist=], return null.
@@ -557,7 +540,7 @@ Private State Token HTTP request headers created for a typical fetch is as follo
 
 ```
 Sec-Private-State-Token: <masked tokens encoded as base64 string>
-Sec-Private-State-Token-Crypto-Version: <cryptographic protocol version, VOPRF or PMB>
+Sec-Private-State-Token-Crypto-Version: <cryptographic protocol version, VOPRF>
 ```
 </div>
 
@@ -566,8 +549,7 @@ Issuer Signing Tokens {#issuer-signing-tokens}
 
 This section explains the signing of tokens that happens in the issuer
 servers. VOPRF can only encode one of six values by the selection of which
-key to use, while [[!PMB]] can encode one of three values by the selection of
-which key to use and an additional bit via the private metadata value.
+key to use.
 
 Using its private keys, issuer signs the masked tokens obtained in the
 <a http-header>Sec-Private-State-Token</a> request header value with a value
@@ -685,7 +667,7 @@ To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=respon
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token-Lifetime</a> from |response|'s [=response/header list=].
 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
 1. Let |topLevel| be |request|'s [=request/client=]'s [=environment/top-level origin=].
-1. Perform [=record redemption timestamp=] with |issuer| and |topLevel|. 
+1. Perform [=record redemption timestamp=] with |issuer| and |topLevel|.
 1. Perform [=record a redemption record=] with |issuer|, |topLevel|, |header|, and |lifetime|.
 
 Note: The [=redemption record=] is HTTP-only and JavaScript is only able to
@@ -833,7 +815,7 @@ The 'Sec-Private-State-Token-Lifetime' Header Field {#sec-private-state-token-li
 ----------------------------
 
 The <dfn http-header>`Sec-Private-State-Token-Lifetime`</dfn> response header
-field gives the expiration for the [=redemption record=] 
+field gives the expiration for the [=redemption record=]
 given in the associated <a http-header>`Sec-Private-State-Token`</a>
 response header. The expiration is given in seconds.
 
@@ -883,7 +865,7 @@ Privacy Considerations {#privacy}
 Unlinkability {#unlinkability}
 ------------------------------
 
-Cryptographic protocols [[!VOPRF]] and [[!PMB]] provide masked signatures. At
+Cryptographic protocols [[!VOPRF]] provide masked signatures. At
 redemption time, issuers can recognize their signature on the provided token,
 however they can not determine at what time or in which context they signed the token.
 This prevents issuers from correlating their issuances on an origin with
@@ -894,23 +876,18 @@ about the origins users visit.
 Limiting Encoded Information {#limit-encoded-info}
 --------------------------------------------------
 
-User agents should enforce limits on the number of unique keys an issuer can have 
-at any point in time, to preserve client privacy.  Without limits, an issuer could 
+User agents should enforce limits on the number of unique keys an issuer can have
+at any point in time, to preserve client privacy.  Without limits, an issuer could
 de-anonymize clients by simply using a unique key for each client. For [[!VOPRF]], the
-number of keys is limited to six, and for [[!PMB]], the number is limited to
-three keys.
+number of keys is limited to six.
 
 Issuers can utilize different keys to represent different "labels", which correspond
-to an arbritrary client state, such as client trust level or some other useful 
-anti-fraud signal. Issuers are responsible for understanding this designation and 
-sharing the key "labels" with token redeemers so they know how to interpret the 
-significance of each token. This helps reduce reverse engineering from malicious 
-actors and preserves client privacy over human-readable labels. When using [[!VOPRF]], 
-the issuer's 6 keys can effectively represent six labels. Similarly, when using [[!PMB]], 
-even though there are only up to three keys, the issuer can still utilize six labels 
-by having each key correspond to the the private bit value (3 keys x 2 values = 6 labels). 
-Both [[!VOPRF]] and [[!PMB]] encode the same amount of information in a token, however the
-difference is [[!PMB]] utilizing a private bit.
+to an arbritrary client state, such as client trust level or some other useful
+anti-fraud signal. Issuers are responsible for understanding this designation and
+sharing the key "labels" with token redeemers so they know how to interpret the
+significance of each token. This helps reduce reverse engineering from malicious
+actors and preserves client privacy over human-readable labels. When using [[!VOPRF]],
+the issuer's 6 keys can effectively represent six labels.
 
 <h4 id="side-channel-fingerprinting">Potential Attack: Side Channel Fingerprinting</h4>
 
