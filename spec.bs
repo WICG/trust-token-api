@@ -439,13 +439,21 @@ A [=/request=] has an associated <dfn for=request>private token issuers</dfn>, w
 
 Note: [=request/Private token refresh policy=] is ignored unless [=request/private token operation=] is <code>"token-redemption"</code>. [=request/Private token issuers=] is ignored unless [=request/private token operation=] is <code>"send-redemption-record"</code>. [=request/Private token issuers=] must be specified and non-empty when [=request/private token operation=] is <code>"send-redemption-record"</code>.
 
+This specification defines two new [=policy-controlled features=]. Exactly one of these policy features applies for a given Private State Token operation.
+
+Policy identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-issuance</code></dfn>" applies for the <code>"token-request"</code> operation. The [=default allowlist=] for this feature is <code>["self"]</code>.
+
+Policy identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-redemption</code></dfn>" applies for the <code>"send-redemption-record"</code> and <code>"token-redemption"</code> operations. The [=default allowlist=] for this feature is <code>["self"]</code>.
+
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
  1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
      1. Set <var ignore>request</var>'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then abort these steps.
+     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>:
+         1. If [=should request be allowed to use feature=] for [=policy-controlled feature/private-state-token-issuance=] returns false, then abort these steps.
+     1. If [=should request be allowed to use feature=] for [=policy-controlled feature/private-state-token-redemption=] returns false, then abort these steps.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
          1. Set <var ignore>request</var>'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
          1. Abort the remaining steps.
