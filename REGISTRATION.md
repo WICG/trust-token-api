@@ -26,13 +26,21 @@ By registering as an issuer, you acknowledge the following:
 1. I understand the technical restrictions on key rotation frequency of 60 days in the PST API.2. I understand that attempts to bypass these restrictions may result in my issuer registration being revoked.3. I understand that my issuer registration will be valid for a period of six months after the key commitment is accepted, and that I will need to re-register in this repository following that six-month period.
 ---
 Request Template:
+
 **Summary:** Private State Token Issuer Request - {Issuer Name}
+
 **Description:**
+
 {Issuer Name}
+
 [Origin](https://developer.mozilla.org/en-US/docs/Glossary/Origin): {Origin}
+
 Contact: {Contact Email}
+
 Key Commitment Endpoint URL: {Issuer Key Commitment Endpoint}
+
 Purpose: {Issuer purpose}
+
 Disclosure & Acknowledgement: {Disclosure Version this request acknowledges}
 
 
