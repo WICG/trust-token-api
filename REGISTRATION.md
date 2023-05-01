@@ -24,7 +24,7 @@ By registering as an issuer, you acknowledge the following:
 
 
 1. I understand the technical restrictions on key rotation frequency of 60 days in the PST API.
-2. I understand that attempts to bypass these restrictions may result in my issuer registration being revoked.
+2. I understand that renewing my registration for this API may require some public attestations about the use of data from the API, to reduce the risk of abuse by token issuers.
 3. I understand that my issuer registration will be valid for a period of six months after the key commitment is accepted, and that I will need to re-register in this repository following that six-month period.
 
 ---
@@ -48,5 +48,5 @@ Disclosure & Acknowledgement: {Disclosure Version this request acknowledges}
 
 
 1. I understand the technical restrictions on key rotation frequency of 60 days in the PST API.
-2. I understand that attempts to bypass these restrictions may result in my issuer registration being revoked.
+2. I understand that renewing my registration for this API may require some public attestations about the use of data from the API, to reduce the risk of abuse by token issuers.
 3. I understand that my issuer registration will be valid for a period of six months after the key commitment is accepted, and that I will need to re-register in this repository following that six-month period.
