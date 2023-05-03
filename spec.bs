@@ -454,9 +454,7 @@ Add the following steps to the <code><a constructor lt="Request()">new Request (
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>:
          1. If [$Should request be allowed to use feature?|should request be allowed$] for "<code>[=policy-controlled feature/private-state-token-issuance=]</code>" returns false, then throw a "{{NotAllowedError}}" {{DOMException}}.
          1. Abort the remaining steps.
-     1. If [$Should request be allowed to use feature?|should request be allowed$] for "<code>[=policy-controlled feature/private-state-token-redemption=]</code>" returns false:
-         1. Throw a "{{NotAllowedError}}" {{DOMException}}.
-         1. Abort the remaining steps.
+     1. If [$Should request be allowed to use feature?|should request be allowed$] for "<code>[=policy-controlled feature/private-state-token-redemption=]</code>" returns false, then throw a "{{NotAllowedError}}" {{DOMException}}.
      1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
          1. Set <var ignore>request</var>'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
          1. Abort the remaining steps.
