@@ -374,6 +374,30 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
+To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
+1. Let |window| be |request|’s [=request/window=].
+1. Let |document| be |window|’s [=associated Document=].
+1. Let |origin| be |request|’s origin.
+1. Set |request|'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
+1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
+    1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
+    1. Abort the remaining steps.
+1. Assert: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
+1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
+1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
+    1. Set |request|'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+    1. Abort the remaining steps.
+1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
+1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
+1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
+    1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
+    1. If |issuerURL| is failure, then throw {{TypeError}}.
+    1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then throw {{TypeError}}.
+    1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
+    1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then throw {{TypeError}}.
+    1. [=list/Append=] |issuerURL| to <var ignore>request</var>'s [=request/private token issuers=].
+
+
 Integration with Fetch {#fetch-integration}
 ====================================
 
@@ -431,26 +455,18 @@ A [=/request=] has an associated <dfn for=request>private token issuers</dfn>, w
 
 Note: [=request/Private token refresh policy=] is ignored unless [=request/private token operation=] is <code>"token-redemption"</code>. [=request/Private token issuers=] is ignored unless [=request/private token operation=] is <code>"send-redemption-record"</code>. [=request/Private token issuers=] must be specified and non-empty when [=request/private token operation=] is <code>"send-redemption-record"</code>.
 
+This specification defines two new [=policy-controlled features=]. Exactly one of these policy features applies for a given Private State Token operation.
+
+The [=policy-controlled feature=] identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-issuance</code></dfn>" applies for the <code>"token-request"</code> operation. The [=default allowlist=] for this feature is <code>["self"]</code>.
+
+The [=policy-controlled feature=] identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-redemption</code></dfn>" applies for the <code>"send-redemption-record"</code> and <code>"token-redemption"</code> operations. The [=default allowlist=] for this feature is <code>["self"]</code>.
+
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
- 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
-     1. Set <var ignore>request</var>'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-request"</code>, then abort these steps.
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
-         1. Set <var ignore>request</var>'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
-         1. Abort the remaining steps.
-     1. [=Assert=]: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"send-redemption-record"</code>.
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
-     1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
-     1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
-         1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
-         1. If |issuerURL| is failure, then throw {{TypeError}}.
-         1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then throw {{TypeError}}.
-         1. Let |issuerOrigin| be |issuerURL|'s [=/origin=].
-         1. If |issuerOrigin| is not a [=potentially trustworthy origin=], then throw {{TypeError}}.
-         1. [=list/Append=] |issuerURL| to <var ignore>request</var>'s [=request/private token issuers=].
+1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
+    1. Run [=set private token property for request=] on |input|, |init| and |request|.
 
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
