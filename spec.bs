@@ -375,19 +375,18 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Return |result|.
 
 To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
-1. Set |window| to |request|’s [=request/window=].
-1. Set |document| to |window|’s [=associated Document=].
+1. Let |window| be |request|’s [=request/window=].
+1. Let |document| be |window|’s [=associated Document=].
 1. Let |origin| be |request|’s origin.
 1. Set |request|'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
 1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
     1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
     1. Abort the remaining steps.
-1. Assert: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}
+1. Assert: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
 1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
 1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
     1. Set |request|'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
     1. Abort the remaining steps.
-1. [=Assert=]: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"send-redemption-record"</code>.
 1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
 1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
 1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
