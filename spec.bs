@@ -31,19 +31,19 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
 {
     "PRIVACY-PASS-ARCHITECTURE": {
         "authors": ["A. Davidson", "J. Iyengar", "C. A. Wood"],
-        "href": "https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html",
+        "href": "https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-10.html",
         "publisher": "IETF",
         "title": "Privacy Pass Architectural Framework"
     },
     "PRIVACY-PASS-AUTH-SCHEME": {
         "authors": ["T. Pauly", "S. Valdez", "C. A. Wood"],
-        "href" : "https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html",
+        "href" : "https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-10.html",
         "publisher": "IETF",
         "title": "The Privacy Pass HTTP Authentication Scheme"
     },
     "PRIVACY-PASS-ISSUANCE-PROTOCOL": {
         "authors": ["S. Celi", "A. Davidson", "A. Faz-Hernandez", "S. Valdez", "C. A. Wood"],
-        "href": "https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html",
+        "href": "https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-10.html",
         "publisher": "IETF",
         "title": "Privacy Pass Issuance Protocol"
     },
@@ -179,7 +179,9 @@ the issuance and redemption operations.
 
 
 Requests to key commitment endpoints should result in a JSON response
-[[!RFC8259]] of the following format.
+[[!RFC8259]] of the following format with a media type of
+`"application/token-issuer-directory`" (using the media type defined in
+[[!PRIVACY-PASS-ISSUANCE-PROTOCOL]]):
 
 ```javascript
 {
