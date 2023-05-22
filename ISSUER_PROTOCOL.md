@@ -12,7 +12,7 @@ This section describes the public issuer interfaces that an issuer will need to 
 
 ### Issuer Key Commitments
 
-A Private State Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Private State Token protocol. Requests to this endpoint should result in a JSON response of the following format:
+A Private State Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Private State Token protocol. Requests to this endpoint should result in a JSON response with a media type of "application/token-issuer-directory" and content in the following format:
 
 
 ```
