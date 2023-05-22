@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 3383f409d, updated Fri Apr 28 15:49:22 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="c0784083f6264443c98f4920df73d8e7ca1de5e1" name="document-revision">
+  <meta content="e3dd9d398848588eec5cec43d49bfa82394e4908" name="document-revision">
 <style>/* style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -593,7 +593,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-05-08">8 May 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-05-22">22 May 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -785,7 +785,7 @@ through secure HTTP <a data-link-type="biblio" href="#biblio-rfc8446" title="The
 commitments periodically. A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="key-commitment">key commitment</dfn> is a <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#ordered-map" id="ref-for-ordered-map">map</a> representing
 a collection of cryptographic keys and associated metadata necessary for executing
 the issuance and redemption operations.</p>
-   <p>Requests to key commitment endpoints should result in a JSON response <a data-link-type="biblio" href="#biblio-rfc8259" title="The JavaScript Object Notation (JSON) Data Interchange Format">[RFC8259]</a> of the following format.</p>
+   <p>Requests to key commitment endpoints should result in a JSON response <a data-link-type="biblio" href="#biblio-rfc8259" title="The JavaScript Object Notation (JSON) Data Interchange Format">[RFC8259]</a> of the following format with a media type of <code>"application/token-issuer-directory"</code> (using the media type defined in <a data-link-type="biblio" href="#biblio-privacy-pass-issuance-protocol" title="Privacy Pass Issuance Protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]</a>):</p>
 <pre class="language-javascript highlight"><c- p>{</c->
   <c- o>&lt;</c->cryptographic protocol_version<c- o>>:</c-> <c- p>{</c->
     <c- u>"protocol_version"</c-><c- o>:</c-> <c- o>&lt;</c->cryptographic protocol version<c- o>></c-><c- p>,</c->
@@ -1887,11 +1887,11 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <dt id="biblio-permissions-policy-1">[PERMISSIONS-POLICY-1]
    <dd>Ian Clelland. <a href="https://w3c.github.io/webappsec-permissions-policy/"><cite>Permissions Policy</cite></a>. URL: <a href="https://w3c.github.io/webappsec-permissions-policy/">https://w3c.github.io/webappsec-permissions-policy/</a>
    <dt id="biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]
-   <dd>A. Davidson; J. Iyengar; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html"><cite>Privacy Pass Architectural Framework</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-06.html</a>
+   <dd>A. Davidson; J. Iyengar; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-10.html"><cite>Privacy Pass Architectural Framework</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-10.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-architecture-10.html</a>
    <dt id="biblio-privacy-pass-auth-scheme">[PRIVACY-PASS-AUTH-SCHEME]
-   <dd>T. Pauly; S. Valdez; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html"><cite>The Privacy Pass HTTP Authentication Scheme</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-05.html</a>
+   <dd>T. Pauly; S. Valdez; C. A. Wood. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-10.html"><cite>The Privacy Pass HTTP Authentication Scheme</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-10.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-10.html</a>
    <dt id="biblio-privacy-pass-issuance-protocol">[PRIVACY-PASS-ISSUANCE-PROTOCOL]
-   <dd>S. Celi; et al. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html"><cite>Privacy Pass Issuance Protocol</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-06.html</a>
+   <dd>S. Celi; et al. <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-10.html"><cite>Privacy Pass Issuance Protocol</cite></a>. URL: <a href="https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-10.html">https://www.ietf.org/archive/id/draft-ietf-privacypass-protocol-10.html</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-rfc4648">[RFC4648]
