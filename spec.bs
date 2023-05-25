@@ -180,8 +180,7 @@ the issuance and redemption operations.
 
 Requests to key commitment endpoints should result in a JSON response
 [[!RFC8259]] of the following format with a media type of
-`"application/token-issuer-directory"` (using the media type defined in
-[[!PRIVACY-PASS-ISSUANCE-PROTOCOL]]):
+`"application/pst-issuer-directory"`:
 
 ```javascript
 {
