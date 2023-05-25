@@ -62,6 +62,9 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
         "publisher": "Google",
         "title": "ISSUER_PROTOCOL"
     },
+    "RFC8446": {
+        "href": "https://www.rfc-editor.org/rfc/rfc8446"
+    },
     "RFC4648": {
         "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
@@ -252,6 +255,8 @@ VOPRF Methods {#voprf-methods}
 ====================================
 
 For Issue (corresponding to **BlindEvaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
+
+This document encodes protocol messages in TLS notation from [[!RFC8446]].
 
 ```
 // Scalars are elliptic curve scalars of length Ns (determined by the curve, 48 for P-384).
