@@ -192,7 +192,7 @@ Requests to key commitment endpoints should result in a JSON response
       <keyID>: { "Y": <base64-encoded public key>,
                  "expiry": <key expiration date>},
       <keyID>: { "Y": <base64-encoded public key>,
-                 "expiry": <key expiration date}, ...
+                 "expiry": <key expiration date>}, ...
     }
   },
   ...
@@ -247,6 +247,88 @@ To ensure this property, it is recommended that user agents fetch the key commit
 If using a centralized mechanism for fetching keys, user agents should have a registration process to allow for issuers to register to have their key commitments fetched and sent to clients at a regular client. The requirements and mechanisms for registering are [=implementation-defined=].
 
 When using a registration process, it is recommended that user agents apply an expiration date to registration requests, to allow for the removal of deprecated or no longer active issuers.
+
+VOPRF Methods {#voprf-methods}
+====================================
+
+For Issue (corresponding to **BlindEvaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
+
+```
+struct {
+  uint16 count;
+  ECPoint nonces[count]; // Encoded as X9.62 Uncompressed point.
+} IssueRequest;
+
+struct {
+  ECPoint blinded; // Encoded as X9.62 Uncompressed point.
+  ECPoint evaluated; // Encoded as X9.62 Uncompressed point.
+} SignedNonce;
+
+struct {
+  Scalar c;
+  Scalar u;
+  Scalar v;
+} DLEQProof;
+
+struct {
+  uint16 issued;
+  uint32 key_id = keyID;
+  SignedNonce signed[issued];
+  opaque proof<1..2^16-1>; // Length-prefixed form of DLEQProof.
+} IssueResponse;
+```
+
+For Redeem (corresponding to **Evaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
+
+```
+struct {
+  uint32 key_id;
+  opaque nonce<nonce_size>;
+  ECPoint W;
+} Token;
+
+struct {
+  opaque token<1..2^16-1>; // Bytestring containing a serialized Token struct.
+  opaque client_data<1..2^16-1>;
+} RedeemRequest;
+
+struct {
+  opaque rr<1..2^16-1>;
+} RedeemResponse;
+```
+
+Private State Tokens uses a variation of the **Finalize** function of the [[!VOPRF]] protocol as follows:
+
+```
+def PSTFinalize(input, blinds, evaluatedElements,
+               blindedElements, pkS, proof):
+  if VerifyProof(G.Generator(), pkS, blindedElements,
+                 evaluatedElements, proof) == false:
+    raise VerifyError
+
+  // PST: Use batched construction.
+  unblindedElements = []
+  for index in range(evaluatedElements.length):
+    N = G.ScalarInverse(blinds[index]) * evaluatedElements[index]
+    unblindedElements.append(G.SerializeElement(N))
+
+  // PST: Return unblindedElements rather than hash output.
+  return unblindedElements
+```
+
+Private State Tokens uses a variation of the **Evaluate** function of the [[!VOPRF]] protocol as follows:
+
+```
+def PSTEvaluate(skS, input):
+  inputElement = G.HashToGroup(input)
+  if inputElement == G.Identity():
+    raise InvalidInputError
+  evaluatedElement = skS * inputElement
+  issuedElement = G.SerializeElement(evaluatedElement)
+
+  // PST: Return issuedElement rather than hash output.
+  return issuedElement
+```
 
 Algorithms {#algorithms}
 ====================================
@@ -364,15 +446,28 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. Let |maskOperation| be the Mask operation corresponding to |issuerKeys|["protocol_version"].
-1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running |maskOperation| on |issuerKeys| and |numTokens|.
-1. If |result| is null, return an error.
-1. Return |result|.
+1. Let |request| be a [=byte sequence=] consisting of |numTokens| encoded as a uint16.
+1. Let |blinds| be an empty [=list=].
+1. Repeat the following steps, |numTokens| times:
+    1. Let |input| be an [=implementation-defined=] random value.
+    1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the **Blind** VOPRF function from [[!VOPRF]], where the second element is encoded as a X9.62 uncompressed point.
+    1. [=list/Append=] the first element of |result| to |blinds|.
+    1. Append the second element of |result| to |request|.
+1. Return [=tuple=] (|request|, |blinds|).
 
-To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |pretokens|, and a bytestring |response|, run the following steps:
+To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a bytestring |response|, run the following steps:
 
-1. Let |unmaskOperation| be the Unmask operation corresponding to |issuerKeys|["protocol_version"].
-1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
+1. Let |input| be empty [=byte sequence=].
+1. Let |evaluatedElements| be an empty [=list=].
+1. Let |blindedElements| be an empty [=list=].
+1. Let |issueResponse| be the deserialization of |response| as an **IssueResponse**.
+1. [=list/For each=] |nonce| of |issueResponse|["signed"]:
+    1. [=list/Append=] |nonce|["blinded"] to |blindedElements|.
+    1. [=list/Append=] |nonce|["evaluated"] to |evaluatedElements|.
+1. Let |pkS| be |issuerKeys|["keys"][|issueResponse|["key_id"]]["Y"].
+1. Let |proof| be |issueResponse|["proof"].
+1. Let |result| ([=list=] of byte strings) be the result of running **PSTFinalize** on |input|, |blinds|, |evaluatedElements|, |blindedElements|, |pkS|, and |proof|.
+1. If |result| is null, return "{{InvalidStateError}}" {{DOMException}.
 1. Return |result|.
 
 To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
