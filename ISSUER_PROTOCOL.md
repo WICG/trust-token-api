@@ -1,3 +1,5 @@
+This file is outdated and is in the process of being moved into spec.bs. The PMBToken construction has been removed and please refer to https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.txt for the VOPRF construction.
+
 # PrivateStateV3 Issuer Protocol
 
 *Version 3 is a working version and is subject to change.*
@@ -12,7 +14,7 @@ This section describes the public issuer interfaces that an issuer will need to 
 
 ### Issuer Key Commitments
 
-A Private State Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Private State Token protocol. Requests to this endpoint should result in a JSON response with a media type of "application/token-issuer-directory" and content in the following format:
+A Private State Token issuer should have an endpoint at a publicly accessible secure URL (HTTPS) that serves the current key commitments used in the Private State Token protocol. Requests to this endpoint should result in a JSON response of the following format:
 
 
 ```
