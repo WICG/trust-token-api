@@ -464,7 +464,7 @@ To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and 
 
 To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a bytestring |response|, run the following steps:
 
-1. Let |input| be empty [=byte sequence=].
+1. Let |input| be an empty [=byte sequence=].
 1. Let |evaluatedElements| be an empty [=list=].
 1. Let |blindedElements| be an empty [=list=].
 1. Let |issueResponse| be the deserialization of |response| as an **IssueResponse**.
