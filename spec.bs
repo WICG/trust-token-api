@@ -254,9 +254,9 @@ When using a registration process, it is recommended that user agents apply an e
 VOPRF Methods {#voprf-methods}
 ====================================
 
-For Issue (corresponding to **BlindEvaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
-
 This document encodes protocol messages in TLS notation from [[!RFC8446]].
+
+For Issue (corresponding to **BlindEvaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
 
 ```
 // Scalars are elliptic curve scalars of length Ns (determined by the curve, 48 for P-384).
@@ -453,16 +453,16 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. Let |request| be a [=byte sequence=] consisting of |numTokens| encoded as a uint16.
+1. Let |issueHeader| be a [=byte sequence=] consisting of two bytes representing |numTokens| as a uint16.
 1. Let |blinds| be an empty [=list=].
 1. Repeat the following steps, |numTokens| times:
     1. Let |input| be an [=implementation-defined=] random value.
     1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the **Blind** VOPRF function from [[!VOPRF]], where the second element is encoded as a X9.62 uncompressed point.
     1. [=list/Append=] the first element of |result| to |blinds|.
-    1. Append the second element of |result| to |request|.
-1. Return [=tuple=] (|request|, |blinds|).
+    1. Append the second element of |result| to |issueHeader|.
+1. Return [=tuple=] (|issueHeader|, |blinds|).
 
-To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a bytestring |response|, run the following steps:
+To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a [=byte sequence=] |response|, run the following steps:
 
 1. Let |input| be an empty [=byte sequence=].
 1. Let |evaluatedElements| be an empty [=list=].
@@ -474,7 +474,6 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |pkS| be |issuerKeys|["keys"][|issueResponse|["key_id"]]["Y"].
 1. Let |proof| be |issueResponse|["proof"].
 1. Let |result| ([=list=] of byte strings) be the result of running **PSTFinalize** on |input|, |blinds|, |evaluatedElements|, |blindedElements|, |pkS|, and |proof|.
-1. If |result| is null, return "{{InvalidStateError}}" {{DOMException}.
 1. Return |result|.
 
 To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
@@ -687,11 +686,11 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
 1. If |response|'s [=response/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return a [=network error=].
 1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. If |header| is empty, return null.
+1. If |header| is empty, return.
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Let |issuer| be |request|'s [=request/URL=]'s [=url/origin=].
 1. Let |issuerKeys| be the result of [=look up the key commitments|looking up the key commitments=] for |issuer|.
-1. If |issuerKeys| is null,  return.
+1. If |issuerKeys| is null, return.
 1. Let |pretokens| be |request|'s [=pstPretokens=].
 1. If |pretokens| is null, return.
 1. Let |rawResponse| be the base64-decoded [[!RFC4648]] version of |header|.
@@ -700,7 +699,7 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Let |signingKey| be the result [=look up the latest keys|looking up the latest keys=] for |issuer|.
 1. For each |token| in |unmasked tokens|, run the following steps:
     1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
-1. Return null.
+1. Return.
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
