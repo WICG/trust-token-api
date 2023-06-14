@@ -254,7 +254,7 @@ When using a registration process, it is recommended that user agents apply an e
 VOPRF Methods {#voprf-methods}
 ====================================
 
-This document encodes protocol messages in TLS notation from [[!RFC8446]].
+This document encodes protocol messages in the TLS presentation language from section 3 of [[!RFC8446]].
 
 For Issue (corresponding to **BlindEvaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
 
