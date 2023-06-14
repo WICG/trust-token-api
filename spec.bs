@@ -25,6 +25,10 @@ spec:infra; type:dfn; text:list
 <pre class="anchors">
 urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     text: http-network-or-cache fetch; url: #concept-http-network-or-cache-fetch; type: dfn
+urlPrefix: https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html; spec: VOPRF
+    text: BlindEvaluate; url: #section-3.3.2-2; type: dfn
+    text: Finalize; url: #section-3.3.2-5; type: dfn
+    text: Evaluate; url: #section-3.3.1-9; type: dfn
 </pre>
 
 <pre class='biblio'>
@@ -52,7 +56,7 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     },
     "VOPRF": {
         "authors": ["A. Davidson", "A. Faz-Hernandez",  "N. Sullivan", "C. A. Wood"],
-        "href": "https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-13.html",
+        "href": "https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html",
         "publisher": "IETF",
         "title": "Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups"
     },
@@ -205,9 +209,9 @@ Requests to key commitment endpoints should result in a JSON response
 * `<cryptographic protocol version>` is a string identifier for the Private State Token
     protocol version used. The same string is used as a value of the inner
     `"protocol_version"` field. Protocol version string identifier is
-    `"PrivateStateTokenV3VOPRF"`.
+    `"PrivateStateTokenV1VOPRF"`.
 
-    * Protocol version `“PrivateStateTokenV3VOPRF”` implements [[!VOPRF]] cryptographic
+    * Protocol version `“PrivateStateTokenV1VOPRF”` implements [[!VOPRF]] cryptographic
                protocol. Issuers can use up to six valid token signing keys.
 
 * `"id"` field provides the identifier of the key commitment. It is a string
@@ -256,7 +260,7 @@ VOPRF Methods {#voprf-methods}
 
 This document encodes protocol messages in the TLS presentation language from section 3 of [[!RFC8446]].
 
-For Issue (corresponding to **BlindEvaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
+For <dfn>Issue</dfn> (corresponding to [=BlindEvaluate=] function of the [[!VOPRF]] protocol), the <dfn>IssueRequest</dfn> and <dfn>IssueResponse</dfn> are serialized as:
 
 ```
 // Scalars are elliptic curve scalars of length Ns (determined by the curve, 48 for P-384).
@@ -285,7 +289,7 @@ struct {
 } IssueResponse;
 ```
 
-For Redeem (corresponding to **Evaluate** function of the [[!VOPRF]] protocol), the Request and Response are serialized as:
+For <dfn>Redeem</dfn> (corresponding to [=Evaluate=] function of the [[!VOPRF]] protocol), the <dfn>RedeemRequest</dfn> and <dfn>RedeemResponse</dfn> are serialized as:
 
 ```
 struct {
@@ -304,7 +308,7 @@ struct {
 } RedeemResponse;
 ```
 
-Private State Tokens uses a variation of the **Finalize** function of the [[!VOPRF]] protocol as follows:
+Private State Tokens defines <dfn>PSTFinalize</dfn> which is a variation of the [=Finalize=] function of the [[!VOPRF]] protocol as follows:
 
 ```
 def PSTFinalize(input, blinds, evaluatedElements,
@@ -323,7 +327,7 @@ def PSTFinalize(input, blinds, evaluatedElements,
   return unblindedElements
 ```
 
-Private State Tokens uses a variation of the **Evaluate** function of the [[!VOPRF]] protocol as follows:
+Private State Tokens defines PSTEvaluate which is a variation of the [=Evaluate=] function of the [[!VOPRF]] protocol as follows:
 
 ```
 def PSTEvaluate(skS, input):
@@ -453,13 +457,15 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 
 To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
 
-1. Let |issueHeader| be a [=byte sequence=] consisting of two bytes representing |numTokens| as a uint16.
+1. Let |issueRequest| be an empty [=IssueRequest=].
+1. Set |issueRequest|["count"] to |numTokens|.
 1. Let |blinds| be an empty [=list=].
 1. Repeat the following steps, |numTokens| times:
     1. Let |input| be an [=implementation-defined=] random value.
-    1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the **Blind** VOPRF function from [[!VOPRF]], where the second element is encoded as a X9.62 uncompressed point.
+    1. Let |result| ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the [=Issue=] method, where the second element is encoded as a X9.62 uncompressed point.
     1. [=list/Append=] the first element of |result| to |blinds|.
-    1. Append the second element of |result| to |issueHeader|.
+    1. Append the second element of |result| to |issueRequest|["nonces"].
+1. Let |issueHeader| be the serialization of |issueRequest|.
 1. Return [=tuple=] (|issueHeader|, |blinds|).
 
 To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a [=byte sequence=] |response|, run the following steps:
@@ -467,13 +473,13 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |input| be an empty [=byte sequence=].
 1. Let |evaluatedElements| be an empty [=list=].
 1. Let |blindedElements| be an empty [=list=].
-1. Let |issueResponse| be the deserialization of |response| as an **IssueResponse**.
+1. Let |issueResponse| be the deserialization of |response| as an [=IssueResponse=].
 1. [=list/For each=] |nonce| of |issueResponse|["signed"]:
     1. [=list/Append=] |nonce|["blinded"] to |blindedElements|.
     1. [=list/Append=] |nonce|["evaluated"] to |evaluatedElements|.
 1. Let |pkS| be |issuerKeys|["keys"][|issueResponse|["key_id"]]["Y"].
 1. Let |proof| be |issueResponse|["proof"].
-1. Let |result| ([=list=] of byte strings) be the result of running **PSTFinalize** on |input|, |blinds|, |evaluatedElements|, |blindedElements|, |pkS|, and |proof|.
+1. Let |result| ([=list=] of byte strings) be the result of running [=PSTFinalize=] on |input|, |blinds|, |evaluatedElements|, |blindedElements|, |pkS|, and |proof|.
 1. Return |result|.
 
 To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
@@ -725,11 +731,11 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
 ```
 </div>
 
-To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=Redemption Record=] |record|:
- 1. Let |redemption-result| be the redemption procedure result.
+To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=RedeemRequest=] |record|:
+ 1. Let |redemptionRequest| be the serialization of |record|.
  1. Let |cryptoProtocolVersion| be the version of the cryptographic protocol used.
  1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
- 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemption-result|)
+ 1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemptionRequest|)
                 in |request|'s header list.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token-Crypto-Version`</a>, |cryptoProtocolVersion|)
                 in |request|'s header list.
@@ -756,7 +762,7 @@ To <dfn>append private state token redemption request headers</dfn> given a [=/r
             the issuer's most recent commitments.
  1. Let |token| be the result of [=retrieve a token|retrieving a token=] for |issuer|.
  1. If |token| is null, return.
- 1. Let |record| be the result of running a cryptographic redemption procedure with |token|. If the procedure fails, return.
+ 1. Let [=RedeemRequest=] |record| be the result of running the [=Redeem=] method with |token|. If the procedure fails, return.
  1. [=Set redemption headers=] with |request| and |record|.
 
 
@@ -767,8 +773,9 @@ To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=respon
 
 1. If |request|'s [=request/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return null.
 1. If |response|'s [=response/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return a [=network error=].
-1. Let |header| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
-1. If |header| is empty, return null.
+1. Let |rawHeader| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
+1. If |rawHeader| is empty, return null.
+1. Let |header| be the deserialization of |rawHeader| as a [=RedeemResponse=].
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Set |lifetime| to be the largest representable duration.
 1. If |response|'s [=response/header list=] [=header list/contains=] <a http-header>Sec-Private-State-Token-Lifetime</a> response header, set |lifetime| to that value.
