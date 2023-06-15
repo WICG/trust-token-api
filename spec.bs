@@ -775,6 +775,7 @@ To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=respon
 1. If |response|'s [=response/header list=] [=header list/contains|does not contain=] <a http-header>Sec-Private-State-Token</a>, return a [=network error=].
 1. Let |rawHeader| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |rawHeader| is empty, return null.
+1. Let |rawResponse| be the base64-decoded [[!RFC4648]] version of |rawHeader|.
 1. Let |header| be the deserialization of |rawHeader| as a [=RedeemResponse=].
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Set |lifetime| to be the largest representable duration.
