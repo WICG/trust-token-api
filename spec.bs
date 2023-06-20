@@ -262,7 +262,7 @@ This document encodes protocol messages in the TLS presentation language from se
 
 For <dfn>Issue</dfn> (corresponding to [=BlindEvaluate=] function of the [[!VOPRF]] protocol), the <dfn>IssueRequest</dfn> and <dfn>IssueResponse</dfn> are serialized as:
 
-```tls
+```
 // Scalars are elliptic curve scalars of length Ns (determined by the curve, 48 for P-384).
 // ECPoints are elliptic curve points encoded using the X9.62 Uncompressed point representation (determined by the curve, 97 for P-384).
 
