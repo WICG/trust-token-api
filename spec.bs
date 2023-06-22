@@ -81,10 +81,11 @@ Goals {#goals}
 ==============
 
 The goal of the Private State Tokens is to transfer a limited amount of signals across
-sites through time in a privacy preserving manner. It achieves this using
+sites through time in a privacy preserving manner. It achieves this using a variant of the
 privacy pass protocol [[!PRIVACY-PASS-ISSUANCE-PROTOCOL]] specified in the working
 documents of the IETF Privacy Pass Working Group [[PRIVACY-PASS-WG]]. Private
-State Tokens can be considered to be a web platform implementation of Privacy Pass.
+State Tokens can be considered to be a web platform implementation of a variant of
+Privacy Pass.
 
 The spec introduces a new field in request dictionary to support token
 operations. It describes how Private State Tokens are utilized through this new
