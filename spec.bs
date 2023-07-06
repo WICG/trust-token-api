@@ -27,6 +27,11 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     text: http-network-or-cache fetch; url: #concept-http-network-or-cache-fetch; type: dfn
 </pre>
 
+<pre class="anchors">
+urlPrefix: https://xhr.spec.whatwg.org/; spec: XMLHttpRequest
+    text: state; url: #concept-xmlhttprequest-state; type: dfn
+</pre>
+
 <pre class='biblio'>
 {
     "PRIVACY-PASS-ARCHITECTURE": {
@@ -497,6 +502,25 @@ The specification adds the following steps to the [=HTTP fetch=] algorithm, befo
 1. If |redeem response result| is a [=network error=], return |issue response result|.
 
 
+Integration with XMLHttpRequest {#xhr}
+====================================
+
+Modifications to Request {#xhr-request}
+---------------------------------------------------------------
+Refer to [[#fetch-request]].
+
+The <dfn><code>setPrivateToken()</code></dfn> method {#xhr-set-private-token}
+---------------------------------------------------------------
+This specification introduces a new [=setPrivateToken()=] that accepts a {{PrivateToken}} object specifying the {{OperationType}} to execute against the request. It must do the following:
+<ol>
+ <li><p>If [=state=] is not "opened", then throw an
+ "{{InvalidStateError!!exception}}" {{DOMException}}.
+ <li> If OperationType is null, abort.
+ <li> If OperationType is "token-request": [=Append private state token issue request headers=] to the request.
+ <li> If OperationType is "token-redemption": [=Append private state token redemption request headers=] to the request.
+ <li> If OperationType is "send-redemption-record": [=Append private state token redemption record headers=] to the request.
+</ol>
+
 Issuing Protocol {#issuing-protocol}
 ====================================
 
@@ -602,6 +626,7 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. Return null.
 
 The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
+
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
