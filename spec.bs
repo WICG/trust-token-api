@@ -518,8 +518,8 @@ The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} 
  <li> If <a>this</a>'s
     <a href="https://xhr.spec.whatwg.org/#send-flag">`send()` flag</a> is set,
     then [=throw=] an "{{InvalidStateError!!exception}}" {{DOMException}}.
- <li> Run [=set private token properties for request from private token=] on |privateToken|
- <li>Set [=this=]'s {{PrivateToken}} to |privateToken| 
+ <li> Run [=set private token properties for request from private token=] on |privateToken|.
+ <li> Set [=this=]'s {{PrivateToken}} to |privateToken|.
 </ol>
 
 Issuing Protocol {#issuing-protocol}
