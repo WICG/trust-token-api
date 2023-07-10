@@ -497,6 +497,21 @@ The specification adds the following steps to the [=HTTP fetch=] algorithm, befo
 1. If |redeem response result| is a [=network error=], return |issue response result|.
 
 
+Integration with iframe {#iframe-integration}
+====================================
+
+privateToken content attribute for HTMLIframeElement {#iframe-private-token}
+---------------------------------------------------------------
+
+The <a href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element">iframe</a> element contains a <dfn element-attr for="iframe">privatetoken</dfn> <a spec=html>content attribute</a>. The IDL attribute <dfn attribute for="HTMLIFrameElement">privateToken</dfn> <a spec=html>reflects</a> the <{iframe/privatetoken}> <a spec=html>content attribute</a>.
+
+  <pre class=idl>
+  partial interface HTMLIFrameElement {
+    [SecureContext, Reflect] attribute DOMString privateToken;
+  };
+  </pre>
+
+
 Issuing Protocol {#issuing-protocol}
 ====================================
 
