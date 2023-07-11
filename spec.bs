@@ -520,7 +520,7 @@ The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} 
     <a spec="xhr">`send()` flag</a> is set,
     then [=throw=] an "{{InvalidStateError}}" {{DOMException}}.
  <li> Run [=set private token properties for request from private token=] on |privateToken|.
- <li> Set [=this=]'s {{PrivateToken}} to |privateToken|.
+ <li> Set [=this=]'s [=XMLHttpRequest/private state token=] to |privateToken|.
 </ol>
 
 Issuing Protocol {#issuing-protocol}
