@@ -518,7 +518,7 @@ The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} 
  "{{InvalidStateError}}" {{DOMException}}.
  <li> If <a>this</a>'s
     <a spec="xhr">`send()` flag</a> is set,
-    then [=throw=] an "{{InvalidStateError!!exception}}" {{DOMException}}.
+    then [=throw=] an "{{InvalidStateError}}" {{DOMException}}.
  <li> Run [=set private token properties for request from private token=] on |privateToken|.
  <li> Set [=this=]'s {{PrivateToken}} to |privateToken|.
 </ol>
