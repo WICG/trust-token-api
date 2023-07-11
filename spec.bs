@@ -515,7 +515,7 @@ a {{PrivateToken}} object that specifies the {{OperationType}} to execute agains
 The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} |privateToken| and must do the following:
 <ol>
  <li><p>If [=this=]'s <a spec="xhr">state</a> is not "opened", then throw an
- "{{InvalidStateError!!exception}}" {{DOMException}}.
+ "{{InvalidStateError}}" {{DOMException}}.
  <li> If <a>this</a>'s
     <a href="https://xhr.spec.whatwg.org/#send-flag">`send()` flag</a> is set,
     then [=throw=] an "{{InvalidStateError!!exception}}" {{DOMException}}.
