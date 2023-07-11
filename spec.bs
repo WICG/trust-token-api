@@ -27,11 +27,6 @@ urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     text: http-network-or-cache fetch; url: #concept-http-network-or-cache-fetch; type: dfn
 </pre>
 
-<pre class="anchors">
-urlPrefix: https://xhr.spec.whatwg.org/; spec: XMLHttpRequest
-    text: state; url: #concept-xmlhttprequest-state; type: dfn
-</pre>
-
 <pre class='biblio'>
 {
     "PRIVACY-PASS-ARCHITECTURE": {
@@ -509,9 +504,17 @@ The specification adds the following steps to the [=HTTP fetch=] algorithm, befo
 Integration with XMLHttpRequest {#xhr}
 ====================================
 
+Attach PrivateToken {#xhr-set-private-token}
+---------------------------------------------------------------
+
 An {{XMLHttpRequest}} has an associated <dfn for="XMLHttpRequest">private state token</dfn>,
 a {{PrivateToken}} object that specifies the {{OperationType}} to execute against the request.
 
+<xmp class="idl">
+partial interface XMLHttpRequest {
+  undefined setPrivateToken(PrivateToken privateToken);
+};
+</xmp>
 The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} |privateToken| and must do the following:
 <ol>
  <li><p>If [=this=]'s <a spec="xhr">state</a> is not "opened", then throw an
@@ -519,9 +522,20 @@ The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} 
  <li> If <a>this</a>'s
     <a spec="xhr">`send()` flag</a> is set,
     then [=throw=] an "{{InvalidStateError}}" {{DOMException}}.
- <li> Run [=set private token properties for request from private token=] on |privateToken|.
  <li> Set [=this=]'s [=XMLHttpRequest/private state token=] to |privateToken|.
 </ol>
+
+send() monkeypatch {#xhr-send-monkeypatch}
+---------------------------------------------------------------
+Modify {{XMLHttpRequest/send(body)}} as follows:
+
+After the step:
+
+> Let |req| be a new [=request=], initialized as follows...
+
+Add the step:
+
+1. Run [=set private token properties for request from private token=] with |req|'s [=request/window=], [=associated Document=] and <a>this</a>'s [=XMLHttpRequest/private state token=].
 
 Issuing Protocol {#issuing-protocol}
 ====================================
