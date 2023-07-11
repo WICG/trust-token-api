@@ -509,7 +509,8 @@ The specification adds the following steps to the [=HTTP fetch=] algorithm, befo
 Integration with XMLHttpRequest {#xhr}
 ====================================
 
-An XMLHttpRequest has an associated {{PrivateToken}} object specifying the {{OperationType}} to execute against the request.
+An {{XMLHttpRequest}} has an associated <dfn for="XMLHttpRequest">private state token</dfn>,
+a {{PrivateToken}} object that specifies the {{OperationType}} to execute against the request.
 
 The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} |privateToken| and must do the following:
 <ol>
