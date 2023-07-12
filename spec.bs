@@ -535,7 +535,7 @@ After the step:
 
 Add the step:
 
-1. Run [=set private token properties for request from private token=] with |req|'s [=request/window=], [=associated Document=] and <a>this</a>'s [=XMLHttpRequest/private state token=].
+1. Run [=set private token properties for request from private token=] with |req| and <a>this</a>'s [=XMLHttpRequest/private state token=].
 
 Issuing Protocol {#issuing-protocol}
 ====================================
