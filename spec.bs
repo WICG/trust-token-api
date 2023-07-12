@@ -517,7 +517,7 @@ partial interface XMLHttpRequest {
   undefined setPrivateToken(PrivateToken privateToken);
 };
 </xmp>
-The <dfn><code>setPrivateToken()</code></dfn> method accepts a {{PrivateToken}} |privateToken| and must do the following:
+The <dfn method for="XMLHttpRequest">setPrivateToken(PrivateToken privateToken)</dfn> method steps are:
 <ol>
  <li><p>If [=this=]'s <a spec="xhr">state</a> is not "opened", then throw an
  "{{InvalidStateError}}" {{DOMException}}.
