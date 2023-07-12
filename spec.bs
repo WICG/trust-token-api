@@ -376,7 +376,7 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
-To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
+To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a [=request=] |request| run the following steps:
 1. Let |window| be |request|’s [=request/window=].
 1. Let |document| be |window|’s [=associated Document=].
 1. Let |origin| be |request|’s origin.
