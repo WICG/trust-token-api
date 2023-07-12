@@ -377,13 +377,13 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Return |result|.
 
 To <dfn>set private token properties for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
-1. Let |window| be |request|’s [=request/window=].
+1. Let |window| be |request|’s associated [=request/window=].
 1. Let |document| be |window|’s [=associated Document=].
 1. Let |privateToken| be |init|["{{RequestInit/privateToken}}"].
 1. Run [=set private token properties for request from private token=] on |privateToken|, |request| and |document|.
 
-To <dfn>set private token properties for request from private token</dfn> given a {{PrivateToken}} |privateToken|, a {{Request}} |request|, and an [=associated Document=] |document| run the following steps:
-1. Let |origin| be |request|’s [=/origin=].
+To <dfn>set private token properties for request from private token</dfn> given a {{PrivateToken}} |privateToken|, a [=request=] |request|, and a [=Document=] |document| run the following steps:
+1. Let |origin| be |request|’s associated [=request/origin=].
 1. Set |request|'s [=request/private token operation=]</a> to |privateToken|["{{PrivateToken/operation}}"].
 1. If |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
     1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
@@ -508,7 +508,7 @@ Integration with iframe {#iframe-integration}
 privateToken content attribute for HTMLIframeElement {#iframe-private-token}
 ---------------------------------------------------------------
 
-The <a href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element">iframe</a> element contains a <dfn element-attr for="iframe">privatetoken</dfn> <a spec=html>content attribute</a>. The IDL attribute <dfn attribute for="HTMLIFrameElement">privateToken</dfn> <a spec=html>reflects</a> the <{iframe/privatetoken}> <a spec=html>content attribute</a>.
+The <{iframe}> element contains a <dfn element-attr for="iframe">privateToken</dfn> <a spec=html>content attribute</a>. The IDL attribute {{HTMLIFrameElement/privateToken}} <a spec=html>reflects</a> the <{iframe/privateToken}> <a spec=html>content attribute</a>.
 
   <pre class=idl>
   partial interface HTMLIFrameElement {
@@ -519,9 +519,10 @@ The <a href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the
 Modification to "create navigation params by fetching" steps {#navigation-params-modifications}
 ====================================
 
-The following step will be added to the [=/create-navigation-params-by-fetching][create navigation params by fetching steps], after step "3. Let |request| be a new [=Request/request=], with ...":
+The following step is added to the <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#create-navigation-params-by-fetching">create navigation params by fetching</a>, before step "25. Return a new <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigation-params">navigation params</a>, with ...":
 
-  1. If <var ignore=''>navigable</var>'s [=container=] is an <{iframe}> element, and if it has a <{iframe/privatetoken}> <a spec=html>content attribute</a>, then run [=set private token properties for request from private token=] on <{iframe/privatetoken}> and <var ignore=''>request</var>.
+  1. If <var ignore=''>navigable</var>'s [=container=] is an <{iframe}> element, and if it has a <{iframe/privateToken}> <a spec=html>content attribute</a>, and if <var ignore=''>navigable</var>'s <var ignore=''>contentDocument</var> is not null, then run [=set private token properties for request from private token=] on <var ignore=''>navigable</var>'s <var ignore=''>privateToken</var>, <var ignore=''>request</var> and <var ignore=''>navigable</var>'s <var ignore=''>contentDocument</var>.
+
 
 Issuing Protocol {#issuing-protocol}
 ====================================
