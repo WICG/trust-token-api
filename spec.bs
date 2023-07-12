@@ -376,13 +376,15 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
-To <dfn>set private token properties for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
+To <dfn>set private token properties for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a [=request=] |request| run the following steps:
+
 1. Let |window| be |request|’s associated [=request/window=].
 1. Let |document| be |window|’s [=associated Document=].
 1. Let |privateToken| be |init|["{{RequestInit/privateToken}}"].
 1. Run [=set private token properties for request from private token=] on |privateToken|, |request| and |document|.
 
 To <dfn>set private token properties for request from private token</dfn> given a {{PrivateToken}} |privateToken|, a [=request=] |request|, and a [=Document=] |document| run the following steps:
+
 1. Let |origin| be |request|’s associated [=request/origin=].
 1. Set |request|'s [=request/private token operation=]</a> to |privateToken|["{{PrivateToken/operation}}"].
 1. If |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
