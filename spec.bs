@@ -497,6 +497,28 @@ The specification adds the following steps to the [=HTTP fetch=] algorithm, befo
 1. If |redeem response result| is a [=network error=], return |issue response result|.
 
 
+Integration with iframe {#iframe-integration}
+====================================
+
+privateToken content attribute for HTMLIframeElement {#iframe-private-token}
+---------------------------------------------------------------
+
+The <{iframe}> element contains a <dfn element-attr for="iframe">privateToken</dfn> <a spec=html>content attribute</a>. The IDL attribute {{HTMLIFrameElement/privateToken}} <a spec=html>reflects</a> the <{iframe/privateToken}> <a spec=html>content attribute</a>.
+
+  <pre class=idl>
+  partial interface HTMLIFrameElement {
+    [SecureContext, Reflect] attribute DOMString privateToken;
+  };
+  </pre>
+
+Modification to "create navigation params by fetching" steps {#navigation-params-modifications}
+---------------------------------------------------------------
+
+The following step is added to the <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#create-navigation-params-by-fetching">create navigation params by fetching</a>, before step "25. Return a new <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigation-params">navigation params</a>, with ...":
+
+  1. If <var ignore=''>navigable</var>'s [=container=] is an <{iframe}> element, and if it has a <{iframe/privateToken}> <a spec=html>content attribute</a>, then run [=set private token properties for request from private token=] on <var ignore=''>navigable</var>'s <var ignore=''>privateToken</var> and |request|.
+
+
 Integration with XMLHttpRequest {#xhr}
 ====================================
 
@@ -532,6 +554,7 @@ After the step:
 Add the step:
 
 1. Run [=set private token properties for request from private token=] with <a>this</a>'s [=XMLHttpRequest/private state token=] and |req|.
+
 
 Issuing Protocol {#issuing-protocol}
 ====================================
