@@ -467,7 +467,7 @@ A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is 
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
-Given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
+Given a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
     1. Let |privateToken| be |init|["{{RequestInit/privateToken}}"].
     1. Run [=set private token properties for request from private token=] on |privateToken| and |request|.
