@@ -258,6 +258,9 @@ VOPRF Methods {#voprf-methods}
 
 This document encodes protocol messages in the TLS presentation language from section 3 of [[!RFC8446]].
 
+To <dfn>serialize protocol messages</dfn> and  <dfn>deserialize protocol messages</dfn>, protocol messages are encoded and interpreted as described in section 3 of [[!RFC8446]].
+
+
 When the server is performing the [=BlindEvaluate=] function of the [[!VOPRF]] protocol, the input <dfn>IssueRequest</dfn> and output <dfn>IssueResponse</dfn> are serialized as:
 
 ```
@@ -463,7 +466,7 @@ To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and 
     1. Let (|blind|, |blindedElement|) ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the [=Blind=] function of the [[!VOPRF]] protocol on |input|, where |blindedElement| is encoded as a X9.62 uncompressed point.
     1. [=list/Append=] the |blind| to |blinds|.
     1. Append the second element of |blindedElement| to |issueRequest|["nonces"].
-1. Let |issueHeader| be the serialization of |issueRequest|.
+1. Let |issueHeader| be the result of [=serialize protocol message|serializing protocol message=] |issueRequest|.
 1. Return [=tuple=] (|issueHeader|, |blinds|).
 
 To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a [=byte sequence=] |response|, run the following steps:
@@ -471,7 +474,7 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |input| be an empty [=byte sequence=].
 1. Let |evaluatedElements| be an empty [=list=].
 1. Let |blindedElements| be an empty [=list=].
-1. Let |issueResponse| be the deserialization of |response| as an [=IssueResponse=].
+1. Let |issueResponse| be the result of [=deserialize protocol message|sdeerializing protocol message=] |response| as an [=IssueResponse=].
 1. [=list/For each=] |nonce| of |issueResponse|["signed"]:
     1. [=list/Append=] |nonce|["blinded"] to |blindedElements|.
     1. [=list/Append=] |nonce|["evaluated"] to |evaluatedElements|.
@@ -730,7 +733,7 @@ let redemptionRequest = new Request('https://example.issuer:1234/redemption_path
 </div>
 
 To <dfn>set redemption headers</dfn> with [=/request=] |request| and a [=RedeemRequest=] |record|:
- 1. Let |redemptionRequest| be the serialization of |record|.
+ 1. Let |redemptionRequest| be the result of [=serialize protocol message|serializing protocol message=] |record|.
  1. Let |cryptoProtocolVersion| be the version of the cryptographic protocol used.
  1. Let |token-lifetime| be the expiration time of the [=redemption record=] in seconds.
  1. [=header list/Set a structured field value=] given (<a http-header>`Sec-Private-State-Token`</a>, |redemptionRequest|)
@@ -775,7 +778,7 @@ To <dfn>handle a redeem response</dfn>, given [=request=] |request| and [=respon
 1. Let |rawHeader| be the result of [=header list/get|getting=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. If |rawHeader| is empty, return null.
 1. Let |rawResponse| be the base64-decoded [[!RFC4648]] version of |rawHeader|.
-1. Let |header| be the deserialization of |rawHeader| as a [=RedeemResponse=].
+1. Let |header| be the result of [=deserialize protocol message|deserializing protocol message=] |rawHeader| as a [=RedeemResponse=].
 1. [=header list/delete|Delete=] <a http-header>Sec-Private-State-Token</a> from |response|'s [=response/header list=].
 1. Set |lifetime| to be the largest representable duration.
 1. If |response|'s [=response/header list=] [=header list/contains=] <a http-header>Sec-Private-State-Token-Lifetime</a> response header, set |lifetime| to that value.
