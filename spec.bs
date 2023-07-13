@@ -376,16 +376,14 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
-To <dfn>set private token properties for request from private token</dfn>, given a {{PrivateToken}} |privateToken| and a {{Request}} |request|, run the following steps:
-1. Let |window| be |request|’s [=request/window=].
-1. Let |document| be |window|’s [=associated Document=].
-1. Let |origin| be |request|’s [=/origin=].
+To <dfn>set private token properties for request from private token</dfn>, given a {{PrivateToken}} |privateToken| and a [=request=] |request|, run the following steps:
+
 1. Set |request|'s [=request/private token operation=]</a> to |privateToken|["{{PrivateToken/operation}}"].
 1. If |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
-    1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
+    1. If [$Should request be allowed to use feature?|should request be allowed to use feature$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
     1. Abort the remaining steps.
 1. Assert: |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
-1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
+1. If [$Should request be allowed to use feature?|should request be allowed to use feature$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
 1. If |privateToken|["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
     1. Set |request|'s [=request/private token refresh policy=]</a> to |privateToken|["{{PrivateToken/refreshPolicy}}"].
     1. Abort the remaining steps.
@@ -533,7 +531,7 @@ After the step:
 
 Add the step:
 
-1. Run [=set private token properties for request from private token=] with |req| and <a>this</a>'s [=XMLHttpRequest/private state token=].
+1. Run [=set private token properties for request from private token=] with <a>this</a>'s [=XMLHttpRequest/private state token=] and |req|.
 
 Issuing Protocol {#issuing-protocol}
 ====================================
