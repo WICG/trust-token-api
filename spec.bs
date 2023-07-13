@@ -66,9 +66,6 @@ urlPrefix: https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html; spec: 
         "publisher": "Google",
         "title": "ISSUER_PROTOCOL"
     },
-    "RFC8446": {
-        "href": "https://www.rfc-editor.org/rfc/rfc8446"
-    },
     "RFC4648": {
         "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
