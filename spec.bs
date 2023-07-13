@@ -26,6 +26,7 @@ spec:infra; type:dfn; text:list
 urlPrefix: https://fetch.spec.whatwg.org/; spec: Fetch
     text: http-network-or-cache fetch; url: #concept-http-network-or-cache-fetch; type: dfn
 urlPrefix: https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html; spec: VOPRF
+    text: Blind; url: #section-3.3.1-2; type: dfn
     text: BlindEvaluate; url: #section-3.3.2-2; type: dfn
     text: Finalize; url: #section-3.3.2-5; type: dfn
     text: Evaluate; url: #section-3.3.1-9; type: dfn
