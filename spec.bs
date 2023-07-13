@@ -380,7 +380,7 @@ To <dfn>set private token properties for request from private token</dfn>, given
 
 1. Set |request|'s [=request/private token operation=]</a> to |privateToken|["{{PrivateToken/operation}}"].
 1. If |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
-    1. If [$Should request be allowed to use feature?|should request be allowed to use feature$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
+    1. If [$Should request be allowed to use feature?$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
     1. Abort the remaining steps.
 1. Assert: |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
 1. If [$Should request be allowed to use feature?|should request be allowed to use feature$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
