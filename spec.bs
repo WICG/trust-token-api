@@ -376,22 +376,22 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 1. Let |result| ([=list=] of byte strings) be the result of running |unmaskOperation| on |pretokens| and |response|.
 1. Return |result|.
 
-To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a [=request=] |request| run the following steps:
+To <dfn>set private token properties for request from private token</dfn>, given a {{PrivateToken}} |privateToken| and a {{Request}} |request|, run the following steps:
 1. Let |window| be |request|’s [=request/window=].
 1. Let |document| be |window|’s [=associated Document=].
-1. Let |origin| be |request|’s origin.
-1. Set |request|'s [=request/private token operation=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"].
-1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
+1. Let |origin| be |request|’s [=/origin=].
+1. Set |request|'s [=request/private token operation=]</a> to |privateToken|["{{PrivateToken/operation}}"].
+1. If |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
     1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
     1. Abort the remaining steps.
-1. Assert: |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
+1. Assert: |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
 1. If [$Is feature enabled in document for origin?|is feature enabled$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>", |document| and |origin| returns `"Disabled"`, then throw a "{{NotAllowedError}}" {{DOMException}}.
-1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
-    1. Set |request|'s [=request/private token refresh policy=]</a> to |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/refreshPolicy}}"].
+1. If |privateToken|["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
+    1. Set |request|'s [=request/private token refresh policy=]</a> to |privateToken|["{{PrivateToken/refreshPolicy}}"].
     1. Abort the remaining steps.
-1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
-1. If |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
-1. [=list/For each=] |issuer| of |init|["{{RequestInit/privateToken}}"]["{{PrivateToken/issuers}}"]:
+1. If |privateToken|["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
+1. If |privateToken|["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
+1. [=list/For each=] |issuer| of |privateToken|["{{PrivateToken/issuers}}"]:
     1. Let |issuerURL| be the the result of running the [=URL parser=] on |issuer|.
     1. If |issuerURL| is failure, then throw {{TypeError}}.
     1. If |issuerURL|'s [=url/scheme=] is not an [=HTTP(S) scheme=], then throw {{TypeError}}.
@@ -467,8 +467,10 @@ A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is 
 
 Add the following steps to the <code><a constructor lt="Request()">new Request (<var ignore>input</var>, |init|)</a></code> constructor, before step 28 ("<code>Set [=this=]'s [=Request/request=] to |request|</code>"):
 
+Given a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
 1. If |init|["{{RequestInit/privateToken}}"] [=map/exists=]:
-    1. Run [=set private token property for request=] on |input|, |init| and |request|.
+    1. Let |privateToken| be |init|["{{RequestInit/privateToken}}"].
+    1. Run [=set private token properties for request from private token=] on |privateToken| and |request|.
 
 
 Modifications to http-network-or-cache fetch {#http-network-or-cache-fetch}
@@ -496,6 +498,42 @@ The specification adds the following steps to the [=HTTP fetch=] algorithm, befo
 1. Let |redeem response result| be the result of [=handle a redeem response|handling a redeem response=], given [=request=] |request| and [=response=] |actualResponse| as input.
 1. If |redeem response result| is a [=network error=], return |issue response result|.
 
+
+Integration with XMLHttpRequest {#xhr}
+====================================
+
+Attach PrivateToken {#xhr-set-private-token}
+---------------------------------------------------------------
+
+An {{XMLHttpRequest}} has an associated <dfn for="XMLHttpRequest">private state token</dfn>,
+a {{PrivateToken}} object that specifies the {{OperationType}} to execute against the request.
+
+<xmp class="idl">
+partial interface XMLHttpRequest {
+  undefined setPrivateToken(PrivateToken privateToken);
+};
+</xmp>
+The <dfn method for="XMLHttpRequest">setPrivateToken(PrivateToken privateToken)</dfn> method steps are:
+<ol>
+ <li><p>If [=this=]'s <a spec="xhr">state</a> is not "opened", then throw an
+ "{{InvalidStateError}}" {{DOMException}}.
+ <li> If <a>this</a>'s
+    <a spec="xhr">`send()` flag</a> is set,
+    then [=throw=] an "{{InvalidStateError}}" {{DOMException}}.
+ <li> Set [=this=]'s [=XMLHttpRequest/private state token=] to |privateToken|.
+</ol>
+
+send() monkeypatch {#xhr-send-monkeypatch}
+---------------------------------------------------------------
+Modify {{XMLHttpRequest/send(body)}} as follows:
+
+After the step:
+
+> Let |req| be a new [=request=], initialized as follows...
+
+Add the step:
+
+1. Run [=set private token properties for request from private token=] with |req| and <a>this</a>'s [=XMLHttpRequest/private state token=].
 
 Issuing Protocol {#issuing-protocol}
 ====================================
