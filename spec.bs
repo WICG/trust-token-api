@@ -30,6 +30,9 @@ urlPrefix: https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html; spec: 
     text: BlindEvaluate; url: #section-3.3.2-2; type: dfn
     text: Finalize; url: #section-3.3.2-5; type: dfn
     text: Evaluate; url: #section-3.3.1-9; type: dfn
+urlPrefix: https://www.ietf.org/archive/id/draft-robert-privacypass-batched-tokens-01.html; spec: BatchedToken
+    text: BlindEvaluateBatch; url: #section-4-5; type: dfn
+    text: FinalizeBatch; url: #section-5-4; type: dfn
 </pre>
 
 <pre class='biblio'>
@@ -60,6 +63,12 @@ urlPrefix: https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html; spec: 
         "href": "https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html",
         "publisher": "IETF",
         "title": "Oblivious Pseudorandom Functions (OPRFs) using Prime-Order Groups"
+    },
+    "BatchedTokens": {
+        "authors": ["R. Robert", "C. A. Wood"],
+        "href": "https://www.ietf.org/archive/id/draft-robert-privacypass-batched-tokens-01.html",
+        "publisher": "IETF",
+        "title": "Batched Token Issuance Protocol"
     },
     "ISSUER-PROTOCOL": {
         "authors": ["S. Valdez", "A. Bulut", "S. Schlesinger"],
@@ -260,8 +269,11 @@ This document encodes protocol messages in the TLS presentation language from se
 
 To <dfn>serialize protocol messages</dfn> and  <dfn>deserialize protocol messages</dfn>, protocol messages are encoded and interpreted as described in section 3 of [[!RFC8446]].
 
+For Private State Tokens, the VOPRF protocol is initialized using P-384 for the curve (`G` in the functions described below) and `nonce_size` is defined as 64. 
 
-When the server is performing the [=BlindEvaluate=] function of the [[!VOPRF]] protocol, the input <dfn>IssueRequest</dfn> and output <dfn>IssueResponse</dfn> are serialized as:
+Note: The use of X9.62 uncompressed points for the inputs/outputs in the current version of PST is a historical divergence from the existing [[!VOPRF]] specification.
+
+When the server is performing an Issuance, the server performs the [=BlindEvaluateBatch=] function of the [[!BatchedTokens]] protocol, where the input <dfn>IssueRequest</dfn> and output <dfn>IssueResponse</dfn> are serialized as:
 
 ```
 // Scalars are elliptic curve scalars of length Ns (determined by the curve, 48 for P-384).
@@ -269,12 +281,12 @@ When the server is performing the [=BlindEvaluate=] function of the [[!VOPRF]] p
 
 struct {
   uint16 count;
-  ECPoint nonces[count];
+  ECPoint nonces[count]; // Corresponding to blindedElements
 } IssueRequest;
 
 struct {
-  ECPoint blinded;
-  ECPoint evaluated;
+  ECPoint blinded; // Note: We diverge from the BlindEvaluateBatch specification by including this field along with each evaluatedElement.
+  ECPoint evaluated; // Corresponding to evaluatedElements
 } SignedNonce;
 
 struct {
@@ -290,12 +302,12 @@ struct {
 } IssueResponse;
 ```
 
-When the server is performing the [=Evaluate=] function of the [[!VOPRF]] protocol, the input <dfn>RedeemRequest</dfn> and output <dfn>RedeemResponse</dfn> are serialized as:
+When the server is performing a Redemption, the server performs [=PSTEvaluate=] on the `Token`, the input <dfn>RedeemRequest</dfn> and output <dfn>RedeemResponse</dfn> are serialized as:
 
 ```
 struct {
   uint32 key_id;
-  opaque nonce<nonce_size>;
+  opaque nonce[nonce_size];
   ECPoint W;
 } Token;
 
@@ -305,11 +317,11 @@ struct {
 } RedeemRequest;
 
 struct {
-  opaque rr<1..2^16-1>;
+  opaque rr<1..2^16-1>; // 
 } RedeemResponse;
 ```
 
-Private State Tokens defines <dfn>PSTFinalize</dfn> which is a variation of the [=Finalize=] function of the [[!VOPRF]] protocol as follows:
+Private State Tokens defines <dfn>PSTFinalize</dfn> which is a variation of the [=FinalizeBatch=] function of the [[!BatchedTokens]] protocol as follows:
 
 ```
 def PSTFinalize(input, blinds, evaluatedElements,
@@ -328,18 +340,24 @@ def PSTFinalize(input, blinds, evaluatedElements,
   return unblindedElements
 ```
 
-Private State Tokens defines PSTEvaluate which is a variation of the [=Evaluate=] function of the [[!VOPRF]] protocol as follows:
+Private State Tokens defines <dfn>PSTEvaluate</dfn> which is a variation of the [=Evaluate=] function of the [[!VOPRF]] protocol as follows:
 
 ```
-def PSTEvaluate(skS, input):
-  inputElement = G.HashToGroup(input)
+// skS is determined by the server by using key_id to lookup the corresponding private key.
+
+def PSTEvaluate(skS, nonce, W, client_data):
+  inputElement = G.HashToGroup(nonce)
   if inputElement == G.Identity():
     raise InvalidInputError
   evaluatedElement = skS * inputElement
   issuedElement = G.SerializeElement(evaluatedElement)
 
-  // PST: Return issuedElement rather than hash output.
-  return issuedElement
+  // PST: Checks issuedElement rather than hash output.
+  if issuedElement != W:
+    raise InvalidInputError
+
+  // PST: The server may use client_data and other information to construct a redemptionRecord to return to the client.
+  return redemptionRecord
 ```
 
 Algorithms {#algorithms}
