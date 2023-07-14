@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b06c00b8e, updated Tue Jul 11 13:41:16 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="6596d23f08bf81e4962a7cf7811aa515f99ee8ea" name="document-revision">
+  <meta content="e54089ff03f65e99adbbf95a73bf24e68723eb86" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -647,7 +647,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-07-13">13 July 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-07-14">14 July 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1232,7 +1232,7 @@ specification supports at this time.</p>
    <h3 class="heading settled" data-level="6.1" id="iframe-private-token"><span class="secno">6.1. </span><span class="content">privateToken content attribute for HTMLIframeElement</span><a class="self-link" href="#iframe-private-token"></a></h3>
    <p>The <code><a data-link-type="element" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#the-iframe-element" id="ref-for-the-iframe-element">iframe</a></code> element contains a <dfn class="dfn-paneled" data-dfn-for="iframe" data-dfn-type="element-attr" data-export id="element-attrdef-iframe-privatetoken"><code>privateToken</code></dfn> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/dom.html#concept-element-attributes" id="ref-for-concept-element-attributes">content attribute</a>. The IDL attribute <code class="idl"><a data-link-type="idl" href="#dom-htmliframeelement-privatetoken" id="ref-for-dom-htmliframeelement-privatetoken">privateToken</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/common-dom-interfaces.html#reflect" id="ref-for-reflect">reflects</a> the <code><a data-link-type="element-sub" href="#element-attrdef-iframe-privatetoken" id="ref-for-element-attrdef-iframe-privatetoken">privateToken</a></code> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/dom.html#concept-element-attributes" id="ref-for-concept-element-attributes①">content attribute</a>.</p>
 <pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#htmliframeelement" id="ref-for-htmliframeelement"><c- g>HTMLIFrameElement</c-></a> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute"><c- g>Reflect</c-></a>] <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString" id="ref-for-idl-DOMString"><c- b>DOMString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="HTMLIFrameElement" data-dfn-type="attribute" data-export data-type="DOMString" id="dom-htmliframeelement-privatetoken"><code><c- g>privateToken</c-></code></dfn>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext"><c- g>SecureContext</c-></a>] <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString" id="ref-for-idl-DOMString"><c- b>DOMString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="HTMLIFrameElement" data-dfn-type="attribute" data-export data-type="DOMString" id="dom-htmliframeelement-privatetoken"><code><c- g>privateToken</c-></code></dfn>;
 };
 </pre>
    <h3 class="heading settled" data-level="6.2" id="navigation-params-modifications"><span class="secno">6.2. </span><span class="content">Modification to "create navigation params by fetching" steps</span><a class="self-link" href="#navigation-params-modifications"></a></h3>
@@ -2070,7 +2070,7 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
 };
 
 <c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#htmliframeelement"><c- g>HTMLIFrameElement</c-></a> {
-  [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext"><c- g>SecureContext</c-></a>, <a class="idl-code" data-link-type="extended-attribute"><c- g>Reflect</c-></a>] <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString"><c- b>DOMString</c-></a> <a data-type="DOMString" href="#dom-htmliframeelement-privatetoken"><code><c- g>privateToken</c-></code></a>;
+  [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext"><c- g>SecureContext</c-></a>] <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-DOMString"><c- b>DOMString</c-></a> <a data-type="DOMString" href="#dom-htmliframeelement-privatetoken"><code><c- g>privateToken</c-></code></a>;
 };
 
 <c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://xhr.spec.whatwg.org/#xmlhttprequest"><c- g>XMLHttpRequest</c-></a> {
