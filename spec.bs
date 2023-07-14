@@ -507,7 +507,7 @@ The <{iframe}> element contains a <dfn element-attr for="iframe">privateToken</d
 
   <pre class=idl>
   partial interface HTMLIFrameElement {
-    [SecureContext, Reflect] attribute DOMString privateToken;
+    [SecureContext] attribute DOMString privateToken;
   };
   </pre>
 
