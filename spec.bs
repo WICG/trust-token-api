@@ -483,7 +483,7 @@ To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and 
     1. Let |input| be a random [=byte sequence=].
     1. Let (|blind|, |blindedElement|) ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the [=Blind=] function of the [[!VOPRF]] protocol on |input|, where |blindedElement| is encoded as a X9.62 uncompressed point.
     1. [=list/Append=] the |blind| to |blinds|.
-    1. Append the second element of |blindedElement| to |issueRequest|["nonces"].
+    1. Append |blindedElement| to |issueRequest|["nonces"].
 1. Let |issueHeader| be the result of [=serialize protocol message|serializing protocol message=] |issueRequest|.
 1. Return [=tuple=] (|issueHeader|, |blinds|).
 
