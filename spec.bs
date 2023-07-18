@@ -270,7 +270,7 @@ This document encodes protocol messages in the TLS presentation language from se
 
 To <dfn>serialize protocol messages</dfn> and  <dfn>deserialize protocol messages</dfn>, protocol messages are encoded and interpreted as described in section 3 of [[!RFC8446]].
 
-For Private State Tokens, the VOPRF protocol is initialized using [=P384=] for the curve (`G` in the functions described below) and `nonce_size` is defined as 64. 
+For Private State Tokens, the VOPRF protocol is initialized using [=P-384=] for the curve (`G` in the functions described below) and `nonce_size` is defined as 64. 
 
 Note: The use of X9.62 uncompressed points for the inputs/outputs in the current version of PST is a historical divergence from the existing [[!VOPRF]] specification. The selection of nonce_size is a historical divergence from the current draft of [[!BatchedTokens]].
 
@@ -479,7 +479,7 @@ To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and 
 
 1. Let |issueRequest| be an empty [=IssueRequest=].
 1. Set |issueRequest|["count"] to |numTokens|.
-1. Let |blinds| be an empty [=byute sequence=].
+1. Let |blinds| be an empty [=byte sequence=].
 1. Repeat the following steps, |numTokens| times:
     1. Let |input| be a random [=byte sequence=].
     1. Let (|blind|, |blindedElement|) ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the [=Blind=] function of the [[!VOPRF]] protocol on |input|, where |blindedElement| is encoded as a X9.62 uncompressed point.
