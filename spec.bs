@@ -30,6 +30,7 @@ urlPrefix: https://www.ietf.org/archive/id/draft-irtf-cfrg-voprf-21.html; spec: 
     text: BlindEvaluate; url: #section-3.3.2-2; type: dfn
     text: Finalize; url: #section-3.3.2-5; type: dfn
     text: Evaluate; url: #section-3.3.1-9; type: dfn
+    text: P-384; url: #name-oprfp-384-sha-384; type: dfn
 urlPrefix: https://www.ietf.org/archive/id/draft-robert-privacypass-batched-tokens-01.html; spec: BatchedToken
     text: BlindEvaluateBatch; url: #section-4-5; type: dfn
     text: FinalizeBatch; url: #section-5-4; type: dfn
@@ -269,9 +270,9 @@ This document encodes protocol messages in the TLS presentation language from se
 
 To <dfn>serialize protocol messages</dfn> and  <dfn>deserialize protocol messages</dfn>, protocol messages are encoded and interpreted as described in section 3 of [[!RFC8446]].
 
-For Private State Tokens, the VOPRF protocol is initialized using P-384 for the curve (`G` in the functions described below) and `nonce_size` is defined as 64. 
+For Private State Tokens, the VOPRF protocol is initialized using [=P384=] for the curve (`G` in the functions described below) and `nonce_size` is defined as 64. 
 
-Note: The use of X9.62 uncompressed points for the inputs/outputs in the current version of PST is a historical divergence from the existing [[!VOPRF]] specification.
+Note: The use of X9.62 uncompressed points for the inputs/outputs in the current version of PST is a historical divergence from the existing [[!VOPRF]] specification. The selection of nonce_size is a historical divergence from the current draft of [[!BatchedTokens]].
 
 When the server is performing an Issuance, the server performs the [=BlindEvaluateBatch=] function of the [[!BatchedTokens]] protocol, where the input <dfn>IssueRequest</dfn> and output <dfn>IssueResponse</dfn> are serialized as:
 
@@ -317,7 +318,7 @@ struct {
 } RedeemRequest;
 
 struct {
-  opaque rr<1..2^16-1>; // 
+  opaque rr<1..2^16-1>;
 } RedeemResponse;
 ```
 
@@ -474,31 +475,35 @@ To get the <dfn>max batch size</dfn> for an [=/origin=] |issuer|, run the follow
 1. If |issuerKey| is null, return 0.
 1. Return |issuerKey|["batchsize"].
 
-To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps:
+To <dfn>generate masked tokens</dfn> given [=key commitments=] |issuerKeys| and number |numTokens|, run the following steps. They return a [=tuple=] ([=byte sequence=], [=byte sequence=]).
 
 1. Let |issueRequest| be an empty [=IssueRequest=].
 1. Set |issueRequest|["count"] to |numTokens|.
-1. Let |blinds| be an empty [=list=].
+1. Let |blinds| be an empty [=byute sequence=].
 1. Repeat the following steps, |numTokens| times:
     1. Let |input| be a random [=byte sequence=].
     1. Let (|blind|, |blindedElement|) ([=tuple=] ([=byte sequence=], [=byte sequence=])) be the result of running the [=Blind=] function of the [[!VOPRF]] protocol on |input|, where |blindedElement| is encoded as a X9.62 uncompressed point.
-    1. [=list/Append=] the |blind| to |blinds|.
+    1. Append |blind| to |blinds|.
     1. Append |blindedElement| to |issueRequest|["nonces"].
 1. Let |issueHeader| be the result of [=serialize protocol message|serializing protocol message=] |issueRequest|.
 1. Return [=tuple=] (|issueHeader|, |blinds|).
 
-To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a [=byte sequence=] |response|, run the following steps:
+To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string |blinds|, and a [=byte sequence=] |response|, run the following steps. They return a [=list=] of [=byte sequence=].
 
 1. Let |input| be an empty [=byte sequence=].
 1. Let |evaluatedElements| be an empty [=list=].
 1. Let |blindedElements| be an empty [=list=].
-1. Let |issueResponse| be the result of [=deserialize protocol message|sdeerializing protocol message=] |response| as an [=IssueResponse=].
+1. Let |issueResponse| be the result of [=deserialize protocol message|deserializing protocol message=] |response| as an [=IssueResponse=].
 1. [=list/For each=] |nonce| of |issueResponse|["signed"]:
     1. [=list/Append=] |nonce|["blinded"] to |blindedElements|.
     1. [=list/Append=] |nonce|["evaluated"] to |evaluatedElements|.
 1. Let |pkS| be |issuerKeys|["keys"][|issueResponse|["key_id"]]["Y"].
 1. Let |proof| be |issueResponse|["proof"].
-1. Let |result| ([=list=] of byte strings) be the result of running [=PSTFinalize=] on |input|, |blinds|, |evaluatedElements|, |blindedElements|, |pkS|, and |proof|.
+1. Let |blindsList| be an empty [=list=].
+1. While the [=byte sequence/length=] of |blinds| is greater than 0:
+    1. Let |blind| be the first N elements of |blinds| and |blinds| be the remainder, where N is the length of a X9.62 uncompressed point.
+    1. [=list/Append=] |blind| to |blindsList|.
+1. Let |result| ([=list=] of byte strings) be the result of running [=PSTFinalize=] on |input|, |blindsList|, |evaluatedElements|, |blindedElements|, |pkS|, and |proof|.
 1. Return |result|.
 
 To <dfn>set private token property for request</dfn> given a {{RequestInfo}} |input|, a {{RequestInit}} |init| and a {{Request}} |request| run the following steps:
