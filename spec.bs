@@ -122,43 +122,28 @@ https://eprint.iacr.org/2020/072.pdf
 Background {#background}
 ========================
 
-The Private State Token API provides a mechanism for anonymous authentication. The
-API provided by the user agent does not authenticate clients, instead it facilitates
-transfer of authentication information.
+The Private State Token API provides a mechanism for transfering limited amount
+of information across sites. The API provided by the user agent is not the
+source of the information, but the facilitator of the cross site transfer. The
+API achieves this through use of Privacy Pass protocol described in
+[[!PRIVACY-PASS-ARCHITECTURE]], [[!PRIVACY-PASS-AUTH-SCHEME]]. Private State
+Tokens API depends on a joint Attester/Issuer deployment.
 
-Authentication of the clients and token signing are both carried by the same
-entity referred to as the **issuer**. This is the joint attester and issuer
-architecture described in [[!PRIVACY-PASS-ARCHITECTURE]],
-[[!PRIVACY-PASS-AUTH-SCHEME]].
-
-User agents store tokens in persistent storage. Navigated origins might fetch/spend
-tokens in first party contexts or include third party code that fetch/spend
-tokens. Spending tokens is called **redeeming**.
+User agents store tokens in persistent storage. Navigated origins might
+fetch/spend tokens in first party contexts or include third party code that
+fetch/spend tokens. Spending tokens is called **redeeming**.
 
 Origins may ask the user agent to fetch tokens from the issuers of their
 choice. Tokens can be redeemed from a different origin than the fetching one.
 
-Private State Tokens API performs cross site anonymous authentication without
-using linkable state carrying cookies [[RFC6265]]. Cookies do provide cross
-site authentication, however, they fail to provide anonymity.
+Privacy Pass protocol is designed to prevent issuers from tracking which tokens
+they issued to which user agent. When presented with their tokens, issuers can
+verify they issued them but cannot link the tokens to the context of their
+issuance. Private State Token API retains this unlinkability property.
 
-[[RFC6265]] requires at least 4096 bytes per cookie and 50 cookies per
-domain. Compared to this capacity at an origin's disposal, the amount of data
-stored in a Private State Token by an issuer is very limited. A token stores a
-value from a set of six values (think of a value of an enum type of six
-possible values). Hence, a token's storage capacity is between 2 and 3 bits (4
-< 6 < 8). This is very small compared to an origin's cookie storage capacity.
-
-Moreover, Private State Tokens API use cryptographic protocols that prevents
-origins from tracking which tokens they issue to which user. When presented with
-their tokens, issuers can verify they issued them but cannot link the
-tokens to the context of their issuance. Cookies do not have this property.
-
-Unlike cookies, storing multiple tokens from an issuer does not deteriorate
-privacy of the user due to the unlinkability of the tokens. The Private
-State Token API allows at most 2 different issuers in a top level origin. This
-is to limit the information stored for a user when the issuers are
-collaborating.
+The Private State Token API allows at most 2 different issuers for a given top
+level origin. This is to limit the availability of cross site information in
+case issuers are collaborating.
 
 Private State Token operations rely on [[!FETCH]]. A fetch request corresponding to a
 specific Private State Token operation can be created and used as a parameter to the
