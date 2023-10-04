@@ -265,10 +265,6 @@ A possible enhancement would be to allow for sending Redemption Records (and sig
 
 If the publisher can configure issuers in response headers (or otherwise early in the page load), then they could invoke a redemption in parallel with the page loading, before the relevant `fetch()` calls.
 
-### Non-web sources of tokens
-
-Private state token issuance could be expanded to other entities (the operating system, or native applications) capable of making an informed decision about whether to grant tokens. Naturally, this would need to take into consideration different systems' security models in order for these tokens to maintain their meaning. (For instance, on some platforms, malicious applications might routinely have similar privileges to the operating system itself, which would at best reduce the signal-to-noise ratio of tokens created on those operating systems.)
-
 ## Appendix
 
 
