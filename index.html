@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="8f20cf751db44ec0de9e919b761036d4b3174acf" name="document-revision">
+  <meta content="1466b7df78633f097bb3f85cc00c575e088e5579" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -647,7 +647,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-10-10">10 October 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-10-13">13 October 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1469,7 +1469,6 @@ header.
 <pre>Sec-Private-State-Token: &lt;token encoded as base64 string>
 </pre>
    </div>
-   <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
    <h3 class="heading settled" data-level="9.3" id="issue-response"><span class="secno">9.3. </span><span class="content">Handling Issue Responses</span><a class="self-link" href="#issue-response"></a></h3>
    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="handle-an-issue-response">handle an issue response</dfn>, given <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-request" id="ref-for-concept-request⑨">request</a> <var>request</var> and <a data-link-type="dfn" href="https://fetch.spec.whatwg.org/#concept-response" id="ref-for-concept-response②">response</a> <var>response</var>, run the following steps:</p>
    <ol>
@@ -1510,7 +1509,6 @@ header.
     <li data-md>
      <p>Return.</p>
    </ol>
-   <p>The details for servers implementing this protocol can be found in <a data-link-type="biblio" href="#biblio-issuer-protocol" title="ISSUER_PROTOCOL">[ISSUER-PROTOCOL]</a>.</p>
    <h2 class="heading settled" data-level="10" id="redeeming-tokens"><span class="secno">10. </span><span class="content">Redeeming Tokens</span><a class="self-link" href="#redeeming-tokens"></a></h2>
    <p>When the user agent navigates to a top-level origin, this top-level origin or a third party site
 embedded on the top level origin may redeem tokens stored in the user agent from a
@@ -2162,8 +2160,6 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <dd>Anne van Kesteren; et al. <a href="https://html.spec.whatwg.org/multipage/"><cite>HTML Standard</cite></a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-infra">[INFRA]
    <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
-   <dt id="biblio-issuer-protocol">[ISSUER-PROTOCOL]
-   <dd>S. Valdez; A. Bulut; S. Schlesinger. <a href="https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md"><cite>ISSUER_PROTOCOL</cite></a>. URL: <a href="https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md">https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md</a>
    <dt id="biblio-permissions-policy-1">[PERMISSIONS-POLICY-1]
    <dd>Ian Clelland. <a href="https://w3c.github.io/webappsec-permissions-policy/"><cite>Permissions Policy</cite></a>. URL: <a href="https://w3c.github.io/webappsec-permissions-policy/">https://w3c.github.io/webappsec-permissions-policy/</a>
    <dt id="biblio-privacy-pass-architecture">[PRIVACY-PASS-ARCHITECTURE]
