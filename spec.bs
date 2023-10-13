@@ -71,12 +71,6 @@ urlPrefix: https://www.ietf.org/archive/id/draft-robert-privacypass-batched-toke
         "publisher": "IETF",
         "title": "Batched Token Issuance Protocol"
     },
-    "ISSUER-PROTOCOL": {
-        "authors": ["S. Valdez", "A. Bulut", "S. Schlesinger"],
-        "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
-        "publisher": "Google",
-        "title": "ISSUER_PROTOCOL"
-    },
     "RFC4648": {
         "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
@@ -766,8 +760,6 @@ Sec-Private-State-Token: <token encoded as base64 string>
 ```
 </div>
 
-The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
-
 Handling Issue Responses {#issue-response}
 ----------------------------------------------------------
 
@@ -790,8 +782,6 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. For each |token| in |unmasked tokens|, run the following steps:
     1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return.
-
-The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
