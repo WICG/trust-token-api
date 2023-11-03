@@ -64,10 +64,8 @@ When an `issuer.example` context wants to provide tokens to a user (i.e. when th
 ```
 fetch('<issuer>/<issuance path>', {
   privateToken: {
-    type: 'private-state-token',
     version: 1,
-    operation: 'token-request',
-    issuer: <issuer>
+    operation: 'token-request'
   }
 }).then(...)
 ```
@@ -88,7 +86,7 @@ When the user is browsing another site (```publisher.example```), that site (or 
 
 
 ```
-document.hasPrivateToken(<issuer>, 'private-state-token')
+document.hasPrivateToken(<issuer>)
 ```
 
 
@@ -98,11 +96,9 @@ This returns whether there are any valid private state tokens for a particular i
 ```
 fetch('<issuer>/<redemption path>', {
   privateToken: {
-    type: 'private-state-token',
     version: 1,
     operation: 'token-redemption',
-    issuer: <issuer>,
-    refreshPolicy: {'none', 'refresh'}
+    refreshPolicy: 'refresh' // either 'refresh' or 'none', default is 'none'
   }
 }).then(...)
 ```
@@ -115,7 +111,7 @@ The RR is HTTP-only and JavaScript is only able to access/send the RR via Privat
 UA stores the RR obtained from the initial redemption. A publisher site can query whether a valid RR exists for a specific issuer using the following method.
 
 ```
-document.hasRedemptionRecord(<issuer>, 'private-state-token')
+document.hasRedemptionRecord(<issuer>)
 ```
 
 This returns whether there are any valid RRs from the given issuer.
@@ -133,7 +129,6 @@ Redemption Records are only accessible via a new option to the Fetch API:
 fetch(<resource-url>, {
   ...
   privateToken: {
-    type: 'private-state-token',
     version: 1,
     operation: 'send-redemption-record',
     issuers: [<issuer>, ...]
@@ -148,9 +143,9 @@ The RRs will be added as a new request header `Sec-Redemption-Record`. The heade
 
 ### Extension: Private State Token Versioning
 
-In order to allow multiple versions of Private State Token to be supported in the ecosystem, issuers include the version of the protocol (i.e. "PrivateStateTokenV1") in their key commitments via the ```protocol_version``` field, and that is included in Private State Token requests via the ```Sec-Private-State-Token-Version``` header. Private State Token operations should not be performed with issuers configured with an unknown protocol version.
+In order to allow multiple versions of Private State Token to be supported in the ecosystem, issuers include the version of the protocol (i.e. "PrivateStateTokenV1") in their key commitments via the ```protocol_version``` field, and that is included in Private State Token requests via the ```Sec-Private-State-Token-Crypto-Version``` header. Private State Token operations should not be performed with issuers configured with an unknown protocol version.
 
-In addition to the core cryptographic layer, signed requests' formats (see the next section) might change from version to version. In order to make adapting to these changes easier, we could employ a mechanism like the ```Sec-Private-State-Token-Version``` header, or an addition to the requests' payloads, to tell consumers the version of the client that generated the request.
+In addition to the core cryptographic layer, signed requests' formats (see the next section) might change from version to version. In order to make adapting to these changes easier, we could employ a mechanism like the ```Sec-Private-State-Token-Crypto-Version``` header, or an addition to the requests' payloads, to tell consumers the version of the client that generated the request.
 
 
 ### Extension: Metadata
@@ -170,7 +165,7 @@ This can be managed by assigning different keys in the key commitment to have di
 
 ### Extension: iframe Activation
 
-Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `privateToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `privateToken="{type:'private-state-token',version:1,operation:'send-redemption-record',issuer:<issuer>,refreshPolicy:'refresh'}"`.
+Some resources requests are performed via iframes or other non-Fetch-based methods. One extension to support such use cases would be the addition of a `privateToken` attribute to iframes that includes the parameters specified in the Fetch API. This would allow an RR to be sent with an iframe by setting an attribute of `privateToken="{version:1,operation:'send-redemption-record',issuers:[<issuer>]}"`.
 
 ## Privacy Considerations
 
@@ -284,14 +279,14 @@ foo.example - Site requiring a Private State Token to prove the user is trusted.
 
 
 1.  User visits `areyouahuman.example`.
-1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {privateToken: {type: 'private-state-token', version: 1, operation: 'token-request', issuer: 'areyouahuman.example'}})`.
+1.  `areyouahuman.example` verifies the user is a human, and calls `fetch('areyouahuman.example/get-human-tokens', {privateToken: {version: 1, operation: 'token-request'}})`.
     1.  The browser stores the trust tokens associated with `areyouahuman.example`.
 1.  Sometime later, the user visits `coolwebsite.example`.
-1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {privateToken: {type: 'private-state-token', version: 1, operation: 'token-redemption', issuer: 'areyouahuman.example'}})`.
+1.  `coolwebsite.example` wants to know if the user is a human, by asking `areyouahuman.example` that question, by calling `fetch('areyouahuman.example/redeem-human-token', {privateToken: {version: 1, operation: 'token-redemption'}})`.
     1.  The browser requests a redemption.
     1.  The issuer returns an RR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the RR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {privateToken: {type: 'private-state-token', version: 1, operation: 'send-redemption-record', issuer: 'areyouahuman.example'}})`
+1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {privateToken: {version: 1, operation: 'send-redemption-record', issuers: ['areyouahuman.example']}})`
     1.  The third-party receives the RR, and now has some indication that `areyouahuman.example` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
 
