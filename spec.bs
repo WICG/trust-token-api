@@ -217,10 +217,9 @@ Requests to key commitment endpoints should result in a JSON response
     * Protocol version `“PrivateStateTokenV1VOPRF”` implements [[!VOPRF]] cryptographic
                protocol. Issuers can use up to six valid token signing keys.
 
-* `"id"` field provides the identifier of the key commitment. It is a string
-         representation of a non-negative integer that is within the range of
-         an unsigned 32 bit integer type. Values should be montonically
-         increasing.
+* `"id"` field provides the identifier of the key commitment. It is a
+         non-negative integer that is within the range of an unsigned 32 bit
+         integer type. Values should be montonically increasing.
 
 * `"batchsize"` specifies the maximum number of masked tokens that the issuer
                 supports for each token issuance operation. Its value is a
@@ -230,17 +229,19 @@ Requests to key commitment endpoints should result in a JSON response
 
 * `"keys"` field is a dictionary of public keys listed by their identifiers.
 
-         * `<keyID>` is a non-negative integer that is within the range of an
-               unsigned 32 bit integer type.
+         * `<keyID>` is a string representation of a non-negative integer that
+               is within the range of an unsigned 32 bit integer type.
 
-         * Each key has a `"Y"` field which is a big-endian base64 encoding
-                [[!RFC4648]] of the byte string of the key.
+         * Each key has a `"Y"` field which is a string representation of a
+                big-endian base64 encoding [[!RFC4648]] of the byte string of
+                the key.
 
          * `"expiry"` field specifies how long the underlying key is valid. It
-                      is a nonnegative integer that is within the range of an
-                      unsigned 64 bit integer type.  Underlying key expires if
-                      this amount many or more microseconds are elapsed since
-                      the POSIX epoch [[!RFC8536]].
+                      is a string representation of a nonnegative integer that
+                      is within the range of an unsigned 64 bit integer type.
+                      Underlying key expires if this amount many or more
+                      microseconds are elapsed since the POSIX epoch
+                      [[!RFC8536]].
 
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
