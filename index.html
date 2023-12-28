@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="1466b7df78633f097bb3f85cc00c575e088e5579" name="document-revision">
+  <meta content="f5c677514ad312146fc3f1a170cc2a551ac2728b" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -647,7 +647,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-10-13">13 October 2023</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-12-28">28 December 2023</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -664,7 +664,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2023 the Contributors to the Private State Token API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/policies/#copyright">Copyright</a> © 2023 the Contributors to the Private State Token API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -879,16 +879,14 @@ protocol version used. The same string is used as a value of the inner <code>"pr
        protocol. Issuers can use up to six valid token signing keys.</p>
      </ul>
     <li data-md>
-     <p><code>"id"</code> field provides the identifier of the key commitment. It is a string
-     representation of a non-negative integer that is within the range of
-     an unsigned 32 bit integer type. Values should be montonically
-     increasing.</p>
+     <p><code>"id"</code> field provides the identifier of the key commitment. It is a
+     non-negative integer that is within the range of an unsigned 32 bit
+     integer type. Values should be montonically increasing.</p>
     <li data-md>
      <p><code>"batchsize"</code> specifies the maximum number of masked tokens that the issuer
             supports for each token issuance operation. Its value is a
-            string representation of a positive integer. The user agent might send
-            fewer tokens in a single operation, but will generally default to
-            sending <code>batchsize</code> many tokens per operation.</p>
+            positive integer. The user agent might send fewer tokens in a
+            single operation, but will generally default to sending <code>batchsize</code> many tokens per operation.</p>
     <li data-md>
      <p><code>"keys"</code> field is a dictionary of public keys listed by their identifiers.</p>
      <ul>
@@ -2179,9 +2177,9 @@ Schlesinger for their contributions. Thanks to Chris Wilson for reviewing and me
    <dt id="biblio-rfc8536">[RFC8536]
    <dd>A. Olson; P. Eggert; K. Murchison. <a href="https://www.rfc-editor.org/rfc/rfc8536"><cite>The Time Zone Information Format (TZif)</cite></a>. February 2019. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc8536">https://www.rfc-editor.org/rfc/rfc8536</a>
    <dt id="biblio-rfc8941">[RFC8941]
-   <dd>M. Nottingham; P-H. Kamp. <a href="https://www.rfc-editor.org/rfc/rfc8941"><cite>Structured Field Values for HTTP</cite></a>. February 2021. Proposed Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc8941">https://www.rfc-editor.org/rfc/rfc8941</a>
+   <dd>M. Nottingham; P-H. Kamp. <a href="https://httpwg.org/specs/rfc8941.html"><cite>Structured Field Values for HTTP</cite></a>. February 2021. Proposed Standard. URL: <a href="https://httpwg.org/specs/rfc8941.html">https://httpwg.org/specs/rfc8941.html</a>
    <dt id="biblio-rfc9110">[RFC9110]
-   <dd>R. Fielding, Ed.; M. Nottingham, Ed.; J. Reschke, Ed.. <a href="https://www.rfc-editor.org/rfc/rfc9110"><cite>HTTP Semantics</cite></a>. June 2022. Internet Standard. URL: <a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>
+   <dd>R. Fielding, Ed.; M. Nottingham, Ed.; J. Reschke, Ed.. <a href="https://httpwg.org/specs/rfc9110.html"><cite>HTTP Semantics</cite></a>. June 2022. Internet Standard. URL: <a href="https://httpwg.org/specs/rfc9110.html">https://httpwg.org/specs/rfc9110.html</a>
    <dt id="biblio-secure-contexts">[SECURE-CONTEXTS]
    <dd>Mike West. <a href="https://w3c.github.io/webappsec-secure-contexts/"><cite>Secure Contexts</cite></a>. URL: <a href="https://w3c.github.io/webappsec-secure-contexts/">https://w3c.github.io/webappsec-secure-contexts/</a>
    <dt id="biblio-url">[URL]
