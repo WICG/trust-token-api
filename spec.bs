@@ -217,16 +217,15 @@ Requests to key commitment endpoints should result in a JSON response
     * Protocol version `“PrivateStateTokenV1VOPRF”` implements [[!VOPRF]] cryptographic
                protocol. Issuers can use up to six valid token signing keys.
 
-* `"id"` field provides the identifier of the key commitment. It is a string
-         representation of a non-negative integer that is within the range of
-         an unsigned 32 bit integer type. Values should be montonically
-         increasing.
+* `"id"` field provides the identifier of the key commitment. It is a
+         non-negative integer that is within the range of an unsigned 32 bit
+         integer type. Values should be montonically increasing.
 
 * `"batchsize"` specifies the maximum number of masked tokens that the issuer
                 supports for each token issuance operation. Its value is a
-                string representation of a positive integer. The user agent might send
-                fewer tokens in a single operation, but will generally default to
-                sending `batchsize` many tokens per operation.
+                positive integer. The user agent might send fewer tokens in a
+                single operation, but will generally default to sending
+                `batchsize` many tokens per operation.
 
 * `"keys"` field is a dictionary of public keys listed by their identifiers.
 
