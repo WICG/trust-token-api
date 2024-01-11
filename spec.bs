@@ -912,7 +912,7 @@ To <dfn>append private state token redemption record headers</dfn> given a [=/re
 
 <pre class="idl">
 partial interface Document {
-  Promise&lt;boolean> hasPrivateTokens(USVString issuer);
+  Promise&lt;boolean> hasPrivateToken(USVString issuer);
   Promise&lt;boolean> hasRedemptionRecord(USVString issuer);
 };
 </pre>
@@ -923,7 +923,7 @@ Query APIs {#query-apis}
 Token Query {#token-query}
 --------------------------
 
-When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasPrivateTokens(issuer)</code></dfn> method must run these steps:
+When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasPrivateToken(issuer)</code></dfn> method must run these steps:
 1. Let |p| be [=a new promise=].
 1. If |doc| is not [=Document/fully active=], then [=reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
 1. Let |global| be |doc|'s [=relevant global object=].
