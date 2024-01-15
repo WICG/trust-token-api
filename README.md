@@ -1,6 +1,6 @@
 # Private State Token API Explainer
 
-This document is an explainer for a potential future web platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
+This document is an explainer for a Web Platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
 
 The current version of the spec is available at [https://wicg.github.io/trust-token-api/](https://wicg.github.io/trust-token-api/).
 
