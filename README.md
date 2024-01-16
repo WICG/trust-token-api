@@ -1,6 +1,6 @@
 # Private State Token API Explainer
 
-This document is an explainer for a potential future web platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
+This document is an explainer for a Web Platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
 
 The current version of the spec is available at [https://wicg.github.io/trust-token-api/](https://wicg.github.io/trust-token-api/).
 
@@ -12,7 +12,7 @@ This API was formerly called the Trust Token API and the repository and API surf
 
 - [Motivation](#motivation)
 - [Overview](#overview)
-- [Potential API](#potential-api)
+- [API](#api)
   - [Private State Token Issuance](#private-state-token-issuance)
   - [Private State Token Redemption](#private-state-token-redemption)
   - [Forwarding Redemption Attestation](#forwarding-redemption-attestation)
@@ -53,7 +53,7 @@ This API proposes a new per-origin storage area for “Privacy Pass” style cry
 When an origin is in a context where they trust the user, they can issue the browser a batch of tokens, which can be “spent” at a later time in a context where the user would otherwise be unknown or less trusted. Crucially, the tokens are indistinguishable from one another, preventing websites from tracking users through them.
 
 
-## Potential API
+## API
 
 
 ### Private State Token Issuance
