@@ -28,6 +28,8 @@ Within this model, there are a couple of implementation methods. First, the issu
 
 **Third-Party Issuance, Private Redemption**: Most IVT/CAPTCHA companies will likely be using a third-party issuance, private redemption model. This reflects that these companies don't have strong first-party state and usually partner with the publishers that use their services to build up and consume their own signals. Similarly, due to the economic/business needs, these sorts of companies wouldn't want to allow any non-partnered entity from consuming their signal.
 
+AdTech companies could, for their own IVT detection, issue and redeem tokens to distinguish new users from users new to the publisher but seen elsewhere for a long time.
+
 **Third-Party Issuance, Public Redemption**: For platform issuers, they will likely be using a third-party issuance (as the non-web source isn't considered first-party to each origin), public redemption model. Platforms are more likely to want to expose their attestation/trust signals to be consumed by anyone in order to promote the ability to protect user safety on their platform.
 
 **First-Party Issuance, Private Redemption**: Larger publishers that have associated but separate partnered sites (news websites) might use a first-party issuance, private redemption model. They are able to establish the initial trust signal based on their primary site, while wanting partners they work with to be able to consume that signal
