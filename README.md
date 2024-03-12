@@ -1,6 +1,6 @@
 # Private State Token API Explainer
 
-This document is an explainer for a potential future web platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
+This document is an explainer for a Web Platform API that allows propagating limited private signals across sites, using the [Privacy Pass](https://privacypass.github.io) protocol as an underlying primitive.
 
 The current version of the spec is available at [https://wicg.github.io/trust-token-api/](https://wicg.github.io/trust-token-api/).
 
@@ -12,7 +12,7 @@ This API was formerly called the Trust Token API and the repository and API surf
 
 - [Motivation](#motivation)
 - [Overview](#overview)
-- [Potential API](#potential-api)
+- [API](#api)
   - [Private State Token Issuance](#private-state-token-issuance)
   - [Private State Token Redemption](#private-state-token-redemption)
   - [Forwarding Redemption Attestation](#forwarding-redemption-attestation)
@@ -43,7 +43,7 @@ The web ecosystem relies heavily on building trust signals to detect fraudulent 
 
 Preventing fraud is a legitimate use case that the web should support, but it shouldn’t require an API as powerful as a stable, global, per-user identifier. In third party contexts, merely segmenting users into trusted and untrusted sets seems like a useful primitive that also preserves privacy. This kind of fraud protection is important both for CDNs, as well as for the ad industry which receives a large amount of invalid, fraudulent traffic.
 
-Segmenting users into very coarse sets satisfies other use cases that establish web trust as well. For instance, sites could use this as a set inclusion primitive in order to ask questions like, “do I have identity at all for this user?” or even do non-personalized cross-site authentication ("Is this user a subscriber?").  While we encourage exploration into solving a broad set of use cases, Private State Tokens should only be utilized for anti-fraud, anti-abuse, web security, or other web trust and safety purposes.  PSTs are not intented to convey artibrary cross-site information, such as user demographic information for ad targeting or measurement.  
+Segmenting users into very coarse sets satisfies other use cases that establish web trust as well. For instance, sites could use this as a set inclusion primitive in order to ask questions like, “do I have identity at all for this user?” or even do non-personalized cross-site authentication ("Is this user a subscriber?").  While we encourage exploration into solving a broad set of use cases, Private State Tokens should only be utilized for anti-fraud, anti-abuse, web security, or other web trust and safety purposes.  PSTs are not intended to convey artibrary cross-site information, such as user demographic information for ad targeting or measurement.  
 
 
 ## Overview
@@ -53,7 +53,7 @@ This API proposes a new per-origin storage area for “Privacy Pass” style cry
 When an origin is in a context where they trust the user, they can issue the browser a batch of tokens, which can be “spent” at a later time in a context where the user would otherwise be unknown or less trusted. Crucially, the tokens are indistinguishable from one another, preventing websites from tracking users through them.
 
 
-## Potential API
+## API
 
 
 ### Private State Token Issuance
@@ -259,10 +259,6 @@ A possible enhancement would be to allow for sending Redemption Records (and sig
 ### Optimizing redemption RTT
 
 If the publisher can configure issuers in response headers (or otherwise early in the page load), then they could invoke a redemption in parallel with the page loading, before the relevant `fetch()` calls.
-
-### Non-web sources of tokens
-
-Private state token issuance could be expanded to other entities (the operating system, or native applications) capable of making an informed decision about whether to grant tokens. Naturally, this would need to take into consideration different systems' security models in order for these tokens to maintain their meaning. (For instance, on some platforms, malicious applications might routinely have similar privileges to the operating system itself, which would at best reduce the signal-to-noise ratio of tokens created on those operating systems.)
 
 ## Appendix
 

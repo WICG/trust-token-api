@@ -71,12 +71,6 @@ urlPrefix: https://www.ietf.org/archive/id/draft-robert-privacypass-batched-toke
         "publisher": "IETF",
         "title": "Batched Token Issuance Protocol"
     },
-    "ISSUER-PROTOCOL": {
-        "authors": ["S. Valdez", "A. Bulut", "S. Schlesinger"],
-        "href": "https://github.com/WICG/trust-token-api/blob/main/ISSUER_PROTOCOL.md",
-        "publisher": "Google",
-        "title": "ISSUER_PROTOCOL"
-    },
     "RFC4648": {
         "href": "https://www.rfc-editor.org/rfc/rfc4648"
     }
@@ -223,16 +217,15 @@ Requests to key commitment endpoints should result in a JSON response
     * Protocol version `“PrivateStateTokenV1VOPRF”` implements [[!VOPRF]] cryptographic
                protocol. Issuers can use up to six valid token signing keys.
 
-* `"id"` field provides the identifier of the key commitment. It is a string
-         representation of a non-negative integer that is within the range of
-         an unsigned 32 bit integer type. Values should be montonically
-         increasing.
+* `"id"` field provides the identifier of the key commitment. It is a
+         non-negative integer that is within the range of an unsigned 32 bit
+         integer type. Values should be montonically increasing.
 
 * `"batchsize"` specifies the maximum number of masked tokens that the issuer
                 supports for each token issuance operation. Its value is a
-                string representation of a positive integer. The user agent might send
-                fewer tokens in a single operation, but will generally default to
-                sending `batchsize` many tokens per operation.
+                positive integer. The user agent might send fewer tokens in a
+                single operation, but will generally default to sending
+                `batchsize` many tokens per operation.
 
 * `"keys"` field is a dictionary of public keys listed by their identifiers.
 
@@ -766,8 +759,6 @@ Sec-Private-State-Token: <token encoded as base64 string>
 ```
 </div>
 
-The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
-
 Handling Issue Responses {#issue-response}
 ----------------------------------------------------------
 
@@ -790,8 +781,6 @@ To <dfn>handle an issue response</dfn>, given [=request=] |request| and [=respon
 1. For each |token| in |unmasked tokens|, run the following steps:
     1. [=Insert a token=] for |issuer|, |token|, and |signingKey|.
 1. Return.
-
-The details for servers implementing this protocol can be found in [[!ISSUER-PROTOCOL]].
 
 Redeeming Tokens {#redeeming-tokens}
 ====================================
@@ -923,7 +912,7 @@ To <dfn>append private state token redemption record headers</dfn> given a [=/re
 
 <pre class="idl">
 partial interface Document {
-  Promise&lt;boolean> hasPrivateTokens(USVString issuer);
+  Promise&lt;boolean> hasPrivateToken(USVString issuer);
   Promise&lt;boolean> hasRedemptionRecord(USVString issuer);
 };
 </pre>
@@ -934,7 +923,7 @@ Query APIs {#query-apis}
 Token Query {#token-query}
 --------------------------
 
-When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasPrivateTokens(issuer)</code></dfn> method must run these steps:
+When invoked on {{Document}} |doc| with {{USVString}} |issuer|, the <dfn export method for=Document><code>hasPrivateToken(issuer)</code></dfn> method must run these steps:
 1. Let |p| be [=a new promise=].
 1. If |doc| is not [=Document/fully active=], then [=reject=] |p| with an "{{InvalidStateError}}" {{DOMException}} and return |p|.
 1. Let |global| be |doc|'s [=relevant global object=].
