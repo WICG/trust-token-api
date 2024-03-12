@@ -282,7 +282,7 @@ foo.example - Site requiring a Private State Token to prove the user is trusted.
     1.  The browser requests a redemption.
     1.  The issuer returns an RR (this indicates that `areyouahuman.example` at some point issued a valid token to this browser).
     1.  When the promise returned by the method resolves, the RR can be used in subsequent resource requests.
-1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {privateToken: {version: 1, operation: 'send-redemption-record', issuers: ['areyouahuman.example']}})`
+1.  Script running code in the top level `coolwebsite.example` document can call `fetch('foo.example/get-content', {privateToken: {version: 1, operation: 'send-redemption-record', issuers: ['https://areyouahuman.example']}})`
     1.  The third-party receives the RR, and now has some indication that `areyouahuman.example` thought this user was a human.
     1.  The third-party responds to this fetch request based on that fact.
 
