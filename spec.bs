@@ -280,7 +280,6 @@ struct {
 } IssueRequest;
 
 struct {
-  ECPoint blinded; // Note: We diverge from the BlindEvaluateBatch specification by including this field along with each evaluatedElement.
   ECPoint evaluated; // Corresponding to evaluatedElements
 } SignedNonce;
 
