@@ -405,8 +405,8 @@ To <dfn>record a redemption record</dfn> given an [=/origin=] |issuer|, an [=/or
 To <dfn>retrieve a redemption record</dfn> given an [=/origin=] |issuer| and an [=/origin=] |topLevel|, run the following steps:
 
 1. Let |currentTime| be the current date and time in milliseconds since 01 January, 1970 UTC.
-1. If [=redemptionTimes=][(|issuer|,|topLevel|)] [=map/exists|does not exist=], return null.
-1. Let (|record|, |expiration|, |signingKeys|) be [=redemptionTimes=][(|issuer|,|topLevel|)].
+1. If [=redemptionRecords=][(|issuer|,|topLevel|)] [=map/exists|does not exist=], return null.
+1. Let (|record|, |expiration|, |signingKeys|) be [=redemptionRecords=][(|issuer|,|topLevel|)].
 1. If |expiration| is less than |currentTime|, return null.
 1. Let |currentSigningKeys| be the result of [=look up the latest keys|looking up of the latest keys=] for |issuer|.
 1. If |currentSigningKeys| does not equal |signingKeys|, return null.
