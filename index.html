@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="00dd7afeca7f115f48f94b3299c3c32e80543ba1" name="document-revision">
+  <meta content="cf9ec90a8ada8450ce8fff0ae06e652ea6b1ee76" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -647,7 +647,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2024-03-27">27 March 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2024-06-10">10 June 2024</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1060,9 +1060,9 @@ def PSTEvaluate(skS, nonce, W, client_data):
     <li data-md>
      <p>Let <var>currentTime</var> be the current date and time in milliseconds since 01 January, 1970 UTC.</p>
     <li data-md>
-     <p>If <a data-link-type="dfn" href="#redemptiontimes" id="ref-for-redemptiontimes⑤">redemptionTimes</a>[(<var>issuer</var>,<var>topLevel</var>)] <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists⑤">does not exist</a>, return null.</p>
+     <p>If <a data-link-type="dfn" href="#redemptionrecords" id="ref-for-redemptionrecords①">redemptionRecords</a>[(<var>issuer</var>,<var>topLevel</var>)] <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-exists" id="ref-for-map-exists⑤">does not exist</a>, return null.</p>
     <li data-md>
-     <p>Let (<var>record</var>, <var>expiration</var>, <var>signingKeys</var>) be <a data-link-type="dfn" href="#redemptiontimes" id="ref-for-redemptiontimes⑥">redemptionTimes</a>[(<var>issuer</var>,<var>topLevel</var>)].</p>
+     <p>Let (<var>record</var>, <var>expiration</var>, <var>signingKeys</var>) be <a data-link-type="dfn" href="#redemptionrecords" id="ref-for-redemptionrecords②">redemptionRecords</a>[(<var>issuer</var>,<var>topLevel</var>)].</p>
     <li data-md>
      <p>If <var>expiration</var> is less than <var>currentTime</var>, return null.</p>
     <li data-md>
@@ -2637,10 +2637,10 @@ window.dfnpanelData['issuerassociations'] = {"dfnID": "issuerassociations", "url
 window.dfnpanelData['determine-whether-associating-an-issuer-would-exceed-the-top-level-limit'] = {"dfnID": "determine-whether-associating-an-issuer-would-exceed-the-top-level-limit", "url": "#determine-whether-associating-an-issuer-would-exceed-the-top-level-limit", "dfnText": "determine whether associating an issuer would exceed the top-level limit", "refSections": [{"refs": [{"id": "ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit"}], "title": "9.1. Creating An Issue Request"}, {"refs": [{"id": "ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit\u2460"}], "title": "10. Redeeming Tokens"}, {"refs": [{"id": "ref-for-determine-whether-associating-an-issuer-would-exceed-the-top-level-limit\u2461"}], "title": "11.1. Token Query"}], "external": false};
 window.dfnpanelData['associate-the-issuer'] = {"dfnID": "associate-the-issuer", "url": "#associate-the-issuer", "dfnText": "associate the issuer", "refSections": [{"refs": [{"id": "ref-for-associate-the-issuer"}], "title": "9.1. Creating An Issue Request"}, {"refs": [{"id": "ref-for-associate-the-issuer\u2460"}], "title": "10. Redeeming Tokens"}, {"refs": [{"id": "ref-for-associate-the-issuer\u2461"}], "title": "11.1. Token Query"}], "external": false};
 window.dfnpanelData['is-associated-with'] = {"dfnID": "is-associated-with", "url": "#is-associated-with", "dfnText": "is associated with", "refSections": [{"refs": [{"id": "ref-for-is-associated-with"}], "title": "11.2. Redemption Record Query"}], "external": false};
-window.dfnpanelData['redemptiontimes'] = {"dfnID": "redemptiontimes", "url": "#redemptiontimes", "dfnText": "redemptionTimes", "refSections": [{"refs": [{"id": "ref-for-redemptiontimes"}, {"id": "ref-for-redemptiontimes\u2460"}, {"id": "ref-for-redemptiontimes\u2461"}, {"id": "ref-for-redemptiontimes\u2462"}, {"id": "ref-for-redemptiontimes\u2463"}, {"id": "ref-for-redemptiontimes\u2464"}, {"id": "ref-for-redemptiontimes\u2465"}], "title": "5. Algorithms"}], "external": false};
+window.dfnpanelData['redemptiontimes'] = {"dfnID": "redemptiontimes", "url": "#redemptiontimes", "dfnText": "redemptionTimes", "refSections": [{"refs": [{"id": "ref-for-redemptiontimes"}, {"id": "ref-for-redemptiontimes\u2460"}, {"id": "ref-for-redemptiontimes\u2461"}, {"id": "ref-for-redemptiontimes\u2462"}, {"id": "ref-for-redemptiontimes\u2463"}], "title": "5. Algorithms"}], "external": false};
 window.dfnpanelData['record-redemption-timestamp'] = {"dfnID": "record-redemption-timestamp", "url": "#record-redemption-timestamp", "dfnText": "record redemption timestamp", "refSections": [{"refs": [{"id": "ref-for-record-redemption-timestamp"}], "title": "10.1. Handling Redeem Responses"}], "external": false};
 window.dfnpanelData['look-up-penultimate-redemption'] = {"dfnID": "look-up-penultimate-redemption", "url": "#look-up-penultimate-redemption", "dfnText": "look up penultimate redemption", "refSections": [{"refs": [{"id": "ref-for-look-up-penultimate-redemption"}], "title": "10. Redeeming Tokens"}], "external": false};
-window.dfnpanelData['redemptionrecords'] = {"dfnID": "redemptionrecords", "url": "#redemptionrecords", "dfnText": "redemptionRecords", "refSections": [{"refs": [{"id": "ref-for-redemptionrecords"}], "title": "5. Algorithms"}], "external": false};
+window.dfnpanelData['redemptionrecords'] = {"dfnID": "redemptionrecords", "url": "#redemptionrecords", "dfnText": "redemptionRecords", "refSections": [{"refs": [{"id": "ref-for-redemptionrecords"}, {"id": "ref-for-redemptionrecords\u2460"}, {"id": "ref-for-redemptionrecords\u2461"}], "title": "5. Algorithms"}], "external": false};
 window.dfnpanelData['record-a-redemption-record'] = {"dfnID": "record-a-redemption-record", "url": "#record-a-redemption-record", "dfnText": "record a redemption record", "refSections": [{"refs": [{"id": "ref-for-record-a-redemption-record"}], "title": "10.1. Handling Redeem Responses"}, {"refs": [{"id": "ref-for-record-a-redemption-record\u2460"}], "title": "10.2. Redemption Records"}], "external": false};
 window.dfnpanelData['retrieve-a-redemption-record'] = {"dfnID": "retrieve-a-redemption-record", "url": "#retrieve-a-redemption-record", "dfnText": "retrieve a redemption record", "refSections": [{"refs": [{"id": "ref-for-retrieve-a-redemption-record"}], "title": "10. Redeeming Tokens"}, {"refs": [{"id": "ref-for-retrieve-a-redemption-record\u2460"}], "title": "10.2. Redemption Records"}], "external": false};
 window.dfnpanelData['pstkeycommitments'] = {"dfnID": "pstkeycommitments", "url": "#pstkeycommitments", "dfnText": "pstKeyCommitments", "refSections": [{"refs": [{"id": "ref-for-pstkeycommitments"}, {"id": "ref-for-pstkeycommitments\u2460"}], "title": "5. Algorithms"}], "external": false};
