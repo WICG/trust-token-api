@@ -973,6 +973,14 @@ origin, because the answer to the redemption query does not leak information abo
 the issuers of the currently stored tokens. Similar to token query, redemption
 query clears stale tokens.
 
+Clearing PST Data {#data-clear}
+--------------------------
+
+<a href="https://storage.spec.whatwg.org/#ui-guidelines">User interface guidance</a>
+from <a href="https://storage.spec.whatwg.org">storage</a> standard should be
+followed. User agents should provide interfaces to clear PST data from
+storage.
+
 Private State Token HTTP Header Fields {#pst-http-header-fields}
 =================================
 
