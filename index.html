@@ -6,7 +6,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://wicg.github.io/trust-token-api/" rel="canonical">
-  <meta content="cf9ec90a8ada8450ce8fff0ae06e652ea6b1ee76" name="document-revision">
+  <meta content="ae07cb54ee14b9c74c378cf0cd1a8bed06e4c535" name="document-revision">
 <style>/* Boilerplate: style-autolinks */
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
@@ -647,7 +647,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Private State Token API</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2024-06-10">10 June 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2024-06-18">18 June 2024</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -735,6 +735,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <ol class="toc">
       <li><a href="#token-query"><span class="secno">11.1</span> <span class="content">Token Query</span></a>
       <li><a href="#redemption-record-query"><span class="secno">11.2</span> <span class="content">Redemption Record Query</span></a>
+      <li><a href="#data-clear"><span class="secno">11.3</span> <span class="content">Clearing PST Data</span></a>
      </ol>
     <li>
      <a href="#pst-http-header-fields"><span class="secno">12</span> <span class="content">Private State Token HTTP Header Fields</span></a>
@@ -1768,6 +1769,10 @@ origin. There is no need to associate the issuer queried with the top level
 origin, because the answer to the redemption query does not leak information about
 the issuers of the currently stored tokens. Similar to token query, redemption
 query clears stale tokens.</p>
+   <h3 class="heading settled" data-level="11.3" id="data-clear"><span class="secno">11.3. </span><span class="content">Clearing PST Data</span><a class="self-link" href="#data-clear"></a></h3>
+   <p><a href="https://storage.spec.whatwg.org/#ui-guidelines">User interface guidance</a> from <a href="https://storage.spec.whatwg.org">storage</a> standard should be
+followed. User agents should provide interfaces to clear PST data from
+storage.</p>
    <h2 class="heading settled" data-level="12" id="pst-http-header-fields"><span class="secno">12. </span><span class="content">Private State Token HTTP Header Fields</span><a class="self-link" href="#pst-http-header-fields"></a></h2>
    <h3 class="heading settled" data-level="12.1" id="sec-private-state-token"><span class="secno">12.1. </span><span class="content">The 'Sec-Private-State-Token' Header Field</span><a class="self-link" href="#sec-private-state-token"></a></h3>
    <p>The <dfn class="dfn-paneled" data-dfn-type="http-header" data-export id="http-headerdef-sec-private-state-token">Sec-Private-State-Token</dfn> <em>request</em> header field sends
