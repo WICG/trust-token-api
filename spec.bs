@@ -1132,6 +1132,15 @@ operations. In the context of a given origin, two redemptions are allowed initia
 the third redemption is only allowed once more than an [=implementation-defined=] amount of time,
 usually 48 hours, have elapsed since the first redemption.
 
+Preventing Issuer Exhaustion {#issuer-exhaustion}
+-----------------------------------------------
+Competing scripts might race to call <code>hasRedemptionRecord(issuer)</code> to ensure their |issuer|
+enters the [=issuerAssociations=] [=map=] before the |issuer| of others given a limit of two per
+[=environment/top-level origin=]. To control this process, the [=environment/top-level origin=]
+could call <code>hasRedemptionRecord(issuer)</code> up to twice before any other JavaScript is included
+to ensure their preferred |issuer|s are available.
+
+
 Preventing Double Spending {#preventing-double-spend}
 -----------------------------------------------------
 
