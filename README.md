@@ -235,6 +235,11 @@ We have a number of mitigations against this attack:
 
 When the issuer detects a site is attacking its token supply, it can fail redemption (before the token is revealed) based on the referring origin, and prevent browsers from spending tokens there.
 
+### Issuer Exhaustion
+
+Given a cap on the issuers usable per top-level origin, there might be a race between third-party scripts to call `hasPrivateToken(issuer)` to ensure their preferred issuer is available.
+The top-level document can control this process by calling `hasPrivateToken(issuer)` for its preferred issuers before any other scripts are loaded.
+This would ensure the availability of the desired issuers and prevent a race to determine availability.
 
 ### Double-Spend Prevention
 
