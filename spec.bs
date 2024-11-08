@@ -580,9 +580,9 @@ Note: [=request/Private token refresh policy=] is ignored unless [=request/priva
 
 This specification defines two new [=policy-controlled features=]. Exactly one of these policy features applies for a given Private State Token operation.
 
-The [=policy-controlled feature=] identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-issuance</code></dfn>" applies for the <code>"token-request"</code> operation. The [=default allowlist=] for this feature is <code>["self"]</code>.
+The [=policy-controlled feature=] identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-issuance</code></dfn>" applies for the <code>"token-request"</code> operation. The [=default allowlist=] for this feature is <code>*</code>.
 
-The [=policy-controlled feature=] identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-redemption</code></dfn>" applies for the <code>"send-redemption-record"</code> and <code>"token-redemption"</code> operations. The [=default allowlist=] for this feature is <code>["self"]</code>.
+The [=policy-controlled feature=] identified by "<dfn data-dfn-for="policy-controlled feature"><code>private-state-token-redemption</code></dfn>" applies for the <code>"send-redemption-record"</code> and <code>"token-redemption"</code> operations. The [=default allowlist=] for this feature is <code>*</code>.
 
 A [=request=] has an associated <dfn for="request">pstPretokens</dfn>, which is null or a [=byte sequence=].
 
