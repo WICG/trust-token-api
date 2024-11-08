@@ -241,7 +241,7 @@ Requests to key commitment endpoints should result in a JSON response
                       is within the range of an unsigned 64 bit integer type.
                       Underlying key expires if this amount many or more
                       microseconds are elapsed since the POSIX epoch
-                      [[!RFC8536]].
+                      [[!RFC8536 obsolete]].
 
 All field names and their values are strings. When new key commitments are
 fetched for an issuer, previous commitments are discarded.
@@ -897,7 +897,7 @@ To <dfn>append private state token redemption record headers</dfn> given a [=/re
     1. If |record| is null, then [=iteration/continue=].
     1. [=map/Set=] |records_per_issuer|[|issuer|] to |record|.
   1. If |records_per_issuer| is empty, then abort these steps.
-  1. Let |headerItems| be a structured headers list [[RFC8941]].
+  1. Let |headerItems| be a structured headers list [[RFC8941 obsolete]].
   1. [=map/For each=] |issuer| -> |record| of |records_per_issuer|:
     1. Let |serializedIssuer| be result of serializing |issuer|.
     1. Let |serializedRecord| be result of serializing |record|.
@@ -997,7 +997,7 @@ a collection of signed, masked tokens. During redemption it sends the
 just-created signed [=redemption record=].
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
-[[!RFC8941]].
+[[!RFC8941 obsolete]].
 
 The header’s ABNF is:
 
@@ -1015,7 +1015,7 @@ given in the associated <a http-header>`Sec-Private-State-Token`</a>
 response header. The expiration is given in seconds.
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/integer=]
-[[!RFC8941]].
+[[!RFC8941 obsolete]].
 
 The header’s ABNF is:
 
@@ -1031,7 +1031,7 @@ The <dfn http-header>`Sec-Private-State-Token-Crypto-Version`</dfn> header field
 the cryptographic protocol version of the Private State Token.
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
-[[!RFC8941]].
+[[!RFC8941 obsolete]].
 
 The header’s ABNF is:
 
@@ -1046,7 +1046,7 @@ The <dfn http-header>`Sec-Redemption-Record`</dfn> *request* header field sends
 a cached [=redemption record=] of a previous redemption operation.
 
 It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
-[[!RFC8941]].
+[[!RFC8941 obsolete]].
 
 The header’s ABNF is:
 
