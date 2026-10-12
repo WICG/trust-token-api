@@ -12,7 +12,7 @@ Editor: Steven Valdez, Google https://www.google.com/, svaldez@google.com
 Abstract: The Private State Token API is a web platform API that allows propagating a limited amount of signals across sites, using the Privacy Pass protocol as an underlying primitive.
 !Participate: <a href="https://github.com/WICG/trust-token-api">GitHub WICG/trust-token-api</a> (<a href="https://github.com/WICG/trust-token-api/issues/new">new issue</a>, <a href="https://github.com/WICG/trust-token-api/issues?state=open">open issues</a>)
 !Commits: <a href="https://github.com/WICG/trust-token-api/commits/main/spec.bs">GitHub spec.bs commits</a>
-Markup Shorthands: css no, markdown yes
+Markup Shorthands: css no, markdown yes, markdown-blockquotes yes
 Complain About: missing-example-ids yes
 </pre>
 
@@ -20,6 +20,7 @@ Complain About: missing-example-ids yes
 spec:fetch; type:dfn; for:/; text:response
 spec:fetch; type:dfn; for:/; text:request
 spec:infra; type:dfn; text:list
+spec:url; type:dfn; text:origin
 </pre>
 
 <pre class="anchors">
@@ -84,6 +85,7 @@ urlPrefix: https://tools.ietf.org/html/rfc8941; spec: rfc8941
         type: dfn
             text: integer; url: #section-3.3.1
             text: string; url: #section-3.3.3
+            text: list; url: #section-3.1
 </pre>
 
 Goals {#goals}
@@ -501,14 +503,14 @@ To <dfn>unmask tokens</dfn> given [=key commitments=] |issuerKeys|, byte string 
 
 To <dfn>set private token properties for request from private token</dfn>, given a {{PrivateToken}} |privateToken| and a [=request=] |request|, run the following steps:
 
-1. Set |request|'s [=request/private token operation=]</a> to |privateToken|["{{PrivateToken/operation}}"].
+1. Set |request|'s [=request/private token operation=] to |privateToken|["{{PrivateToken/operation}}"].
 1. If |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-request"}}:
     1. If [$Should request be allowed to use feature?$] on "<code>[=policy-controlled feature/private-state-token-issuance=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
     1. Abort the remaining steps.
 1. Assert: |privateToken|["{{PrivateToken/operation}}"] is {{OperationType/"token-redemption"}} or {{OperationType/"send-redemption-record"}}.
 1. If [$Should request be allowed to use feature?$] on "<code>[=policy-controlled feature/private-state-token-redemption=]</code>" and |request| returns <code>false</code>, then throw a "{{NotAllowedError}}" {{DOMException}}.
 1. If |privateToken|["{{PrivateToken/operation}}"] is <code>"token-redemption"</code>:
-    1. Set |request|'s [=request/private token refresh policy=]</a> to |privateToken|["{{PrivateToken/refreshPolicy}}"].
+    1. Set |request|'s [=request/private token refresh policy=] to |privateToken|["{{PrivateToken/refreshPolicy}}"].
     1. Abort the remaining steps.
 1. If |privateToken|["{{PrivateToken/issuers}}"] does not [=map/exists|exist=], then throw {{TypeError}}.
 1. If |privateToken|["{{PrivateToken/issuers}}"] is [=list/empty=], then throw {{TypeError}}.
@@ -661,7 +663,7 @@ The <dfn method for="XMLHttpRequest">setPrivateToken(PrivateToken privateToken)<
  <li><p>If [=this=]'s <a spec="xhr">state</a> is not "opened", then throw an
  "{{InvalidStateError}}" {{DOMException}}.
  <li> If <a>this</a>'s
-    <a spec="xhr">`send()` flag</a> is set,
+    <a spec="xhr">send() invoked</a> flag is set,
     then [=throw=] an "{{InvalidStateError}}" {{DOMException}}.
  <li> Set [=this=]'s [=XMLHttpRequest/private state token=] to |privateToken|.
 </ol>
@@ -897,11 +899,12 @@ To <dfn>append private state token redemption record headers</dfn> given a [=/re
     1. If |record| is null, then [=iteration/continue=].
     1. [=map/Set=] |records_per_issuer|[|issuer|] to |record|.
   1. If |records_per_issuer| is empty, then abort these steps.
-  1. Let |headerItems| be a structured headers list [[RFC8941]].
+  1. Let |headerItems| be an empty [=structured header/list=] [[!RFC8941]].
   1. [=map/For each=] |issuer| -> |record| of |records_per_issuer|:
-    1. Let |serializedIssuer| be result of serializing |issuer|.
-    1. Let |serializedRecord| be result of serializing |record|.
-    1. [=list/Append=] |serializedIssuer| and |serializedRecord| pairs to |headerItems|.
+    1. Let |serializedIssuer| be the result of serializing |issuer| as a [=structured header/string=].
+    1. Let |serializedRecord| be the result of serializing |record| as a [=structured header/string=].
+    1. Let |member| be |serializedIssuer| with a parameter whose key is "`redemption-record`" and whose value is |serializedRecord|.
+    1. [=list/Append=] |member| to |headerItems|.
   1. Let |serializedHeaderItems| be result of serializing |headerItems|.
   1. If |serializedHeaderItems| is null, then abort these steps.
   1. Set <a http-header>`Sec-Redemption-Record`</a> to |serializedHeaderItems|.
@@ -1043,15 +1046,18 @@ The 'Sec-Redemption-Record' Header Field {#sec-redemption-record}
 ----------------------------
 
 The <dfn http-header>`Sec-Redemption-Record`</dfn> *request* header field sends
-a cached [=redemption record=] of a previous redemption operation.
+cached [=redemption records=] of previous redemption operations.
 
-It is a [=Structured Header=] whose value MUST be an [=structured header/string=]
-[[!RFC8941]].
+It is a [=Structured Header=] whose value MUST be a [=structured header/list=]
+[[!RFC8941]]. Each member in the list is a [=structured header/string=] representing
+the serialized [=/origin=] of the token issuer, parameterized with a
+"`redemption-record`" parameter whose value MUST be a [=structured header/string=]
+containing the serialized [=redemption record=].
 
 The header’s ABNF is:
 
 ``` abnf
-Sec-Redemption-Record = sf-string
+Sec-Redemption-Record = sf-list
 ```
 
 Privacy Considerations {#privacy}
